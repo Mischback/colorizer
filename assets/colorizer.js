@@ -17,7 +17,7 @@ let db;
 //
 // FIXME: Probably this should be wrapped in a function to make the site more
 //        responsive, applying progressive enhancement methods
-const openRequest = window.indexedDB.open("color_palette", 1);
+const openRequest = window.indexedDB.open("colorizer_palette", 1);
 
 /** Error handler */
 openRequest.addEventListener("error", () => {
@@ -39,7 +39,7 @@ openRequest.addEventListener("upgradeneeded", (e) => {
   db = e.target.result;
 
   // setup the objectStore
-  const objectStore = db.createObjectStore("colorizer_palette", {
+  const objectStore = db.createObjectStore("colors", {
     keyPath: "id",
     autoIncrement: true,
   });
@@ -48,4 +48,15 @@ openRequest.addEventListener("upgradeneeded", (e) => {
 
   console.log("Database setup completed");
 });
+
+// Hook into the DOM
+const color_add_form = document.querySelector("#color-add form");
+
+color_add_form.addEventListener("submit", (e) => {
+  // don't actually submit the form, intercept with this code
+  e.preventDefault();
+
+  console.log("Adding a color");
+});
+
 /**** **** **** **** **** **** **** **** **** **** **** **** **** **** **** ***/
