@@ -35,7 +35,7 @@ openRequest.addEventListener("success", () => {
 });
 
 /** Initialize the desired database structure. */
-openRquest.addEventListener("upgradeneeded", (e) => {
+openRequest.addEventListener("upgradeneeded", (e) => {
   db = e.target.result;
 
   // setup the objectStore
