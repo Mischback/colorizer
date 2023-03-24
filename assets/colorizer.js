@@ -44,19 +44,58 @@ openRequest.addEventListener("upgradeneeded", (e) => {
     autoIncrement: true,
   });
 
-  objectStore.createIndex("color_hex", "color_hex", { unique: false });
+  objectStore.createIndex("color_hex", "color_hex", { unique: true });
+  objectStore.createIndex("color_r", "color_r", { unique: false });
+  objectStore.createIndex("color_g", "color_g", { unique: false });
+  objectStore.createIndex("color_b", "color_b", { unique: false });
 
   console.log("Database setup completed");
 });
 
+function hexToRGB(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+
+  return result ? [
+    parseInt(result[1], 16),
+    parseInt(result[2], 16),
+    parseInt(result[3], 16)
+  ] : null;
+}
+
 // Hook into the DOM
 const color_add_form = document.querySelector("#color-add form");
+const color_add_input = document.querySelector("#new-color");
 
 color_add_form.addEventListener("submit", (e) => {
   // don't actually submit the form, intercept with this code
   e.preventDefault();
 
-  console.log("Adding a color");
+  let color = hexToRGB(color_add_input.value);
+
+  if (color === null)
+    // leave the function if the input can not be parsed as hex color code
+    return;
+
+  const new_item = { color_hex: color_add_input.value, color_r: color[0], color_g: color[1], color_b: color[2] };
+
+  const transaction = db.transaction(["colors"], "readwrite");
+  const objectStore = transaction.objectStore("colors");
+  const addRequest = objectStore.add(new_item);
+
+  addRequest.addEventListener("success", () => {
+    // clear the form's field
+    color_add_input.value = "";
+  });
+
+  transaction.addEventListener("complete", () => {
+    console.log("Transaction completed, database modification finished");
+
+    // TODO: Trigger function to display the palette!
+  });
+
+  transaction.addEventListener("error", () => {
+    console.error("Transaction not opened due to error");
+  });
 });
 
 /**** **** **** **** **** **** **** **** **** **** **** **** **** **** **** ***/
