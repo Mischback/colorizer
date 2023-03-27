@@ -14,9 +14,9 @@
 let db;
 
 // Get DOM elements
-const color_palette_list = document.querySelector("#color-palette ul");
-const color_add_form = document.querySelector("#color-add form");
-const color_add_input = document.querySelector("#new-color");
+const DOM_color_palette_list = document.querySelector("#color-palette ul");
+const DOM_color_add_form = document.querySelector("#color-add form");
+const DOM_color_add_input = document.querySelector("#new-color");
 
 
 // open an existing database or create a new one
@@ -113,8 +113,8 @@ function deleteColorFromPalette(e) {
 
 function updatePalette() {
   // empty the existing palette to prevent duplicates
-  while (color_palette_list.firstChild) {
-    color_palette_list.removeChild(color_palette_list.firstChild);
+  while (DOM_color_palette_list.firstChild) {
+    DOM_color_palette_list.removeChild(DOM_color_palette_list.firstChild);
   }
 
   const objectStore = db.transaction("colors").objectStore("colors");
@@ -122,7 +122,7 @@ function updatePalette() {
     const cursor = e.target.result;
 
     if (cursor) {
-      color_palette_list.appendChild(generatePaletteItem(cursor.value.id, cursor.value.color_hex));
+      DOM_color_palette_list.appendChild(generatePaletteItem(cursor.value.id, cursor.value.color_hex));
 
       // iterate to the next item
       cursor.continue();
@@ -131,17 +131,17 @@ function updatePalette() {
 }
 
 // Hook into the DOM
-color_add_form.addEventListener("submit", (e) => {
+DOM_color_add_form.addEventListener("submit", (e) => {
   // don't actually submit the form, intercept with this code
   e.preventDefault();
 
-  let color = hexToRGB(color_add_input.value);
+  let color = hexToRGB(DOM_color_add_input.value);
 
   if (color === null)
     // leave the function if the input can not be parsed as hex color code
     return;
 
-  const new_item = { color_hex: color_add_input.value, color_r: color[0], color_g: color[1], color_b: color[2] };
+  const new_item = { color_hex: DOM_color_add_input.value, color_r: color[0], color_g: color[1], color_b: color[2] };
 
   const transaction = db.transaction(["colors"], "readwrite");
   const objectStore = transaction.objectStore("colors");
@@ -149,7 +149,7 @@ color_add_form.addEventListener("submit", (e) => {
 
   addRequest.addEventListener("success", () => {
     // clear the form's field
-    color_add_input.value = "";
+    DOM_color_add_input.value = "";
   });
 
   transaction.addEventListener("complete", () => {
