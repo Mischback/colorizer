@@ -13,10 +13,13 @@
 // The database object
 let db;
 
+var color_palette_list = [];
+
 // Get DOM elements
 const DOM_color_palette_list = document.querySelector("#color-palette ul");
 const DOM_color_add_form = document.querySelector("#color-add form");
 const DOM_color_add_input = document.querySelector("#new-color");
+const DOM_contrast_grid = document.querySelector("#contrast-grid");
 
 
 // open an existing database or create a new one
@@ -70,6 +73,96 @@ function hexToRGB(hex) {
 }
 
 
+function w3Category(contrastValue) {
+  switch(true) {
+    case contrastValue >= 7:
+      return "AAA";
+      break;
+    case contrastValue >= 4.5:
+      return "AA";
+      break;
+    case contrastValue >= 3:
+      return "A";
+      break;
+    default:
+      return "FAIL";
+      break;
+  }
+}
+
+
+function luminance(r, g, b) {
+  var a = [r, g, b].map(function(v) {
+    v /= 255;
+    return v <= 0.03928
+      ? v / 12.92
+      : Math.pow((v+0.055) / 1.055, 2,4);
+  });
+  return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+}
+
+
+function contrast(rgb1, rgb2) {
+  var lum1 = luminance(rgb1[0], rgb1[1], rgb1[2]);
+  var lum2 = luminance(rgb2[0], rgb2[1], rgb2[2]);
+  var brighter = Math.max(lum1, lum2);
+  var darker = Math.min(lum1, lum2);
+  return (brighter + 0.05) / (darker + 0.05);
+}
+
+
+function buildContrastGrid(colorList, container) {
+  /* Takes a list of hex colors (provided as strings) and builds a grid of
+   * boxes with their respective contrast values.
+   */
+
+  let grid_row;
+  let this_container;
+  let this_container_content;
+  let container_text;
+
+  for (let i=0; i<colorList.length; i++) {
+    console.log("Color: " + color_palette_list[i]);
+
+    grid_row = document.createElement("div");
+    grid_row.classList.add("grid-row");
+
+    for (var j=0; j<colorList.length; j++) {
+
+      console.log("Color: " + colorList[i]);
+
+      this_container = document.createElement("div");
+      this_container.classList.add("grid-element");
+      this_container.style.cssText = "background-color: " + colorList[i] + "; color: " + colorList[j] + ";";
+
+      this_contrast = contrast(hexToRGB(colorList[i]), hexToRGB(colorList[j]))
+
+      this_container_content = document.createElement("div");
+      this_container_content.classList.add("w3cat");
+      container_text = document.createTextNode(w3Category(this_contrast));
+      this_container_content.appendChild(container_text);
+      this_container.appendChild(this_container_content);
+
+      this_container_content = document.createElement("div");
+      this_container_content.classList.add("contrast-value");
+      container_text = document.createTextNode(this_contrast.toFixed(2));
+      this_container_content.appendChild(container_text);
+      this_container.appendChild(this_container_content);
+
+      this_container_content = document.createElement("div");
+      this_container_content.classList.add("color-value");
+      container_text = document.createTextNode(colorList[j]);
+      this_container_content.appendChild(container_text);
+      this_container.appendChild(this_container_content);
+
+      grid_row.appendChild(this_container);
+    }
+
+    container.appendChild(grid_row);
+  }
+}
+
+
 function generatePaletteItem(color_id, color_hex) {
   // create the general list element
   const listItem = document.createElement("li");
@@ -116,13 +209,20 @@ function updatePalette() {
   while (DOM_color_palette_list.firstChild) {
     DOM_color_palette_list.removeChild(DOM_color_palette_list.firstChild);
   }
+  color_palette_list = [];
 
-  const objectStore = db.transaction("colors").objectStore("colors");
+  const transaction = db.transaction("colors");
+  transaction.addEventListener("complete", () => {
+    buildContrastGrid(color_palette_list, DOM_contrast_grid);
+  });
+
+  const objectStore = transaction.objectStore("colors");
   objectStore.openCursor().addEventListener("success", (e) => {
     const cursor = e.target.result;
 
     if (cursor) {
       DOM_color_palette_list.appendChild(generatePaletteItem(cursor.value.id, cursor.value.color_hex));
+      color_palette_list.push(cursor.value.color_hex);
 
       // iterate to the next item
       cursor.continue();
