@@ -121,6 +121,11 @@ function buildContrastGrid(colorList, container) {
   let this_container_content;
   let container_text;
 
+  // empty the existing palette to prevent duplicates
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
+
   for (let i=0; i<colorList.length; i++) {
     console.log("Color: " + color_palette_list[i]);
 
@@ -133,7 +138,7 @@ function buildContrastGrid(colorList, container) {
 
       this_container = document.createElement("div");
       this_container.classList.add("grid-element");
-      this_container.style.cssText = "background-color: " + colorList[i] + "; color: " + colorList[j] + ";";
+      this_container.style.cssText = "background-color: #" + colorList[i] + "; color: #" + colorList[j] + ";";
 
       this_contrast = contrast(hexToRGB(colorList[i]), hexToRGB(colorList[j]))
 
