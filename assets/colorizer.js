@@ -13,6 +13,12 @@
 // The database object
 let db;
 
+// Get DOM elements
+const color_palette_list = document.querySelector("#color-palette ul");
+const color_add_form = document.querySelector("#color-add form");
+const color_add_input = document.querySelector("#new-color");
+
+
 // open an existing database or create a new one
 //
 // FIXME: Probably this should be wrapped in a function to make the site more
@@ -32,6 +38,7 @@ openRequest.addEventListener("success", () => {
   db = openRequest.result;
 
   // TODO: Trigger function to display the palette!
+  updatePalette();
 });
 
 /** Initialize the desired database structure. */
@@ -53,7 +60,7 @@ openRequest.addEventListener("upgradeneeded", (e) => {
 });
 
 function hexToRGB(hex) {
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 
   return result ? [
     parseInt(result[1], 16),
@@ -62,10 +69,68 @@ function hexToRGB(hex) {
   ] : null;
 }
 
-// Hook into the DOM
-const color_add_form = document.querySelector("#color-add form");
-const color_add_input = document.querySelector("#new-color");
 
+function generatePaletteItem(color_id, color_hex) {
+  // create the general list element
+  const listItem = document.createElement("li");
+  listItem.setAttribute("palette-color-id", color_id);
+
+  // create a <span> to hold the color code as text
+  const itemColorCode = document.createElement("span");
+  itemColorCode.textContent = color_hex;
+
+  // create an empty <div> to visualize the color
+  const itemColorPreview = document.createElement("div");
+  itemColorPreview.style.cssText = "background-color: #" + color_hex + ";";
+
+  // create a <button> to delete the color from the palette
+  const itemColorDelete = document.createElement("button");
+  itemColorDelete.textContent = "delete";
+  itemColorDelete.addEventListener("click", deleteColorFromPalette);
+
+  listItem.appendChild(itemColorCode);
+  listItem.appendChild(itemColorPreview);
+  listItem.appendChild(itemColorDelete);
+
+  return listItem;
+}
+
+function deleteColorFromPalette(e) {
+  const color_id = Number(e.target.parentNode.getAttribute("palette-color-id"));
+
+  const transaction = db.transaction(["colors"], "readwrite");
+  const objectStore = transaction.objectStore("colors");
+  const deleteRequest = objectStore.delete(color_id);
+
+  transaction.addEventListener("complete", () => {
+    e.target.parentNode.parentNode.removeChild(e.target.parentNode);
+    console.log("Color deleted");
+
+    // TODO: Trigger function to display the palette!
+    updatePalette();
+  });
+}
+
+function updatePalette() {
+  // empty the existing palette to prevent duplicates
+  while (color_palette_list.firstChild) {
+    color_palette_list.removeChild(color_palette_list.firstChild);
+  }
+
+  const objectStore = db.transaction("colors").objectStore("colors");
+  objectStore.openCursor().addEventListener("success", (e) => {
+    const cursor = e.target.result;
+
+    if (cursor) {
+      color_palette_list.appendChild(generatePaletteItem(cursor.value.id, cursor.value.color_hex));
+
+      // iterate to the next item
+      cursor.continue();
+    }
+  });
+}
+
+// Hook into the DOM
 color_add_form.addEventListener("submit", (e) => {
   // don't actually submit the form, intercept with this code
   e.preventDefault();
@@ -91,6 +156,7 @@ color_add_form.addEventListener("submit", (e) => {
     console.log("Transaction completed, database modification finished");
 
     // TODO: Trigger function to display the palette!
+    updatePalette();
   });
 
   transaction.addEventListener("error", () => {
