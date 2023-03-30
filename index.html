@@ -9,13 +9,17 @@
   </head>
 
   <body>
-    <h1>Colorizer</h1>
+    <header>
+      <h1>Colorizer</h1>
+      <p>A tool to build color palettes while considering contrast values.</p>
+    </header>
     <div id="ctrl">
+      <button id="ctrl-toggle">&gt;</button>
       <section id="color-add">
         <form>
           <label for="new-color">New Color:</label>
           <input id="new-color" type="text" required>
-          <button>Add Color!</button>
+          <button>Add</button>
         </form>
         <div id="color-palette">
             <ul></ul>

@@ -175,7 +175,7 @@ function generatePaletteItem(color_id, color_hex) {
 
   // create a <span> to hold the color code as text
   const itemColorCode = document.createElement("span");
-  itemColorCode.textContent = color_hex;
+  itemColorCode.textContent = "#" + color_hex;
 
   // create an empty <div> to visualize the color
   const itemColorPreview = document.createElement("div");
@@ -183,7 +183,7 @@ function generatePaletteItem(color_id, color_hex) {
 
   // create a <button> to delete the color from the palette
   const itemColorDelete = document.createElement("button");
-  itemColorDelete.textContent = "delete";
+  itemColorDelete.textContent = "remove";
   itemColorDelete.addEventListener("click", deleteColorFromPalette);
 
   listItem.appendChild(itemColorCode);
@@ -270,3 +270,20 @@ DOM_color_add_form.addEventListener("submit", (e) => {
 });
 
 /**** **** **** **** **** **** **** **** **** **** **** **** **** **** **** ***/
+
+
+// NEW SHIT!
+const DOM_ctrl_container = document.querySelector("#ctrl");
+const DOM_ctrl_toggle = document.querySelector("#ctrl-toggle");
+
+DOM_ctrl_toggle.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  if (DOM_ctrl_toggle.textContent === "<") {
+    DOM_ctrl_toggle.textContent = ">";
+    DOM_ctrl_container.style.cssText = "";
+  } else {
+    DOM_ctrl_toggle.textContent = "<";
+    DOM_ctrl_container.style.cssText = "left: 0;";
+  }
+});
