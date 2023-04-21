@@ -40,13 +40,16 @@ class DBInterface {
    * @param successCallback A function to execute on successfully opening the
    *                        database.
    *
+   * Note: The parameters are actually passed using an object literal, see
+   * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   *
    * The method opens the database and stores a handle to it internally. It
    * will take care of proper initialization, depending on the instance's
    * ``dbVersion`` and the ``stores``.
    *
    * When the database is successfully opened, ``successCallback`` is executed.
    */
-  openDatabase(stores=[], successCallback=(() => {})) {
+  openDatabase({stores = [], successCallback = (() => {})}) {
     if (!window.indexedDB) {
       console.error("IndexedDB not available!");
       return;
@@ -79,8 +82,85 @@ class DBInterface {
     });
   }
 
-  getAll() {
-    console.log("BAAAAR!");
+  getAll(storeName, successCallback=((result) => {})) {
+    console.debug("getAll(): " + storeName);
+
+    if (this.dbHandle) {
+      let request = this.dbHandle.transaction(storeName).objectStore(storeName).openCursor(null, IDBCursor.NEXT);
+      let results = [];
+
+      request.addEventListener("success", (e) => {
+        let cursor = e.target.result;
+        if (cursor) {
+          console.debug("Key: " + cursor.key + " Value: " + cursor.value);
+          results.push({ [cursor.key]: cursor.value });
+          cursor.continue();
+        } else {
+          console.log("Finished! " + results);
+          successCallback(results);
+        }
+      });
+
+      request.addEventListener("error", (e) => {
+        console.error("Error while fetching items from " + storeName);
+        console.debug(e.target.error);
+      });
+    }
+  }
+}
+
+
+class PaletteItem {
+  constructor(red, green, blue, sorting=0) {
+
+    this.red = red;
+    this.green = green;
+    this.blue = blue;
+    this.sorting = sorting;
+  }
+}
+
+
+class ColorizerEngine {
+  constructor(dbName="colorizer") {
+
+    // Initialize the object's palette
+    this.palette = [];
+
+    this.paletteStoreName = "color_palette";
+
+    const dbVersion = 1;
+    const dbStores = [
+      {
+        name: this.paletteStoreName,
+        options: {
+          keyPath: "paletteItemID",
+          autoIncrement: true,
+        },
+      },
+    ];
+
+    // Setup and initialize the database
+    this.db = new DBInterface(dbName, dbVersion);
+
+    // Open the database
+    //
+    // The ``successCallback`` must be explicitly bound to ``this``. See
+    // https://stackoverflow.com/a/59060545 for reference!
+    this.db.openDatabase({stores: dbStores, successCallback: this.fetchPaletteFromDatabase.bind(this)});
+  }
+
+  fetchPaletteFromDatabase() {
+    console.log("fetchPaletteFromDatabase()");
+
+    this.db.getAll(this.paletteStoreName, (result) => {
+      console.log("success: " + result);
+    });
+  }
+
+  addItemToPalette(item) {
+    console.log("addItemToPalette() " + item.red + ", " + item.green + ", " + item.blue);
+    console.log(item.sorting);
   }
 }
 
@@ -89,24 +169,7 @@ class DBInterface {
 document.addEventListener("DOMContentLoaded", (e) => {
   console.debug("DOM ready, doing stuff!");
 
-  const idbName = "colorizer";
-  const idbVersion = 1;
-  const idbStores = [
-    {
-      name: "color_palette",
-      options: {
-        keyPath: "paletteItemID",
-        autoIncrement: true,
-      },
-    },
-  ];
-  let idb = new DBInterface(idbName, idbVersion);
-
-  function databaseReady() {
-    console.log("Foooooooobar!");
-
-    idb.getAll("color_palette");
-  }
-
-  idb.openDatabase(stores=idbStores, successCallback=databaseReady);
+  // Initialize the actual engine. This object will provide the actual logic of
+  // the application.
+  let engine = new ColorizerEngine();
 });
