@@ -230,8 +230,9 @@ class PaletteItem {
     return "rgb(" + this.red + ", " + this.green + ", " + this.blue +")";
   }
 
-  toHex() {
-    return "#rrggbb";
+  toRgbHex() {
+    // https://stackoverflow.com/a/5624139
+    return "#" + (1 << 24 | this.red << 16 | this.green << 8 | this.blue).toString(16).slice(1);
   }
 }
 
@@ -320,7 +321,7 @@ class ColorizerInterface {
 
     contentContainer = document.createElement("div");
     contentContainer.classList.add("color-value");
-    contentContainer.appendChild(document.createTextNode(foreground.toHex()));
+    contentContainer.appendChild(document.createTextNode(foreground.toRgbHex()));
     gridElement.appendChild(contentContainer);
 
     return gridElement;
