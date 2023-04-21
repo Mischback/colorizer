@@ -238,6 +238,15 @@ class ColorizerInterface {
     this.color_add_form_hex.addEventListener("submit", (e) => {
       this.color_add_hex_submit(e);
     });
+
+    // TODO: Make this nice and shiny!
+    // This might still be an anonymous function, but it should call an actual
+    // class method to build the contrast grid and it might call another
+    // class method to build the palette list (in the control container).
+    this.engine.observePalette((palette) => {
+      console.log("Observer!");
+      console.log(palette);
+    });
   }
 
   /**
@@ -291,6 +300,13 @@ class ColorizerEngine {
     // Initialize the object's palette
     this.palette = [];
 
+    // Provide a list of observers of the palette
+    //
+    // This is a quick and dirty implementation of the Observer pattern. See
+    // the ``observePalette()`` method for the registration function and the
+    // implementation of ``updatePalette()`` for the calling of the observers.
+    this.paletteObservers = [];
+
     this.paletteStoreName = "color_palette";
 
     const dbVersion = 1;
@@ -314,21 +330,44 @@ class ColorizerEngine {
     this.db.openDatabase({stores: dbStores, successCallback: this.fetchPaletteFromDatabase.bind(this)});
   }
 
+  /**
+   * Register a callback function for palette updates.
+   *
+   * @param cb The callback to be executed.
+   *
+   * Part of the quick and dirty implementation of the Observer pattern. See
+   * the class's attribute ``paletteObservers`` and the ``updatePalette()``
+   * method.
+   */
+  observePalette(cb) {
+    this.paletteObservers.push(cb);
+  }
+
+  updatePalette(newPalette) {
+    console.debug("updatePalette()");
+
+    newPalette.forEach((item) => {
+      console.log(item);
+    });
+
+    // Quick and dirty Observer pattern
+    this.paletteObservers.forEach((obs) => {
+      obs(this.palette);
+    });
+  }
+
   fetchPaletteFromDatabase() {
     console.debug("fetchPaletteFromDatabase()");
 
     this.db.getAll(this.paletteStoreName, (result) => {
-      console.log("success: " + result);
-      result.forEach((item) => {
-        console.log(item);
-      });
+      this.updatePalette(result);
     });
   }
 
   addItemToPalette(item) {
     console.log("addItemToPalette() " + item.red + ", " + item.green + ", " + item.blue + ", sorting: " + item.sorting);
 
-    this.db.upsert(this.paletteStoreName, item);
+    this.db.upsert(this.paletteStoreName, item, {transSuccessCallback: this.fetchPaletteFromDatabase.bind(this)});
   }
 }
 
