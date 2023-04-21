@@ -96,7 +96,7 @@ class DBInterface {
           results.push({ [cursor.key]: cursor.value });
           cursor.continue();
         } else {
-          console.log("Finished! " + results);
+          console.debug("Finished! " + results);
           successCallback(results);
         }
       });
@@ -110,6 +110,32 @@ class DBInterface {
 }
 
 
+/**
+ * Provide several utility functions in a dedicated object.
+ *
+ * This is implemented this way to make sure that the functions exist in a
+ * dedicated namespace.
+ */
+const ColorizerUtility = {
+
+  /**
+   * Convert a hex-formatted color code to dedicated RGB values.
+   *
+   * @param hexColor The hex-formatted color code, provided as ``string``.
+   * @returns ``array`` with dedicated R, G and B values.
+   */
+  hexToRGB: function(hexColor) {
+    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexColor);
+
+    return result ? [
+      parseInt(result[1], 16),
+      parseInt(result[2], 16),
+      parseInt(result[3], 16)
+    ] : null;
+  },
+}
+
+
 class PaletteItem {
   constructor(red, green, blue, sorting=0) {
 
@@ -117,6 +143,98 @@ class PaletteItem {
     this.green = green;
     this.blue = blue;
     this.sorting = sorting;
+  }
+}
+
+
+/**
+ * All interface-related stuff wrapped in a dedicated class.
+ *
+ * @param engine A reference to the ``ColorizerEngine`` instance.
+ *
+ * The constructor does all of the heavy lifting: it retrieves the elemens
+ * from the DOM and attaches the corresponding event handlers.
+ *
+ * This follows the idea of progressive enhancement, meaning this class **must**
+ * be instantiated when the DOM is ready!
+ */
+class ColorizerInterface {
+  constructor(engine) {
+
+    this.engine = engine;
+
+    // Get DOM elements
+    this.ctrl_toggle = document.querySelector("#ctrl-toggle");
+    if (this.ctrl_toggle === null) {
+      console.error("Missing required element with id '#ctrl-toggle'");
+    }
+
+    this.ctrl_container = document.querySelector("#ctrl");
+    if (this.ctrl_container === null) {
+      console.error("Missing required element with id '#ctrl'");
+    }
+
+    this.color_add_form_hex = document.querySelector("#color-add-hex");
+    if (this.color_add_form_hex === null) {
+      console.error("Missing required element with id '#color-add-hex'");
+    }
+
+    this.color_add_input_hex = document.querySelector("#new-color-hex");
+    if (this.color_add_input_hex === null) {
+      console.error("Missing required element with id '#new-color-hex'");
+    }
+
+    // Apply EventHandler functions
+    this.ctrl_toggle.addEventListener("click", (e) => {
+      this.ctrl_toggle_click(e);
+    });
+
+    this.color_add_form_hex.addEventListener("submit", (e) => {
+      this.color_add_hex_submit(e);
+    });
+  }
+
+  /**
+   * *Click* event handler for the button that shows/hides the control menu.
+   *
+   * @param e The DOM's ``click`` event.
+   */
+  ctrl_toggle_click(e) {
+    if (this.ctrl_toggle.textContent === "<") {
+      this.ctrl_toggle.textContent = ">";
+      this.ctrl_container.style.cssText = "";
+    } else {
+      this.ctrl_toggle.textContent = "<";
+      this.ctrl_container.style.cssText = "left: 0;";
+    }
+  }
+
+  /**
+   * *Submit* event handler for the form that is meant to add new colors by
+   * hex values.
+   *
+   * @param e The DOM's ``submit`` event.
+   *
+   * The method parses the hex string into actual R, G and B values (using
+   * the ``ColorizerUtility.hexToRGB`` function), creates a temporary instance
+   * of ``PaletteItem`` and asks the engine to add this item to the actual
+   * palette.
+   */
+  color_add_hex_submit(e) {
+    // don't actually submit the form, intercept with this code
+    e.preventDefault();
+
+    console.debug("Color (hex): " + this.color_add_input_hex.value);
+    let color = ColorizerUtility.hexToRGB(this.color_add_input_hex.value);
+    if (color === null)
+      // leave the function if the input can not be parsed as hex color code
+      return;
+    console.debug(color);
+
+    let item = new PaletteItem(color[0], color[1], color[2]);
+    console.debug(item);
+
+    this.engine.addItemToPalette(item);
   }
 }
 
@@ -151,7 +269,7 @@ class ColorizerEngine {
   }
 
   fetchPaletteFromDatabase() {
-    console.log("fetchPaletteFromDatabase()");
+    console.debug("fetchPaletteFromDatabase()");
 
     this.db.getAll(this.paletteStoreName, (result) => {
       console.log("success: " + result);
@@ -159,8 +277,7 @@ class ColorizerEngine {
   }
 
   addItemToPalette(item) {
-    console.log("addItemToPalette() " + item.red + ", " + item.green + ", " + item.blue);
-    console.log(item.sorting);
+    console.log("addItemToPalette() " + item.red + ", " + item.green + ", " + item.blue + ", sorting: " + item.sorting);
   }
 }
 
@@ -172,4 +289,6 @@ document.addEventListener("DOMContentLoaded", (e) => {
   // Initialize the actual engine. This object will provide the actual logic of
   // the application.
   let engine = new ColorizerEngine();
+
+  let io = new ColorizerInterface(engine);
 });
