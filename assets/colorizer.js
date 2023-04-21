@@ -82,6 +82,52 @@ class DBInterface {
     });
   }
 
+  /**
+   * Update or insert data into the IndexedDB store.
+   *
+   * @param storeName The name of the store to insert into.
+   * @param data The data to be inserted.
+   * @param putSuccessCallback Callback function that is executed when the
+   *                           ``put`` operation was successful.
+   * @param transSuccessCallback Callback function that is executed when the
+   *                             transaction was successful.
+   *
+   * Please note: ``putSuccessCallback`` and ``transSuccessCallback`` are
+   * wrapped in an object literal, see
+   * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   */
+  upsert(storeName, data, {putSuccessCallback = (() => {}), transSuccessCallback = (() => {})} = {}) {
+    console.debug("upsert(): " + storeName + ", " + data);
+
+    if (this.dbHandle) {
+      let transaction = this.dbHandle.transaction([storeName], "readwrite");
+      transaction.addEventListener("complete", () => {
+        console.debug("Transaction completed successfully");
+
+        transSuccessCallback();
+      });
+      transaction.addEventListener("abort", (te) => {
+        console.error("Transaction aborted!");
+        console.debug(te.target.error);
+      });
+      transaction.addEventListener("error", (te) => {
+        console.error("Transaction had error");
+        console.debug(te.target.error);
+      });
+
+      let request = transaction.objectStore(storeName).put(data);
+      request.addEventListener("success", () => {
+        console.debug("PUT successful");
+
+        putSuccessCallback();
+      });
+      request.addEventListener("error", (re) => {
+        console.error("PUT had an error");
+        console.debug(re.target.error);
+      });
+    }
+  }
+
   getAll(storeName, successCallback=((result) => {})) {
     console.debug("getAll(): " + storeName);
 
@@ -273,11 +319,16 @@ class ColorizerEngine {
 
     this.db.getAll(this.paletteStoreName, (result) => {
       console.log("success: " + result);
+      result.forEach((item) => {
+        console.log(item);
+      });
     });
   }
 
   addItemToPalette(item) {
     console.log("addItemToPalette() " + item.red + ", " + item.green + ", " + item.blue + ", sorting: " + item.sorting);
+
+    this.db.upsert(this.paletteStoreName, item);
   }
 }
 
