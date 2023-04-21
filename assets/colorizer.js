@@ -179,6 +179,41 @@ const ColorizerUtility = {
       parseInt(result[3], 16)
     ] : null;
   },
+
+  w3Category: function(contrastValue) {
+    switch(true) {
+      case contrastValue >= 7:
+        return "AAA";
+        break;
+      case contrastValue >= 4.5:
+        return "AA";
+        break;
+      case contrastValue >= 3:
+        return "A";
+        break;
+      default:
+        return "FAIL";
+        break;
+    }
+  },
+
+  contrast: function(c1, c2) {
+    var lum1 = ColorizerUtility.luminance(c1.red, c1.green, c1.blue);
+    var lum2 = ColorizerUtility.luminance(c2.red, c2.green, c2.blue);
+    var brighter = Math.max(lum1, lum2);
+    var darker = Math.min(lum1, lum2);
+    return (brighter + 0.05) / (darker + 0.05);
+  },
+
+  luminance: function(r, g, b) {
+    var a = [r, g, b].map(function(v) {
+      v /= 255;
+      return v <= 0.03928
+        ? v / 12.92
+        : Math.pow((v+0.055) / 1.055, 2,4);
+    });
+    return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+  },
 }
 
 
@@ -265,19 +300,22 @@ class ColorizerInterface {
 
     let contentContainer;
     let contentNode;
+    let contrastValue;
 
     let gridElement = document.createElement("div");
     gridElement.classList.add("grid-element");
     gridElement.style.cssText = "background-color: " + background.toCssRgb() + "; color: " + foreground.toCssRgb() + ";";
 
+    contrastValue = ColorizerUtility.contrast(background, foreground);
+
     contentContainer = document.createElement("div");
     contentContainer.classList.add("w3cat");
-    contentContainer.appendChild(document.createTextNode("w3Category"));  // FIXME
+    contentContainer.appendChild(document.createTextNode(ColorizerUtility.w3Category(contrastValue)));
     gridElement.appendChild(contentContainer);
 
     contentContainer = document.createElement("div");
     contentContainer.classList.add("contrast-value");
-    contentContainer.appendChild(document.createTextNode("contast value"));  // FIXME
+    contentContainer.appendChild(document.createTextNode(contrastValue.toFixed(2)));
     gridElement.appendChild(contentContainer);
 
     contentContainer = document.createElement("div");
