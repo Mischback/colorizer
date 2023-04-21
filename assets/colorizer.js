@@ -139,7 +139,7 @@ class DBInterface {
         let cursor = e.target.result;
         if (cursor) {
           console.debug("Key: " + cursor.key + " Value: " + cursor.value);
-          results.push({ [cursor.key]: cursor.value });
+          results.push(cursor.value);
           cursor.continue();
         } else {
           console.debug("Finished! " + results);
@@ -190,6 +190,14 @@ class PaletteItem {
     this.blue = blue;
     this.sorting = sorting;
   }
+
+  toCssRgb() {
+    return "rgb(" + this.red + ", " + this.green + ", " + this.blue +")";
+  }
+
+  toHex() {
+    return "#rrggbb";
+  }
 }
 
 
@@ -230,6 +238,11 @@ class ColorizerInterface {
       console.error("Missing required element with id '#new-color-hex'");
     }
 
+    this.contrast_grid = document.querySelector("#contrast-grid");
+    if (this.contrast_grid === null) {
+      console.error("Missing required element with id '#contrast-grid'");
+    }
+
     // Apply EventHandler functions
     this.ctrl_toggle.addEventListener("click", (e) => {
       this.ctrl_toggle_click(e);
@@ -239,14 +252,68 @@ class ColorizerInterface {
       this.color_add_hex_submit(e);
     });
 
-    // TODO: Make this nice and shiny!
-    // This might still be an anonymous function, but it should call an actual
-    // class method to build the contrast grid and it might call another
-    // class method to build the palette list (in the control container).
-    this.engine.observePalette((palette) => {
-      console.log("Observer!");
-      console.log(palette);
-    });
+    // Register Observer callbacks for the engine's palette
+    this.engine.observePalette(this.buildContrastGrid.bind(this));
+    this.engine.observePalette(this.updatePaletteDisplay.bind(this));
+  }
+
+  generateContrastGridElement(background, foreground) {
+
+    console.debug("generateContrastGridElement()");
+    console.debug("Background: " + background.toCssRgb());
+    console.debug("Foreground: " + foreground.toCssRgb());
+
+    let contentContainer;
+    let contentNode;
+
+    let gridElement = document.createElement("div");
+    gridElement.classList.add("grid-element");
+    gridElement.style.cssText = "background-color: " + background.toCssRgb() + "; color: " + foreground.toCssRgb() + ";";
+
+    contentContainer = document.createElement("div");
+    contentContainer.classList.add("w3cat");
+    contentContainer.appendChild(document.createTextNode("w3Category"));  // FIXME
+    gridElement.appendChild(contentContainer);
+
+    contentContainer = document.createElement("div");
+    contentContainer.classList.add("contrast-value");
+    contentContainer.appendChild(document.createTextNode("contast value"));  // FIXME
+    gridElement.appendChild(contentContainer);
+
+    contentContainer = document.createElement("div");
+    contentContainer.classList.add("color-value");
+    contentContainer.appendChild(document.createTextNode(foreground.toHex()));
+    gridElement.appendChild(contentContainer);
+
+    return gridElement;
+  }
+
+  buildContrastGrid(palette) {
+    console.debug("buildContrastGrid()");
+    console.debug(palette);
+
+    let grid_row;
+
+    // empty the existing grid to prevent duplicates
+    while (this.contrast_grid.firstChild) {
+      this.contrast_grid.removeChild(this.contrast_grid.firstChild);
+    }
+
+    for (let i=0; i<palette.length; i++) {
+      grid_row = document.createElement("div");
+      grid_row.classList.add("grid-row");
+
+      for (var j=0; j<palette.length; j++) {
+        grid_row.appendChild(this.generateContrastGridElement(palette[i], palette[j]));
+      }
+
+      this.contrast_grid.appendChild(grid_row);
+    }
+  }
+
+  updatePaletteDisplay(palette) {
+    console.debug("updatePaletteDisplay()");
+    console.debug(palette);
   }
 
   /**
@@ -346,8 +413,14 @@ class ColorizerEngine {
   updatePalette(newPalette) {
     console.debug("updatePalette()");
 
+    this.palette = [];
+
     newPalette.forEach((item) => {
-      console.log(item);
+      this.palette.push(new PaletteItem(item.red, item.green, item.blue, item.sorting));
+    });
+
+    this.palette.sort((a, b) => {
+      return a.sorting - b.sorting;
     });
 
     // Quick and dirty Observer pattern
