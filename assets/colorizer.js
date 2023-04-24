@@ -419,6 +419,7 @@ class ColorizerInterface {
     // Register Observer callbacks for the engine's palette
     this.engine.registerPaletteObserver(this.buildContrastGrid.bind(this));
     this.engine.registerPaletteObserver(this.updatePaletteDisplay.bind(this));
+    this.engine.registerPaletteObserver(this.clearInputFieldsOnPaletteUpdate.bind(this));
   }
 
   /**
@@ -473,6 +474,18 @@ class ColorizerInterface {
     return gridElement;
   }
 
+  /**
+   * Create a DOM element representing one palette item/color in the
+   * application's control interface.
+   *
+   * @param paletteItem An instance of PaletteItem.
+   *
+   * This method is **private**.
+   *
+   * The list element contains a visual and textual representation of the
+   * palette item/color and element-specific control elements, e.g. the button
+   * to remove that item from the palette.
+   */
   #generatePaletteListItem(paletteItem) {
     // console.debug("#generatePaletteListItem()");
 
@@ -568,6 +581,20 @@ class ColorizerInterface {
   }
 
   /**
+   * Clear all input fields.
+   *
+   * This is meant to be attached as an Observer to the palette. Updates of the
+   * palette are triggered if a palette item/color is added/updated/removed,
+   * making the present input fields obsolete, thus, they can be cleared.
+   *
+   * This is a quick and dirty solution, but should work without major
+   * drawbacks.
+   */
+  clearInputFieldsOnPaletteUpdate() {
+    this.color_add_input_hex.value = "";
+  }
+
+  /**
    * *Click* event handler for the button to remove palette items/colors.
    *
    * @param e The DOM's ``click`` event.
@@ -619,9 +646,6 @@ class ColorizerInterface {
     let item = new PaletteItem(color[0], color[1], color[2]);
 
     this.engine.addItemToPalette(item);
-
-    // FIXME: When the color was successfully added, the input field should be
-    //        cleared!
   }
 }
 
