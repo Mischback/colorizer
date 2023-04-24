@@ -320,6 +320,7 @@ class PaletteItem {
 class ColorizerInterface {
   constructor(engine) {
 
+    // Store a reference to the ``ColorizerEngine``
     this.engine = engine;
 
     // Get DOM elements
@@ -362,12 +363,28 @@ class ColorizerInterface {
     this.engine.observePalette(this.updatePaletteDisplay.bind(this));
   }
 
+  /**
+   * Create a DOM element for the *contrast grid*, representing a single
+   * combination of *background* and *foreground* color.
+   *
+   * @param background The background color as ``PaletteItem``.
+   * @param foreground The foreground color as ``PaletteItem``.
+   * @returns DOM element
+   *
+   * The grid element is basically a ``<div>`` and contains the following
+   * information:
+   *   - the W3C category of the contrast value, see
+   *     ``ColorizerUtility.w3Category()``
+   *   - the actual contrast value, see ``ColorizerUtility.contrast()``
+   *   - the color value in hex notation
+   */
   generateContrastGridElement(background, foreground) {
 
     console.debug("generateContrastGridElement()");
-    console.debug("Background: " + background.toCssRgb());
-    console.debug("Foreground: " + foreground.toCssRgb());
+    console.debug("Background: " + background.toRgbHex());
+    console.debug("Foreground: " + foreground.toRgbHex());
 
+    // Declare some variables for future use and re-use
     let contentContainer;
     let contentNode;
     let contrastValue;
@@ -396,6 +413,23 @@ class ColorizerInterface {
     return gridElement;
   }
 
+  /**
+   * Generate the *contrast grid*.
+   *
+   * @param palette A list of ``PaletteItem`` instances.
+   *
+   * The *contrast grid* is one of the core functions of the application, as
+   * it visualizes the contrast values between the colors of the application's
+   * color palette.
+   *
+   * The actual palette is managed in the ``ColorizerEngine`` class. This method
+   * handles the visualization by manipulating the DOM (including the creation
+   * of new DOM elements).
+   *
+   * This method is *attached* to the engine's palette with a quick and dirty
+   * implementation of the Observer pattern (see the ``constructor()`` of this
+   * class for details).
+   */
   buildContrastGrid(palette) {
     console.debug("buildContrastGrid()");
     console.debug(palette);
@@ -419,6 +453,19 @@ class ColorizerInterface {
     }
   }
 
+  /**
+   * Update the visualization of the palette.
+   *
+   * @param palette A list of ``PaletteItem`` instances.
+   *
+   * The actual palette is managed in the ``ColorizerEngine`` class. This method
+   * handles the visualization by manipulating the DOM (including the creation
+   * of new DOM elements).
+   *
+   * This method is *attached* to the engine's palette with a quick and dirty
+   * implementation of the Observer pattern (see the ``constructor()`` of this
+   * class for details).
+   */
   updatePaletteDisplay(palette) {
     console.debug("updatePaletteDisplay()");
     console.debug(palette);
