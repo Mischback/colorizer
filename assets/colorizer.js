@@ -256,7 +256,16 @@ const ColorizerUtility = {
   },
 }
 
-
+/**
+ * Represent a single color of the palette.
+ *
+ * @param red The red color component.
+ * @param green The green color component.
+ * @param blue the blue color component.
+ * @param sorting The internal sorting of the palette, default ``0``.
+ *
+ * The color is internally represented in the (s)RGB model.
+ */
 class PaletteItem {
   constructor(red, green, blue, sorting=0) {
 
@@ -266,16 +275,32 @@ class PaletteItem {
     this.sorting = sorting;
   }
 
+  /**
+   * Return the *relative luminance* of the color.
+   *
+   * Internally this relies on ``ColorizerUtility.luminance()``.
+   */
   luminance() {
     return ColorizerUtility.luminance(this.red, this.green, this.blue);
   }
 
+  /**
+   * Return the color in a CSS-compatible notation.
+   *
+   * The string is of the form ``rgb([0..255], [0..255], [0..255])``.
+   */
   toCssRgb() {
     return "rgb(" + this.red + ", " + this.green + ", " + this.blue +")";
   }
 
+  /**
+   * Return the color in hex notation.
+   *
+   * The string includes the ``#``.
+   *
+   * The implementation is based on https://stackoverflow.com/a/5624139
+   */
   toRgbHex() {
-    // https://stackoverflow.com/a/5624139
     return "#" + (1 << 24 | this.red << 16 | this.green << 8 | this.blue).toString(16).slice(1);
   }
 }
