@@ -608,7 +608,7 @@ class ColorizerEngine {
     //
     // The ``successCallback`` must be explicitly bound to ``this``. See
     // https://stackoverflow.com/a/59060545 for reference!
-    this.db.openDatabase({stores: dbStores, successCallback: this.fetchPaletteFromDatabase.bind(this)});
+    this.db.openDatabase({stores: dbStores, successCallback: this.refreshPaletteFromDB.bind(this)});
   }
 
   /**
@@ -624,37 +624,46 @@ class ColorizerEngine {
     this.paletteObservers.push(cb);
   }
 
-  updatePalette(newPalette) {
-    console.debug("updatePalette()");
+  /**
+   * Refresh the internal list of colors from the database.
+   *
+   * The method accesses the IndexedDB and retrieves all colors/items. As this
+   * operation is executed asynchronously, an anonymous function is used for
+   * further processing, including sorting of the colors/items and notifying
+   * the observers.
+   */
+  refreshPaletteFromDB() {
+    console.debug("refreshPaletteFromDB()");
 
-    this.palette = [];
-
-    newPalette.forEach((item) => {
-      this.palette.push(new PaletteItem(item.red, item.green, item.blue, {sorting: item.sorting, id: item.paletteItemID}));
-    });
-
-    this.palette.sort((a, b) => {
-      return a.sorting - b.sorting;
-    });
-
-    // Quick and dirty Observer pattern
-    this.paletteObservers.forEach((obs) => {
-      obs(this.palette);
-    });
-  }
-
-  fetchPaletteFromDatabase() {
-    console.debug("fetchPaletteFromDatabase()");
-
+    // Access the DB and provide an asynchronous callback function
     this.db.getAll(this.paletteStoreName, (result) => {
-      this.updatePalette(result);
+      // Reset the existing palette
+      this.palette = [];
+
+      // Create PaletteItem instances
+      result.forEach((item) => {
+        this.palette.push(new PaletteItem(
+          item.red, item.green, item.blue,
+          { sorting: item.sorting, id: item.paletteItemID },
+        ));
+      });
+
+      // Sort the palette
+      this.palette.sort((a, b) => {
+        return a.sorting - b.sorting;
+      });
+
+      // Notify the Observers by calling the registered callback functions
+      this.paletteObservers.forEach((cb) => {
+        cb(this.palette);
+      });
     });
   }
 
   addItemToPalette(item) {
     console.log("addItemToPalette() " + item.red + ", " + item.green + ", " + item.blue + ", sorting: " + item.sorting);
 
-    this.db.upsert(this.paletteStoreName, item, {transSuccessCallback: this.fetchPaletteFromDatabase.bind(this)});
+    this.db.upsert(this.paletteStoreName, item, {transSuccessCallback: this.refreshPaletteFromDB.bind(this)});
   }
 }
 
