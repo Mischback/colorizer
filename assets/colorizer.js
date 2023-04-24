@@ -349,6 +349,11 @@ class ColorizerInterface {
       console.error("Missing required element with id '#contrast-grid'");
     }
 
+    this.palette_list = document.querySelector("#color-palette ul");
+    if (this.palette_list === null) {
+      console.error("Missing required element with id '#color-palette ul'");
+    }
+
     // Apply EventHandler functions
     this.ctrl_toggle.addEventListener("click", (e) => {
       this.ctrl_toggle_click(e);
@@ -415,6 +420,31 @@ class ColorizerInterface {
     return gridElement;
   }
 
+  #generatePaletteListItem(paletteItem) {
+    console.debug("generatePaletteListItem()");
+
+    // Declare some variables for future use and re-use
+    let elem;
+
+    let listItem = document.createElement("li");
+    listItem.setAttribute("palette-color-id", paletteItem.paletteItemID);  // FIXME 1
+
+    elem = document.createElement("span");
+    elem.textContent = paletteItem.toRgbHex();
+    listItem.appendChild(elem);
+
+    elem = document.createElement("div");
+    elem.style.cssText = "background-color: " + paletteItem.toCssRgb() + ";";
+    listItem.appendChild(elem);
+
+    elem = document.createElement("button");
+    elem.textContent = "remove";
+    elem.addEventListener("click", () => {});  // FIXME 2
+    listItem.appendChild(elem);
+
+    return listItem;
+  }
+
   /**
    * Generate the *contrast grid*.
    *
@@ -471,6 +501,15 @@ class ColorizerInterface {
   updatePaletteDisplay(palette) {
     console.debug("updatePaletteDisplay()");
     console.debug(palette);
+
+    // empty the existing palette to prevent duplicates
+    while (this.palette_list.firstChild) {
+      this.palette_list.removeChild(this.palette_list.firstChild);
+    }
+
+    for (let i=0; i<palette.length; i++) {
+      this.palette_list.appendChild(this.#generatePaletteListItem(palette[i]));
+    }
   }
 
   /**
