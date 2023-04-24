@@ -371,6 +371,8 @@ class ColorizerInterface {
    * @param foreground The foreground color as ``PaletteItem``.
    * @returns DOM element
    *
+   * This method is **private**.
+   *
    * The grid element is basically a ``<div>`` and contains the following
    * information:
    *   - the W3C category of the contrast value, see
@@ -378,7 +380,7 @@ class ColorizerInterface {
    *   - the actual contrast value, see ``ColorizerUtility.contrast()``
    *   - the color value in hex notation
    */
-  generateContrastGridElement(background, foreground) {
+  #generateContrastGridElement(background, foreground) {
 
     console.debug("generateContrastGridElement()");
     console.debug("Background: " + background.toRgbHex());
@@ -446,7 +448,7 @@ class ColorizerInterface {
       grid_row.classList.add("grid-row");
 
       for (var j=0; j<palette.length; j++) {
-        grid_row.appendChild(this.generateContrastGridElement(palette[i], palette[j]));
+        grid_row.appendChild(this.#generateContrastGridElement(palette[i], palette[j]));
       }
 
       this.contrast_grid.appendChild(grid_row);
