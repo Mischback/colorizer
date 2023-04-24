@@ -62,7 +62,7 @@ class DBInterface {
     });
 
     openRequest.addEventListener("success", () => {
-      console.debug("Database opened successfully");
+      console.info("Database opened successfully");
 
       this.dbHandle = openRequest.result;
 
@@ -96,7 +96,7 @@ class DBInterface {
    * https://2ality.com/2011/11/keyword-parameters.html for reference.
    */
   upsert(storeName, data, {putSuccessCallback = (() => {}), transSuccessCallback = (() => {})} = {}) {
-    console.debug(`upsert() on ${storeName}: ${data}`);
+    // console.debug(`upsert() on ${storeName}: ${data}`);
 
     if (this.dbHandle) {
       let transaction = this.dbHandle.transaction([storeName], "readwrite");
@@ -107,11 +107,11 @@ class DBInterface {
       });
       transaction.addEventListener("abort", (te) => {
         console.error("Transaction aborted!");
-        console.debug(te.target.error);
+        console.error(te.target.error);
       });
       transaction.addEventListener("error", (te) => {
         console.error("Transaction had an error");
-        console.debug(te.target.error);
+        console.error(te.target.error);
       });
 
       let request = transaction.objectStore(storeName).put(data);
@@ -122,7 +122,7 @@ class DBInterface {
       });
       request.addEventListener("error", (re) => {
         console.error("PUT had an error");
-        console.debug(re.target.error);
+        console.error(re.target.error);
       });
     }
   }
@@ -143,7 +143,7 @@ class DBInterface {
    * https://2ality.com/2011/11/keyword-parameters.html for reference.
    */
   deleteByKey(storeName, key, {deleteSuccessCallback = (() => {}), transSuccessCallback = (() => {})} = {}) {
-    console.debug(`deleteByKey() on ${storeName}: ${key}`);
+    //console.debug(`deleteByKey() on ${storeName}: ${key}`);
 
     if (this.dbHandle) {
       let transaction = this.dbHandle.transaction([storeName], "readwrite");
@@ -154,11 +154,11 @@ class DBInterface {
       });
       transaction.addEventListener("abort", (te) => {
         console.error("Transaction aborted!");
-        console.debug(te.target.error);
+        console.error(te.target.error);
       });
       transaction.addEventListener("error", (te) => {
         console.error("Transaction had an error");
-        console.debug(te.target.error);
+        console.error(te.target.error);
       });
 
       let request = transaction.objectStore(storeName).delete(key);
@@ -169,13 +169,13 @@ class DBInterface {
       });
       request.addEventListener("error", (re) => {
         console.error("DELETE had an error");
-        console.debug(re.target.error);
+        console.error(re.target.error);
       });
     }
   }
 
   getAll(storeName, successCallback=((result) => {})) {
-    console.debug(`getAll() from "${storeName}"`);
+    // console.debug(`getAll() from "${storeName}"`);
 
     if (this.dbHandle) {
       let request = this.dbHandle.transaction(storeName).objectStore(storeName).openCursor(null, IDBCursor.NEXT);
@@ -188,14 +188,14 @@ class DBInterface {
           results.push(cursor.value);
           cursor.continue();
         } else {
-          console.debug("Finished! " + results);
+          // console.debug("Finished! " + results);
           successCallback(results);
         }
       });
 
       request.addEventListener("error", (e) => {
         console.error(`Error while fetching items from ${storeName}`);
-        console.debug(e.target.error);
+        console.error(e.target.error);
       });
     }
   }
@@ -440,9 +440,9 @@ class ColorizerInterface {
    */
   #generateContrastGridElement(background, foreground) {
 
-    console.debug("#generateContrastGridElement()");
-    console.debug(`Background: ${background.toRgbHex()}`);
-    console.debug(`Foreground: ${foreground.toRgbHex()}`);
+    // console.debug("#generateContrastGridElement()");
+    // console.debug(`Background: ${background.toRgbHex()}`);
+    // console.debug(`Foreground: ${foreground.toRgbHex()}`);
 
     // Declare some variables for future use and re-use
     let contentContainer;
@@ -474,7 +474,7 @@ class ColorizerInterface {
   }
 
   #generatePaletteListItem(paletteItem) {
-    console.debug("#generatePaletteListItem()");
+    // console.debug("#generatePaletteListItem()");
 
     // Declare some variables for future use and re-use
     let elem;
@@ -518,8 +518,8 @@ class ColorizerInterface {
    * class for details).
    */
   buildContrastGrid(palette) {
-    console.debug("buildContrastGrid()");
-    console.debug(palette);
+    // console.debug("buildContrastGrid()");
+    // console.debug(palette);
 
     let grid_row;
 
@@ -554,8 +554,8 @@ class ColorizerInterface {
    * class for details).
    */
   updatePaletteDisplay(palette) {
-    console.debug("updatePaletteDisplay()");
-    console.debug(palette);
+    // console.debug("updatePaletteDisplay()");
+    // console.debug(palette);
 
     // empty the existing palette to prevent duplicates
     while (this.palette_list.firstChild) {
@@ -573,7 +573,7 @@ class ColorizerInterface {
    * @param e The DOM's ``click`` event.
    */
   deleteItemFromPalette(e) {
-    console.debug("deleteItemFromPalette()");
+    // console.debug("deleteItemFromPalette()");
 
     this.engine.deleteItemByID(
       Number(e.target.parentNode.getAttribute("palette-color-id"))
@@ -610,15 +610,13 @@ class ColorizerInterface {
     // don't actually submit the form, intercept with this code
     e.preventDefault();
 
-    console.debug(`Color (hex): ${this.color_add_input_hex.value}`);
+    console.debug(`Adding color by hex value: ${this.color_add_input_hex.value}`);
     let color = ColorizerUtility.hexToRGB(this.color_add_input_hex.value);
     if (color === null)
       // leave the function if the input can not be parsed as hex color code
       return;
-    console.debug(color);
 
     let item = new PaletteItem(color[0], color[1], color[2]);
-    console.debug(item);
 
     this.engine.addItemToPalette(item);
 
@@ -704,7 +702,7 @@ class ColorizerEngine {
    * the observers.
    */
   refreshPaletteFromDB() {
-    console.debug("refreshPaletteFromDB()");
+    // console.debug("refreshPaletteFromDB()");
 
     // Access the DB and provide an asynchronous callback function
     this.db.getAll(this.#paletteStoreName, (result) => {
@@ -738,7 +736,7 @@ class ColorizerEngine {
    * triggers refreshing of the palette from the database.
    */
   addItemToPalette(item) {
-    console.log(`addItemToPalette(): R: ${item.red}, G: ${item.green}, B: ${item.blue}`);
+    // console.debug(`addItemToPalette(): R: ${item.red}, G: ${item.green}, B: ${item.blue}`);
 
     this.db.upsert(this.#paletteStoreName, item, {transSuccessCallback: this.refreshPaletteFromDB.bind(this)});
   }
@@ -749,7 +747,7 @@ class ColorizerEngine {
    * @param id The ID of the color/item.
    */
   deleteItemByID(id) {
-    console.log(`deleteItemByID(): ${id}`);
+    // console.debug(`deleteItemByID(): ${id}`);
 
     this.db.deleteByKey(this.#paletteStoreName, id, {transSuccessCallback: this.refreshPaletteFromDB.bind(this)});
   }
@@ -758,7 +756,7 @@ class ColorizerEngine {
 
 // The following code is meant to be executed when the DOM is ready.
 document.addEventListener("DOMContentLoaded", (e) => {
-  console.debug("DOM ready, doing stuff!");
+  console.info("DOM ready, doing stuff!");
 
   // Initialize the actual engine. This object will provide the actual logic of
   // the application.
