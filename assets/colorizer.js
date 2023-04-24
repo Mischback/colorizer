@@ -263,16 +263,22 @@ const ColorizerUtility = {
  * @param green The green color component.
  * @param blue the blue color component.
  * @param sorting The internal sorting of the palette, default ``0``.
+ * @param id The ID of the element (this is auto-generated once the element is
+ *           stored in the IndexDB).
+ *
+ * Please note: ``sorting`` and ``id`` are wrapped in an object literal, see
+ * https://2ality.com/2011/11/keyword-parameters.html for reference.
  *
  * The color is internally represented in the (s)RGB model.
  */
 class PaletteItem {
-  constructor(red, green, blue, sorting=0) {
+  constructor(red, green, blue, {sorting=0, id=undefined}={}) {
 
     this.red = red;
     this.green = green;
     this.blue = blue;
     this.sorting = sorting;
+    this.id = id;
   }
 
   /**
@@ -427,7 +433,7 @@ class ColorizerInterface {
     let elem;
 
     let listItem = document.createElement("li");
-    listItem.setAttribute("palette-color-id", paletteItem.paletteItemID);  // FIXME 1
+    listItem.setAttribute("palette-color-id", paletteItem.id);
 
     elem = document.createElement("span");
     elem.textContent = paletteItem.toRgbHex();
@@ -612,7 +618,7 @@ class ColorizerEngine {
     this.palette = [];
 
     newPalette.forEach((item) => {
-      this.palette.push(new PaletteItem(item.red, item.green, item.blue, item.sorting));
+      this.palette.push(new PaletteItem(item.red, item.green, item.blue, {sorting: item.sorting, id: item.paletteItemID}));
     });
 
     this.palette.sort((a, b) => {
@@ -635,6 +641,7 @@ class ColorizerEngine {
 
   addItemToPalette(item) {
     console.log("addItemToPalette() " + item.red + ", " + item.green + ", " + item.blue + ", sorting: " + item.sorting);
+
 
     this.db.upsert(this.paletteStoreName, item, {transSuccessCallback: this.fetchPaletteFromDatabase.bind(this)});
   }
