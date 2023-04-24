@@ -370,8 +370,8 @@ class ColorizerInterface {
     });
 
     // Register Observer callbacks for the engine's palette
-    this.engine.observePalette(this.buildContrastGrid.bind(this));
-    this.engine.observePalette(this.updatePaletteDisplay.bind(this));
+    this.engine.registerPaletteObserver(this.buildContrastGrid.bind(this));
+    this.engine.registerPaletteObserver(this.updatePaletteDisplay.bind(this));
   }
 
   /**
@@ -576,24 +576,33 @@ class ColorizerInterface {
 
 
 class ColorizerEngine {
+
+  // Declare **private** variables.
+  // They need initalisation, e.g. in the constructor.
+  #palette;
+  #paletteObservers;
+  #paletteStoreName;
+
   constructor(dbName="colorizer") {
 
     // Initialize the object's palette
-    this.palette = [];
+    this.#palette = [];
 
     // Provide a list of observers of the palette
     //
     // This is a quick and dirty implementation of the Observer pattern. See
-    // the ``observePalette()`` method for the registration function and the
-    // implementation of ``updatePalette()`` for the calling of the observers.
-    this.paletteObservers = [];
+    // the ``registerPaletteObserver()`` method for the registration function
+    // and the implementation of ``notifyPaletteObservers()`` for the calling
+    // of the observers.
+    this.#paletteObservers = [];
 
-    this.paletteStoreName = "color_palette";
+    // Provide the default *store name* for accessing the IndexedDB
+    this.#paletteStoreName = "color_palette";
 
     const dbVersion = 1;
     const dbStores = [
       {
-        name: this.paletteStoreName,
+        name: this.#paletteStoreName,
         options: {
           keyPath: "paletteItemID",
           autoIncrement: true,
@@ -620,8 +629,17 @@ class ColorizerEngine {
    * the class's attribute ``paletteObservers`` and the ``updatePalette()``
    * method.
    */
-  observePalette(cb) {
-    this.paletteObservers.push(cb);
+  registerPaletteObserver(cb) {
+    this.#paletteObservers.push(cb);
+  }
+
+  /**
+   * Call the registered callback functions of Observers of the palette.
+   */
+  #notifyPaletteObservers() {
+    this.#paletteObservers.forEach((cb) => {
+      cb(this.#palette);
+    });
   }
 
   /**
@@ -636,34 +654,32 @@ class ColorizerEngine {
     console.debug("refreshPaletteFromDB()");
 
     // Access the DB and provide an asynchronous callback function
-    this.db.getAll(this.paletteStoreName, (result) => {
+    this.db.getAll(this.#paletteStoreName, (result) => {
       // Reset the existing palette
-      this.palette = [];
+      this.#palette = [];
 
       // Create PaletteItem instances
       result.forEach((item) => {
-        this.palette.push(new PaletteItem(
+        this.#palette.push(new PaletteItem(
           item.red, item.green, item.blue,
           { sorting: item.sorting, id: item.paletteItemID },
         ));
       });
 
       // Sort the palette
-      this.palette.sort((a, b) => {
+      this.#palette.sort((a, b) => {
         return a.sorting - b.sorting;
       });
 
-      // Notify the Observers by calling the registered callback functions
-      this.paletteObservers.forEach((cb) => {
-        cb(this.palette);
-      });
+      // Notify the Observers
+      this.#notifyPaletteObservers();
     });
   }
 
   addItemToPalette(item) {
     console.log("addItemToPalette() " + item.red + ", " + item.green + ", " + item.blue + ", sorting: " + item.sorting);
 
-    this.db.upsert(this.paletteStoreName, item, {transSuccessCallback: this.refreshPaletteFromDB.bind(this)});
+    this.db.upsert(this.#paletteStoreName, item, {transSuccessCallback: this.refreshPaletteFromDB.bind(this)});
   }
 }
 
