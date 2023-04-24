@@ -180,6 +180,15 @@ const ColorizerUtility = {
     ] : null;
   },
 
+  /**
+   * Map a given contrast value to its W3C category.
+   *
+   * @param contrastValue A contrast value as number, most likely a ``float``.
+   * @returns ``string`` One of ``AAA``, ``AA``, ``A`` or ``FAIL``.
+   *
+   * The classification is based on
+   * https://www.w3.org/TR/UNDERSTANDING-WCAG20/visual-audio-contrast-contrast.html
+   */
   w3Category: function(contrastValue) {
     switch(true) {
       case contrastValue >= 7:
@@ -197,6 +206,21 @@ const ColorizerUtility = {
     }
   },
 
+  /**
+   * Determine the contrast between two colors.
+   *
+   * @param c1 One color.
+   * @param c2 The other color.
+   * @returns The contrast ratio, a value between 1..21.
+   *
+   * The *common notation* of contrast values is something like ``6.1:1``. This
+   * function would then return ``6.1``.
+   *
+   * The formula is taken from
+   * https://www.w3.org/TR/WCAG20/#contrast-ratiodef but the implementation is
+   * most likely based on a StackOverflow answer that I failed to reference.
+   * My bad, sorry!
+   */
   contrast: function(c1, c2) {
     var lum1 = ColorizerUtility.luminance(c1.red, c1.green, c1.blue);
     var lum2 = ColorizerUtility.luminance(c2.red, c2.green, c2.blue);
@@ -205,8 +229,24 @@ const ColorizerUtility = {
     return (brighter + 0.05) / (darker + 0.05);
   },
 
-  luminance: function(r, g, b) {
-    var a = [r, g, b].map(function(v) {
+  /**
+   * Determine the *relative luminance* of a color.
+   *
+   * @param red The red component of the color.
+   * @param green The green component of the color.
+   * @param blue The blue component of the color.
+   * @returns The relative luminance, normalized to a value between 0 and 1.
+   *
+   * The formula is taken from
+   * https://www.w3.org/TR/WCAG20/#relativeluminancedef (which might not be
+   * the original source). The implementation is - almost definitely - not my
+   * own. Most likely it is a StackOverflow answer that I failed to reference.
+   * My bad, sorry!
+   *
+   * See the corresponding method ``luminance()`` of ``PaletteItem``.
+   */
+  luminance: function(red, green, blue) {
+    var a = [red, green, blue].map(function(v) {
       v /= 255;
       return v <= 0.03928
         ? v / 12.92
@@ -224,6 +264,10 @@ class PaletteItem {
     this.green = green;
     this.blue = blue;
     this.sorting = sorting;
+  }
+
+  luminance() {
+    return ColorizerUtility.luminance(this.red, this.green, this.blue);
   }
 
   toCssRgb() {
