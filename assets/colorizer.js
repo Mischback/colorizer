@@ -8,6 +8,7 @@
  * of contrast values between the colors.
  */
 
+
 /**
  * A generic interface to the browser's IndexedDB.
  *
@@ -100,7 +101,7 @@ class DBInterface {
     if (this.dbHandle) {
       let transaction = this.dbHandle.transaction([storeName], "readwrite");
       transaction.addEventListener("complete", () => {
-        console.debug("Transaction completed successfully");
+        console.info("Transaction completed successfully");
 
         transSuccessCallback();
       });
@@ -109,18 +110,65 @@ class DBInterface {
         console.debug(te.target.error);
       });
       transaction.addEventListener("error", (te) => {
-        console.error("Transaction had error");
+        console.error("Transaction had an error");
         console.debug(te.target.error);
       });
 
       let request = transaction.objectStore(storeName).put(data);
       request.addEventListener("success", () => {
-        console.debug("PUT successful");
+        console.info("PUT successful");
 
         putSuccessCallback();
       });
       request.addEventListener("error", (re) => {
         console.error("PUT had an error");
+        console.debug(re.target.error);
+      });
+    }
+  }
+
+
+  /**
+   * Delete an item from the IndexedDB store, specified by its ``key``.
+   *
+   * @param storeName The name of the store.
+   * @param key The key of the item to be deleted.
+   * @param deleteSuccessCallback Callback function that is executed when the
+   *                           ``delete`` operation was successful.
+   * @param transSuccessCallback Callback function that is executed when the
+   *                             transaction was successful.
+   *
+   * Please note: ``deleteSuccessCallback`` and ``transSuccessCallback`` are
+   * wrapped in an object literal, see
+   * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   */
+  deleteByKey(storeName, key, {deleteSuccessCallback = (() => {}), transSuccessCallback = (() => {})} = {}) {
+    console.debug(`deleteByKey() on ${storeName}: ${key}`);
+
+    if (this.dbHandle) {
+      let transaction = this.dbHandle.transaction([storeName], "readwrite");
+      transaction.addEventListener("complete", () => {
+        console.info("Transaction completed successfully");
+
+        transSuccessCallback();
+      });
+      transaction.addEventListener("abort", (te) => {
+        console.error("Transaction aborted!");
+        console.debug(te.target.error);
+      });
+      transaction.addEventListener("error", (te) => {
+        console.error("Transaction had an error");
+        console.debug(te.target.error);
+      });
+
+      let request = transaction.objectStore(storeName).delete(key);
+      request.addEventListener("success", () => {
+        console.info("DELETE successful");
+
+        deleteSuccessCallback();
+      });
+      request.addEventListener("error", (re) => {
+        console.error("DELETE had an error");
         console.debug(re.target.error);
       });
     }
@@ -253,6 +301,7 @@ const ColorizerUtility = {
     return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
   },
 }
+
 
 /**
  * Represent a single color of the palette.
@@ -518,11 +567,17 @@ class ColorizerInterface {
     }
   }
 
+  /**
+   * *Click* event handler for the button to remove palette items/colors.
+   *
+   * @param e The DOM's ``click`` event.
+   */
   deleteItemFromPalette(e) {
     console.debug("deleteItemFromPalette()");
 
-    const colorID = Number(e.target.parentNode.getAttribute("palette-color-id"));
-    console.debug(`PaletteItem.id: ${colorID}`);
+    this.engine.deleteItemByID(
+      Number(e.target.parentNode.getAttribute("palette-color-id"))
+    );
   }
 
   /**
@@ -674,10 +729,29 @@ class ColorizerEngine {
     });
   }
 
+  /**
+   * Add a new color to the palette.
+   *
+   * @param item The new color, given as PaletteItem instance.
+   *
+   * This function stores the new color/item into the IndexedDB and then
+   * triggers refreshing of the palette from the database.
+   */
   addItemToPalette(item) {
     console.log(`addItemToPalette(): R: ${item.red}, G: ${item.green}, B: ${item.blue}`);
 
     this.db.upsert(this.#paletteStoreName, item, {transSuccessCallback: this.refreshPaletteFromDB.bind(this)});
+  }
+
+  /**
+   * Delete a color/item from the palette.
+   *
+   * @param id The ID of the color/item.
+   */
+  deleteItemByID(id) {
+    console.log(`deleteItemByID(): ${id}`);
+
+    this.db.deleteByKey(this.#paletteStoreName, id, {transSuccessCallback: this.refreshPaletteFromDB.bind(this)});
   }
 }
 
