@@ -393,7 +393,7 @@ class ColorizerInterface {
    */
   #generateContrastGridElement(background, foreground) {
 
-    console.debug("generateContrastGridElement()");
+    console.debug("#generateContrastGridElement()");
     console.debug("Background: " + background.toRgbHex());
     console.debug("Foreground: " + foreground.toRgbHex());
 
@@ -427,7 +427,7 @@ class ColorizerInterface {
   }
 
   #generatePaletteListItem(paletteItem) {
-    console.debug("generatePaletteListItem()");
+    console.debug("#generatePaletteListItem()");
 
     // Declare some variables for future use and re-use
     let elem;
@@ -445,7 +445,9 @@ class ColorizerInterface {
 
     elem = document.createElement("button");
     elem.textContent = "remove";
-    elem.addEventListener("click", () => {});  // FIXME 2
+    elem.addEventListener("click", (e) => {
+      this.deleteItemFromPalette(e);
+    });
     listItem.appendChild(elem);
 
     return listItem;
@@ -518,6 +520,13 @@ class ColorizerInterface {
     }
   }
 
+  deleteItemFromPalette(e) {
+    console.debug("deleteItemFromPalette()");
+
+    const colorID = Number(e.target.parentNode.getAttribute("palette-color-id"));
+    console.debug("PaletteItem.id: " + colorID);
+  }
+
   /**
    * *Click* event handler for the button that shows/hides the control menu.
    *
@@ -559,6 +568,9 @@ class ColorizerInterface {
     console.debug(item);
 
     this.engine.addItemToPalette(item);
+
+    // FIXME: When the color was successfully added, the input field should be
+    //        cleared!
   }
 }
 
@@ -641,7 +653,6 @@ class ColorizerEngine {
 
   addItemToPalette(item) {
     console.log("addItemToPalette() " + item.red + ", " + item.green + ", " + item.blue + ", sorting: " + item.sorting);
-
 
     this.db.upsert(this.paletteStoreName, item, {transSuccessCallback: this.fetchPaletteFromDatabase.bind(this)});
   }
