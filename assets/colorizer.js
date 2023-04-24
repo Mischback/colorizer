@@ -26,8 +26,6 @@
  */
 class DBInterface {
   constructor(dbName, dbVersion) {
-    console.debug("DBInterface.constructor()");
-
     this.dbHandle;
     this.dbName = dbName;
     this.dbVersion = dbVersion;
@@ -76,7 +74,7 @@ class DBInterface {
 
       // Initialize the ObjectStores
       stores.forEach((store) => {
-        console.debug("Creating ObjectStore " + store.name);
+        console.info(`Creating ObjectStore "${store.name}"`);
         this.dbHandle.createObjectStore(store.name, store.options);
       });
     });
@@ -97,7 +95,7 @@ class DBInterface {
    * https://2ality.com/2011/11/keyword-parameters.html for reference.
    */
   upsert(storeName, data, {putSuccessCallback = (() => {}), transSuccessCallback = (() => {})} = {}) {
-    console.debug("upsert(): " + storeName + ", " + data);
+    console.debug(`upsert() on ${storeName}: ${data}`);
 
     if (this.dbHandle) {
       let transaction = this.dbHandle.transaction([storeName], "readwrite");
@@ -129,7 +127,7 @@ class DBInterface {
   }
 
   getAll(storeName, successCallback=((result) => {})) {
-    console.debug("getAll(): " + storeName);
+    console.debug(`getAll() from "${storeName}"`);
 
     if (this.dbHandle) {
       let request = this.dbHandle.transaction(storeName).objectStore(storeName).openCursor(null, IDBCursor.NEXT);
@@ -138,7 +136,7 @@ class DBInterface {
       request.addEventListener("success", (e) => {
         let cursor = e.target.result;
         if (cursor) {
-          console.debug("Key: " + cursor.key + " Value: " + cursor.value);
+          // console.debug("Key: " + cursor.key + " Value: " + cursor.value);
           results.push(cursor.value);
           cursor.continue();
         } else {
@@ -148,7 +146,7 @@ class DBInterface {
       });
 
       request.addEventListener("error", (e) => {
-        console.error("Error while fetching items from " + storeName);
+        console.error(`Error while fetching items from ${storeName}`);
         console.debug(e.target.error);
       });
     }
@@ -296,7 +294,7 @@ class PaletteItem {
    * The string is of the form ``rgb([0..255], [0..255], [0..255])``.
    */
   toCssRgb() {
-    return "rgb(" + this.red + ", " + this.green + ", " + this.blue +")";
+    return `rgb(${this.red}, ${this.green}, ${this.blue})`;
   }
 
   /**
@@ -394,8 +392,8 @@ class ColorizerInterface {
   #generateContrastGridElement(background, foreground) {
 
     console.debug("#generateContrastGridElement()");
-    console.debug("Background: " + background.toRgbHex());
-    console.debug("Foreground: " + foreground.toRgbHex());
+    console.debug(`Background: ${background.toRgbHex()}`);
+    console.debug(`Foreground: ${foreground.toRgbHex()}`);
 
     // Declare some variables for future use and re-use
     let contentContainer;
@@ -524,7 +522,7 @@ class ColorizerInterface {
     console.debug("deleteItemFromPalette()");
 
     const colorID = Number(e.target.parentNode.getAttribute("palette-color-id"));
-    console.debug("PaletteItem.id: " + colorID);
+    console.debug(`PaletteItem.id: ${colorID}`);
   }
 
   /**
@@ -557,7 +555,7 @@ class ColorizerInterface {
     // don't actually submit the form, intercept with this code
     e.preventDefault();
 
-    console.debug("Color (hex): " + this.color_add_input_hex.value);
+    console.debug(`Color (hex): ${this.color_add_input_hex.value}`);
     let color = ColorizerUtility.hexToRGB(this.color_add_input_hex.value);
     if (color === null)
       // leave the function if the input can not be parsed as hex color code
@@ -677,7 +675,7 @@ class ColorizerEngine {
   }
 
   addItemToPalette(item) {
-    console.log("addItemToPalette() " + item.red + ", " + item.green + ", " + item.blue + ", sorting: " + item.sorting);
+    console.log(`addItemToPalette(): R: ${item.red}, G: ${item.green}, B: ${item.blue}`);
 
     this.db.upsert(this.#paletteStoreName, item, {transSuccessCallback: this.refreshPaletteFromDB.bind(this)});
   }
