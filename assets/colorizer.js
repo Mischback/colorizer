@@ -37,10 +37,7 @@ class DBInterface {
    *
    * @param stores A list of stores in the database.
    * @param successCallback A function to execute on successfully opening the
-   *                        database.
-   *
-   * Note: The parameters are actually passed using an object literal, see
-   * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   *                        database. Default: a ``noop`` function.
    *
    * The method opens the database and stores a handle to it internally. It
    * will take care of proper initialization, depending on the instance's
@@ -48,7 +45,7 @@ class DBInterface {
    *
    * When the database is successfully opened, ``successCallback`` is executed.
    */
-  openDatabase({stores = [], successCallback = (() => {})}) {
+  openDatabase(stores=[], successCallback=(() => {})) {
     if (!window.indexedDB) {
       console.error("IndexedDB not available!");
       return;
@@ -88,45 +85,61 @@ class DBInterface {
    * @param data The data to be inserted.
    * @param putSuccessCallback Callback function that is executed when the
    *                           ``put`` operation was successful.
+   *                           Default: ``undefined``.
    * @param transSuccessCallback Callback function that is executed when the
    *                             transaction was successful.
+   *                             Default: ``undefined``.
    *
    * Please note: ``putSuccessCallback`` and ``transSuccessCallback`` are
    * wrapped in an object literal, see
    * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   *
+   * The event listener for the ``success`` event (of the ``put()`` operation)
+   * and the ``success`` event (of the transaction) are only attached, if they
+   * are  provided by the calling code
+   * (see https://stackoverflow.com/a/52555073).
    */
-  upsert(storeName, data, {putSuccessCallback = (() => {}), transSuccessCallback = (() => {})} = {}) {
+  upsert(storeName, data, { putSuccessCallback=undefined, transSuccessCallback=undefined } = {}) {
     // console.debug(`upsert() on ${storeName}: ${data}`);
 
     if (this.dbHandle) {
       let transaction = this.dbHandle.transaction([storeName], "readwrite");
-      transaction.addEventListener("complete", () => {
-        console.info("Transaction completed successfully");
+      transaction.addEventListener("abort", (e) => {
+        console.error("upsert(): Transaction aborted!");
+        console.error(e.target.error);
+      });
+      transaction.addEventListener("error", (e) => {
+        console.error("upsert(): Transaction had an error");
+        console.error(e.target.error);
+      });
 
-        transSuccessCallback();
-      });
-      transaction.addEventListener("abort", (te) => {
-        console.error("Transaction aborted!");
-        console.error(te.target.error);
-      });
-      transaction.addEventListener("error", (te) => {
-        console.error("Transaction had an error");
-        console.error(te.target.error);
-      });
+      // Only add the eventListener for ``complete``, if a callback function is
+      // provided.
+      if (transSuccessCallback !== undefined) {
+        transaction.addEventListener("complete", () => {
+          console.info("upsert(): Transaction completed successfully");
+
+          transSuccessCallback();
+        });
+      }
 
       let request = transaction.objectStore(storeName).put(data);
-      request.addEventListener("success", () => {
-        console.info("PUT successful");
+      request.addEventListener("error", (e) => {
+        console.error("upsert(): PUT had an error");
+        console.error(e.target.error);
+      });
 
-        putSuccessCallback();
-      });
-      request.addEventListener("error", (re) => {
-        console.error("PUT had an error");
-        console.error(re.target.error);
-      });
+      // Only add the eventListener for ``success``, if a callback function is
+      // provided.
+      if (putSuccessCallback !== undefined) {
+        request.addEventListener("success", () => {
+          console.info("upsert(): PUT successful");
+
+          putSuccessCallback();
+        });
+      }
     }
   }
-
 
   /**
    * Delete an item from the IndexedDB store, specified by its ``key``.
@@ -135,46 +148,63 @@ class DBInterface {
    * @param key The key of the item to be deleted.
    * @param deleteSuccessCallback Callback function that is executed when the
    *                           ``delete`` operation was successful.
+   *                           Default: ``undefined``.
    * @param transSuccessCallback Callback function that is executed when the
    *                             transaction was successful.
+   *                             Default: ``undefined``.
    *
    * Please note: ``deleteSuccessCallback`` and ``transSuccessCallback`` are
    * wrapped in an object literal, see
    * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   *
+   * The event listener for the ``success`` event (of the ``delete()``
+   * operation) and the ``success`` event (of the transaction) are only
+   * attached, if they are  provided by the calling code
+   * (see https://stackoverflow.com/a/52555073).
    */
-  deleteByKey(storeName, key, {deleteSuccessCallback = (() => {}), transSuccessCallback = (() => {})} = {}) {
+  deleteByKey(storeName, key, { deleteSuccessCallback=undefined, transSuccessCallback=undefined } = {}) {
     //console.debug(`deleteByKey() on ${storeName}: ${key}`);
 
     if (this.dbHandle) {
       let transaction = this.dbHandle.transaction([storeName], "readwrite");
-      transaction.addEventListener("complete", () => {
-        console.info("Transaction completed successfully");
+      transaction.addEventListener("abort", (e) => {
+        console.error("deleteByKey(): Transaction aborted!");
+        console.error(e.target.error);
+      });
+      transaction.addEventListener("error", (e) => {
+        console.error("deleteByKey(): Transaction had an error");
+        console.error(e.target.error);
+      });
 
-        transSuccessCallback();
-      });
-      transaction.addEventListener("abort", (te) => {
-        console.error("Transaction aborted!");
-        console.error(te.target.error);
-      });
-      transaction.addEventListener("error", (te) => {
-        console.error("Transaction had an error");
-        console.error(te.target.error);
-      });
+      // Only add the eventListener for ``complete``, if a callback function is
+      // provided.
+      if (transSuccessCallback !== undefined) {
+        transaction.addEventListener("complete", () => {
+          console.info("deleteByKey(): Transaction completed successfully");
+
+          transSuccessCallback();
+        });
+      }
 
       let request = transaction.objectStore(storeName).delete(key);
-      request.addEventListener("success", () => {
-        console.info("DELETE successful");
+      request.addEventListener("error", (e) => {
+        console.error("deleteByKey(): DELETE had an error");
+        console.error(e.target.error);
+      });
 
-        deleteSuccessCallback();
-      });
-      request.addEventListener("error", (re) => {
-        console.error("DELETE had an error");
-        console.error(re.target.error);
-      });
+      // Only add the eventListener for ``success``, if a callback function is
+      // provided.
+      if (deleteSuccessCallback !== undefined) {
+        request.addEventListener("success", () => {
+          console.info("deleteByKey(): DELETE successful");
+
+          deleteSuccessCallback();
+        });
+      }
     }
   }
 
-  getAll(storeName, successCallback=((result) => {})) {
+  getAll(storeName, successCallback=(() => {})) {
     // console.debug(`getAll() from "${storeName}"`);
 
     if (this.dbHandle) {
@@ -194,7 +224,7 @@ class DBInterface {
       });
 
       request.addEventListener("error", (e) => {
-        console.error(`Error while fetching items from ${storeName}`);
+        console.error(`getAll(): Error while fetching items from ${storeName}`);
         console.error(e.target.error);
       });
     }
@@ -692,7 +722,7 @@ class ColorizerEngine {
     //
     // The ``successCallback`` must be explicitly bound to ``this``. See
     // https://stackoverflow.com/a/59060545 for reference!
-    this.db.openDatabase({stores: dbStores, successCallback: this.refreshPaletteFromDB.bind(this)});
+    this.db.openDatabase(dbStores, this.refreshPaletteFromDB.bind(this));
   }
 
   /**
