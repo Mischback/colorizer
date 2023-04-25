@@ -247,6 +247,32 @@ class DBInterface {
     }
   }
 
+  bulkUpdate(storeName, bulkData) {
+
+    let transaction = this.#getTransaction(storeName, "readwrite");
+
+    let request = transaction.objectStore(storeName).openCursor(null, "next");
+    let current;
+    let elem;
+
+    request.addEventListener("success", (e) => {
+      let cursor = e.target.result;
+
+      if (cursor) {
+        current = cursor.value;
+        elem = bulkData.find((needle) => needle.id === cursor.key);
+        Object.keys(current).forEach((k) => {
+          if (elem[k] !== undefined)
+            current[k] = elem[k];
+        });
+
+        cursor.update(current);
+
+        cursor.continue();
+      }
+    });
+  }
+
   // https://stackoverflow.com/a/25055070
   getAll(storeName, successCallback=(() => {}), { dataIndex=undefined } = {}) {
     // console.debug(`getAll() from "${storeName}"`);
@@ -937,7 +963,7 @@ class ColorizerEngine {
     item.sorting = insertAfter.sorting + 1;
     console.log(item);
 
-    // TODO: Update all paletteItems in the database and then refresh palette from database
+    this.db.bulkUpdate(this.#paletteStoreName, this.#palette);
   }
 }
 
