@@ -599,7 +599,7 @@ class ColorizerInterface {
         // console.debug(`draggedItem: ${this.#draggedItem.getAttribute("palette-color-id")} (${this.#draggedItem})`);
         // console.debug(`dropTarget: ${this.#dropTarget.getAttribute("palette-color-id")} (${this.#dropTarget})`);
 
-        this.engine.moveItemInPalette(this.#draggedItem.getAttribute("palette-color-id"), this.#dropTarget.getAttribute("palette-color-id"));
+        this.engine.reorderPalette(this.#draggedItem.getAttribute("palette-color-id"), this.#dropTarget.getAttribute("palette-color-id"));
       }
 
       this.#draggedItem = null;
@@ -883,11 +883,17 @@ class ColorizerEngine {
       this.#palette = [];
 
       // Create PaletteItem instances
+      //
+      // The ``sorting`` attribute is refreshed every time. This makes
+      // reordering of the palette easy (implementation-wise). See
+      // ``reorderPalette()`` for the details.
+      let newSorting = 1;
       result.forEach((item) => {
         this.#palette.push(new PaletteItem(
           item.red, item.green, item.blue,
-          { sorting: item.sorting, id: item.paletteItemID },
+          { sorting: newSorting * 5, id: item.paletteItemID },
         ));
+        newSorting++;
       });
 
       // Notify the Observers
@@ -920,8 +926,18 @@ class ColorizerEngine {
     this.db.deleteByKey(this.#paletteStoreName, id, {transSuccessCallback: this.refreshPaletteFromDB.bind(this)});
   }
 
-  moveItemInPalette(itemID, insertAfterID) {
-    console.debug(`moveItemInPalette(): ${itemID} to ${insertAfterID}`);
+  reorderPalette(itemID, insertAfterID) {
+    console.debug(`reorderPalette(): ${itemID} to ${insertAfterID}`);
+
+    const item = this.#palette.find((needle) => needle.id === Number(itemID));
+    console.info(item);
+    const insertAfter = this.#palette.find((needle) => needle.id === Number(insertAfterID));
+    console.info(insertAfter);
+
+    item.sorting = insertAfter.sorting + 1;
+    console.log(item);
+
+    // TODO: Update all paletteItems in the database and then refresh palette from database
   }
 }
 
