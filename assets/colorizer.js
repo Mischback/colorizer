@@ -105,42 +105,45 @@ class DBInterface {
   upsert(storeName, data, { putSuccessCallback=undefined, transSuccessCallback=undefined } = {}) {
     // console.debug(`upsert() on ${storeName}: ${data}`);
 
-    if (this.#dbHandle) {
-      let transaction = this.#dbHandle.transaction([storeName], "readwrite");
-      transaction.addEventListener("abort", (e) => {
-        console.error("upsert(): Transaction aborted!");
-        console.error(e.target.error);
+    if (this.#dbHandle === undefined) {
+      console.error("upsert(): No handle to the database");
+      return;
+    }
+
+    let transaction = this.#dbHandle.transaction([storeName], "readwrite");
+    transaction.addEventListener("abort", (e) => {
+      console.error("upsert(): Transaction aborted!");
+      console.error(e.target.error);
+    });
+    transaction.addEventListener("error", (e) => {
+      console.error("upsert(): Transaction had an error");
+      console.error(e.target.error);
+    });
+
+    // Only add the eventListener for ``complete``, if a callback function is
+    // provided.
+    if (transSuccessCallback !== undefined) {
+      transaction.addEventListener("complete", () => {
+        console.info("upsert(): Transaction completed successfully");
+
+        transSuccessCallback();
       });
-      transaction.addEventListener("error", (e) => {
-        console.error("upsert(): Transaction had an error");
-        console.error(e.target.error);
+    }
+
+    let request = transaction.objectStore(storeName).put(data);
+    request.addEventListener("error", (e) => {
+      console.error("upsert(): PUT had an error");
+      console.error(e.target.error);
+    });
+
+    // Only add the eventListener for ``success``, if a callback function is
+    // provided.
+    if (putSuccessCallback !== undefined) {
+      request.addEventListener("success", () => {
+        console.info("upsert(): PUT successful");
+
+        putSuccessCallback();
       });
-
-      // Only add the eventListener for ``complete``, if a callback function is
-      // provided.
-      if (transSuccessCallback !== undefined) {
-        transaction.addEventListener("complete", () => {
-          console.info("upsert(): Transaction completed successfully");
-
-          transSuccessCallback();
-        });
-      }
-
-      let request = transaction.objectStore(storeName).put(data);
-      request.addEventListener("error", (e) => {
-        console.error("upsert(): PUT had an error");
-        console.error(e.target.error);
-      });
-
-      // Only add the eventListener for ``success``, if a callback function is
-      // provided.
-      if (putSuccessCallback !== undefined) {
-        request.addEventListener("success", () => {
-          console.info("upsert(): PUT successful");
-
-          putSuccessCallback();
-        });
-      }
     }
   }
 
@@ -168,69 +171,75 @@ class DBInterface {
   deleteByKey(storeName, key, { deleteSuccessCallback=undefined, transSuccessCallback=undefined } = {}) {
     //console.debug(`deleteByKey() on ${storeName}: ${key}`);
 
-    if (this.#dbHandle) {
-      let transaction = this.#dbHandle.transaction([storeName], "readwrite");
-      transaction.addEventListener("abort", (e) => {
-        console.error("deleteByKey(): Transaction aborted!");
-        console.error(e.target.error);
+    if (this.#dbHandle === undefined) {
+      console.error("deleteByKey(): No handle to the database");
+      return;
+    }
+
+    let transaction = this.#dbHandle.transaction([storeName], "readwrite");
+    transaction.addEventListener("abort", (e) => {
+      console.error("deleteByKey(): Transaction aborted!");
+      console.error(e.target.error);
+    });
+    transaction.addEventListener("error", (e) => {
+      console.error("deleteByKey(): Transaction had an error");
+      console.error(e.target.error);
+    });
+
+    // Only add the eventListener for ``complete``, if a callback function is
+    // provided.
+    if (transSuccessCallback !== undefined) {
+      transaction.addEventListener("complete", () => {
+        console.info("deleteByKey(): Transaction completed successfully");
+
+        transSuccessCallback();
       });
-      transaction.addEventListener("error", (e) => {
-        console.error("deleteByKey(): Transaction had an error");
-        console.error(e.target.error);
+    }
+
+    let request = transaction.objectStore(storeName).delete(key);
+    request.addEventListener("error", (e) => {
+      console.error("deleteByKey(): DELETE had an error");
+      console.error(e.target.error);
+    });
+
+    // Only add the eventListener for ``success``, if a callback function is
+    // provided.
+    if (deleteSuccessCallback !== undefined) {
+      request.addEventListener("success", () => {
+        console.info("deleteByKey(): DELETE successful");
+
+        deleteSuccessCallback();
       });
-
-      // Only add the eventListener for ``complete``, if a callback function is
-      // provided.
-      if (transSuccessCallback !== undefined) {
-        transaction.addEventListener("complete", () => {
-          console.info("deleteByKey(): Transaction completed successfully");
-
-          transSuccessCallback();
-        });
-      }
-
-      let request = transaction.objectStore(storeName).delete(key);
-      request.addEventListener("error", (e) => {
-        console.error("deleteByKey(): DELETE had an error");
-        console.error(e.target.error);
-      });
-
-      // Only add the eventListener for ``success``, if a callback function is
-      // provided.
-      if (deleteSuccessCallback !== undefined) {
-        request.addEventListener("success", () => {
-          console.info("deleteByKey(): DELETE successful");
-
-          deleteSuccessCallback();
-        });
-      }
     }
   }
 
   getAll(storeName, successCallback=(() => {})) {
     // console.debug(`getAll() from "${storeName}"`);
 
-    if (this.#dbHandle) {
-      let request = this.#dbHandle.transaction(storeName).objectStore(storeName).openCursor(null, IDBCursor.NEXT);
-      let results = [];
-
-      request.addEventListener("success", (e) => {
-        let cursor = e.target.result;
-        if (cursor) {
-          // console.debug("Key: " + cursor.key + " Value: " + cursor.value);
-          results.push(cursor.value);
-          cursor.continue();
-        } else {
-          // console.debug("Finished! " + results);
-          successCallback(results);
-        }
-      });
-
-      request.addEventListener("error", (e) => {
-        console.error(`getAll(): Error while fetching items from ${storeName}`);
-        console.error(e.target.error);
-      });
+    if (this.#dbHandle === undefined) {
+      console.error("getAll(): No handle to the database");
+      return;
     }
+
+    let request = this.#dbHandle.transaction(storeName).objectStore(storeName).openCursor(null, IDBCursor.NEXT);
+    let results = [];
+
+    request.addEventListener("success", (e) => {
+      let cursor = e.target.result;
+      if (cursor) {
+        // console.debug("Key: " + cursor.key + " Value: " + cursor.value);
+        results.push(cursor.value);
+        cursor.continue();
+      } else {
+        // console.debug("Finished! " + results);
+        successCallback(results);
+      }
+    });
+
+    request.addEventListener("error", (e) => {
+      console.error(`getAll(): Error while fetching items from ${storeName}`);
+      console.error(e.target.error);
+    });
   }
 }
 
