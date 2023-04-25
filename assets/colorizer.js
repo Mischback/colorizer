@@ -26,8 +26,11 @@
  *  - https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase
  */
 class DBInterface {
+
+  #dbHandle;
+
   constructor(dbName, dbVersion) {
-    this.dbHandle;
+    this.#dbHandle = undefined;
     this.dbName = dbName;
     this.dbVersion = dbVersion;
   }
@@ -61,19 +64,19 @@ class DBInterface {
     openRequest.addEventListener("success", () => {
       console.info("Database opened successfully");
 
-      this.dbHandle = openRequest.result;
+      this.#dbHandle = openRequest.result;
 
       // And now execute the specified successCallback!
       successCallback();
     });
 
     openRequest.addEventListener("upgradeneeded", (e) => {
-      this.dbHandle = e.target.result;
+      this.#dbHandle = e.target.result;
 
       // Initialize the ObjectStores
       stores.forEach((store) => {
         console.info(`Creating ObjectStore "${store.name}"`);
-        this.dbHandle.createObjectStore(store.name, store.options);
+        this.#dbHandle.createObjectStore(store.name, store.options);
       });
     });
   }
@@ -102,8 +105,8 @@ class DBInterface {
   upsert(storeName, data, { putSuccessCallback=undefined, transSuccessCallback=undefined } = {}) {
     // console.debug(`upsert() on ${storeName}: ${data}`);
 
-    if (this.dbHandle) {
-      let transaction = this.dbHandle.transaction([storeName], "readwrite");
+    if (this.#dbHandle) {
+      let transaction = this.#dbHandle.transaction([storeName], "readwrite");
       transaction.addEventListener("abort", (e) => {
         console.error("upsert(): Transaction aborted!");
         console.error(e.target.error);
@@ -165,8 +168,8 @@ class DBInterface {
   deleteByKey(storeName, key, { deleteSuccessCallback=undefined, transSuccessCallback=undefined } = {}) {
     //console.debug(`deleteByKey() on ${storeName}: ${key}`);
 
-    if (this.dbHandle) {
-      let transaction = this.dbHandle.transaction([storeName], "readwrite");
+    if (this.#dbHandle) {
+      let transaction = this.#dbHandle.transaction([storeName], "readwrite");
       transaction.addEventListener("abort", (e) => {
         console.error("deleteByKey(): Transaction aborted!");
         console.error(e.target.error);
@@ -207,8 +210,8 @@ class DBInterface {
   getAll(storeName, successCallback=(() => {})) {
     // console.debug(`getAll() from "${storeName}"`);
 
-    if (this.dbHandle) {
-      let request = this.dbHandle.transaction(storeName).objectStore(storeName).openCursor(null, IDBCursor.NEXT);
+    if (this.#dbHandle) {
+      let request = this.#dbHandle.transaction(storeName).objectStore(storeName).openCursor(null, IDBCursor.NEXT);
       let results = [];
 
       request.addEventListener("success", (e) => {
