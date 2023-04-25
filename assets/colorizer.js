@@ -82,6 +82,58 @@ class DBInterface {
   }
 
   /**
+   * Get a transaction for further use.
+   *
+   * @param storeName The objectStore to operate on.
+   * @param mode The mode of the transaction (see
+   *             https://developer.mozilla.org/en-US/docs/Web/API/IDBTransaction/mode).
+   *             Should be "readonly" or "readwrite".
+   * @param transSuccessCallback Callback function that is executed when the
+   *                             transaction was successful.
+   *                             Default: ``undefined``.
+   *
+   * Please note: ``transSuccessCallback`` is wrapped in an object literal, see
+   * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   *
+   * This is a private method to get an IndexedDB ``transaction``to a given
+   * store with a given mode. Optionally, a callback function can be provided
+   * that is executed when the transaction completed successfully.
+   */
+  #getTransaction(storeName, mode, { transSuccessCallback=undefined } = {}) {
+    // console.debug("#getTransaction()");
+    // console.debug(`storeName: ${storeName}`);
+    // console.debug(`mode: ${mode}`);
+    // console.debug(`transSuccessCallback: ${transSuccessCallback}`);
+
+    if (this.#dbHandle === undefined) {
+      console.error("No handle to the database");
+      return;
+    }
+
+    let transaction = this.#dbHandle.transaction([storeName], mode);
+    transaction.addEventListener("abort", (e) => {
+      console.error("Transaction aborted!");
+      console.error(e.target.error);
+    });
+    transaction.addEventListener("error", (e) => {
+      console.error("Transaction had an error");
+      console.error(e.target.error);
+    });
+
+    // Only add the eventListener for ``complete``, if a callback function is
+    // provided.
+    if (transSuccessCallback !== undefined) {
+      transaction.addEventListener("complete", () => {
+        console.info("Transaction completed successfully");
+
+        transSuccessCallback();
+      });
+    }
+
+    return transaction;
+  }
+
+  /**
    * Update or insert data into the IndexedDB store.
    *
    * @param storeName The name of the store to insert into.
@@ -105,30 +157,7 @@ class DBInterface {
   upsert(storeName, data, { putSuccessCallback=undefined, transSuccessCallback=undefined } = {}) {
     // console.debug(`upsert() on ${storeName}: ${data}`);
 
-    if (this.#dbHandle === undefined) {
-      console.error("upsert(): No handle to the database");
-      return;
-    }
-
-    let transaction = this.#dbHandle.transaction([storeName], "readwrite");
-    transaction.addEventListener("abort", (e) => {
-      console.error("upsert(): Transaction aborted!");
-      console.error(e.target.error);
-    });
-    transaction.addEventListener("error", (e) => {
-      console.error("upsert(): Transaction had an error");
-      console.error(e.target.error);
-    });
-
-    // Only add the eventListener for ``complete``, if a callback function is
-    // provided.
-    if (transSuccessCallback !== undefined) {
-      transaction.addEventListener("complete", () => {
-        console.info("upsert(): Transaction completed successfully");
-
-        transSuccessCallback();
-      });
-    }
+    let transaction = this.#getTransaction(storeName, "readwrite", {transSuccessCallback: transSuccessCallback});
 
     let request = transaction.objectStore(storeName).put(data);
     request.addEventListener("error", (e) => {
@@ -171,30 +200,7 @@ class DBInterface {
   deleteByKey(storeName, key, { deleteSuccessCallback=undefined, transSuccessCallback=undefined } = {}) {
     //console.debug(`deleteByKey() on ${storeName}: ${key}`);
 
-    if (this.#dbHandle === undefined) {
-      console.error("deleteByKey(): No handle to the database");
-      return;
-    }
-
-    let transaction = this.#dbHandle.transaction([storeName], "readwrite");
-    transaction.addEventListener("abort", (e) => {
-      console.error("deleteByKey(): Transaction aborted!");
-      console.error(e.target.error);
-    });
-    transaction.addEventListener("error", (e) => {
-      console.error("deleteByKey(): Transaction had an error");
-      console.error(e.target.error);
-    });
-
-    // Only add the eventListener for ``complete``, if a callback function is
-    // provided.
-    if (transSuccessCallback !== undefined) {
-      transaction.addEventListener("complete", () => {
-        console.info("deleteByKey(): Transaction completed successfully");
-
-        transSuccessCallback();
-      });
-    }
+    let transaction = this.#getTransaction(storeName, "readwrite", {transSuccessCallback: transSuccessCallback});
 
     let request = transaction.objectStore(storeName).delete(key);
     request.addEventListener("error", (e) => {
