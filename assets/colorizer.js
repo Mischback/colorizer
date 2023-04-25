@@ -26,8 +26,11 @@
  *  - https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase
  */
 class DBInterface {
+
+  #dbHandle;
+
   constructor(dbName, dbVersion) {
-    this.dbHandle;
+    this.#dbHandle = undefined;
     this.dbName = dbName;
     this.dbVersion = dbVersion;
   }
@@ -36,19 +39,37 @@ class DBInterface {
    * Open (and initialize) the database as required.
    *
    * @param stores A list of stores in the database.
+   *               The required format of ``stores`` is described below.
    * @param successCallback A function to execute on successfully opening the
-   *                        database.
-   *
-   * Note: The parameters are actually passed using an object literal, see
-   * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   *                        database. Default: a ``noop`` function.
    *
    * The method opens the database and stores a handle to it internally. It
    * will take care of proper initialization, depending on the instance's
-   * ``dbVersion`` and the ``stores``.
+   * ``dbVersion`` and the ``stores`` parameter.
    *
    * When the database is successfully opened, ``successCallback`` is executed.
+   *
+   * The ``stores`` parameter
+   * ------------------------
+   *
+   * ``stores`` should be an ``Array`` of objects providing the following
+   * attributes:
+   *   - ``name``: The name of the store to be created.
+   *   - ``options``: Options of that store, as specified here:
+   *     https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/createObjectStore#parameters
+   *   - ``indices``: An ``Array`` of objects providing the following attributs:
+   *     - ``indexName``: The name of the index.
+   *     - ``keyPath``: The attribute to work on.
+   *     - ``options``: Options of that index, as specified here:
+   *       https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore/createIndex#parameters
+   *
+   * The ``stores`` parameter is internally evaluated in the ``upgradeneeded``
+   * handler and provides the required setup of the IndexedDB instance for the
+   * application. With the current implementation it is possible to create
+   * instances of ``ObjectStore`` as required and provide the means to create
+   * indices (instances of ``IDBIndex``) as required.
    */
-  openDatabase({stores = [], successCallback = (() => {})}) {
+  openDatabase(stores=[], successCallback=(() => {})) {
     if (!window.indexedDB) {
       console.error("IndexedDB not available!");
       return;
@@ -64,21 +85,80 @@ class DBInterface {
     openRequest.addEventListener("success", () => {
       console.info("Database opened successfully");
 
-      this.dbHandle = openRequest.result;
+      this.#dbHandle = openRequest.result;
 
       // And now execute the specified successCallback!
       successCallback();
     });
 
     openRequest.addEventListener("upgradeneeded", (e) => {
-      this.dbHandle = e.target.result;
+      this.#dbHandle = e.target.result;
 
       // Initialize the ObjectStores
-      stores.forEach((store) => {
-        console.info(`Creating ObjectStore "${store.name}"`);
-        this.dbHandle.createObjectStore(store.name, store.options);
+      stores.forEach((storeConfig) => {
+        console.info(`Creating ObjectStore "${storeConfig.name}"`);
+        const store = this.#dbHandle.createObjectStore(storeConfig.name, storeConfig.options);
+
+        if (Array.isArray(storeConfig.indices)) {
+          storeConfig.indices.forEach((indexConfig) => {
+            console.info(`Creating index "${indexConfig.indexName}" for objectStore "${storeConfig.name}"`);
+            store.createIndex(indexConfig.indexName, indexConfig.keyPath, indexConfig.options);
+          });
+        }
       });
     });
+  }
+
+  /**
+   * Get a transaction for further use.
+   *
+   * @param storeName The objectStore to operate on.
+   * @param mode The mode of the transaction (see
+   *             https://developer.mozilla.org/en-US/docs/Web/API/IDBTransaction/mode).
+   *             Should be "readonly" or "readwrite".
+   * @param transSuccessCallback Callback function that is executed when the
+   *                             transaction was successful.
+   *                             Default: ``undefined``.
+   *
+   * Please note: ``transSuccessCallback`` is wrapped in an object literal, see
+   * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   *
+   * This is a private method to get an IndexedDB ``transaction``to a given
+   * store with a given mode. Optionally, a callback function can be provided
+   * that is executed when the transaction completed successfully.
+   */
+  #getTransaction(storeName, mode, { transSuccessCallback=undefined } = {}) {
+    // console.debug("#getTransaction()");
+    // console.debug(`storeName: ${storeName}`);
+    // console.debug(`mode: ${mode}`);
+    // console.debug(`transSuccessCallback: ${transSuccessCallback}`);
+
+    if (this.#dbHandle === undefined) {
+      console.error("No handle to the database");
+      return;
+    }
+
+    let transaction = this.#dbHandle.transaction([storeName], mode);
+    transaction.addEventListener("abort", (e) => {
+      console.error("Transaction aborted!");
+      console.error(e.target.error);
+    });
+    transaction.addEventListener("error", (e) => {
+      console.error("Transaction had an error");
+      console.error(e.target.error);
+    });
+
+    // Only add the eventListener for ``complete``, if a callback function is
+    // provided.
+    if (transSuccessCallback !== undefined) {
+      transaction.addEventListener("complete", () => {
+        console.info("Transaction completed successfully");
+
+        transSuccessCallback();
+      });
+    }
+
+    return transaction;
   }
 
   /**
@@ -88,45 +168,41 @@ class DBInterface {
    * @param data The data to be inserted.
    * @param putSuccessCallback Callback function that is executed when the
    *                           ``put`` operation was successful.
+   *                           Default: ``undefined``.
    * @param transSuccessCallback Callback function that is executed when the
    *                             transaction was successful.
+   *                             Default: ``undefined``.
    *
    * Please note: ``putSuccessCallback`` and ``transSuccessCallback`` are
    * wrapped in an object literal, see
    * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   *
+   * The event listener for the ``success`` event (of the ``put()`` operation)
+   * and the ``success`` event (of the transaction) are only attached, if they
+   * are  provided by the calling code
+   * (see https://stackoverflow.com/a/52555073).
    */
-  upsert(storeName, data, {putSuccessCallback = (() => {}), transSuccessCallback = (() => {})} = {}) {
+  upsert(storeName, data, { putSuccessCallback=undefined, transSuccessCallback=undefined } = {}) {
     // console.debug(`upsert() on ${storeName}: ${data}`);
 
-    if (this.dbHandle) {
-      let transaction = this.dbHandle.transaction([storeName], "readwrite");
-      transaction.addEventListener("complete", () => {
-        console.info("Transaction completed successfully");
+    let transaction = this.#getTransaction(storeName, "readwrite", {transSuccessCallback: transSuccessCallback});
 
-        transSuccessCallback();
-      });
-      transaction.addEventListener("abort", (te) => {
-        console.error("Transaction aborted!");
-        console.error(te.target.error);
-      });
-      transaction.addEventListener("error", (te) => {
-        console.error("Transaction had an error");
-        console.error(te.target.error);
-      });
+    let request = transaction.objectStore(storeName).put(data);
+    request.addEventListener("error", (e) => {
+      console.error("upsert(): PUT had an error");
+      console.error(e.target.error);
+    });
 
-      let request = transaction.objectStore(storeName).put(data);
+    // Only add the eventListener for ``success``, if a callback function is
+    // provided.
+    if (putSuccessCallback !== undefined) {
       request.addEventListener("success", () => {
-        console.info("PUT successful");
+        console.info("upsert(): PUT successful");
 
         putSuccessCallback();
       });
-      request.addEventListener("error", (re) => {
-        console.error("PUT had an error");
-        console.error(re.target.error);
-      });
     }
   }
-
 
   /**
    * Delete an item from the IndexedDB store, specified by its ``key``.
@@ -135,69 +211,123 @@ class DBInterface {
    * @param key The key of the item to be deleted.
    * @param deleteSuccessCallback Callback function that is executed when the
    *                           ``delete`` operation was successful.
+   *                           Default: ``undefined``.
    * @param transSuccessCallback Callback function that is executed when the
    *                             transaction was successful.
+   *                             Default: ``undefined``.
    *
    * Please note: ``deleteSuccessCallback`` and ``transSuccessCallback`` are
    * wrapped in an object literal, see
    * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   *
+   * The event listener for the ``success`` event (of the ``delete()``
+   * operation) and the ``success`` event (of the transaction) are only
+   * attached, if they are  provided by the calling code
+   * (see https://stackoverflow.com/a/52555073).
    */
-  deleteByKey(storeName, key, {deleteSuccessCallback = (() => {}), transSuccessCallback = (() => {})} = {}) {
+  deleteByKey(storeName, key, { deleteSuccessCallback=undefined, transSuccessCallback=undefined } = {}) {
     //console.debug(`deleteByKey() on ${storeName}: ${key}`);
 
-    if (this.dbHandle) {
-      let transaction = this.dbHandle.transaction([storeName], "readwrite");
-      transaction.addEventListener("complete", () => {
-        console.info("Transaction completed successfully");
+    let transaction = this.#getTransaction(storeName, "readwrite", {transSuccessCallback: transSuccessCallback});
 
-        transSuccessCallback();
-      });
-      transaction.addEventListener("abort", (te) => {
-        console.error("Transaction aborted!");
-        console.error(te.target.error);
-      });
-      transaction.addEventListener("error", (te) => {
-        console.error("Transaction had an error");
-        console.error(te.target.error);
-      });
+    let request = transaction.objectStore(storeName).delete(key);
+    request.addEventListener("error", (e) => {
+      console.error("deleteByKey(): DELETE had an error");
+      console.error(e.target.error);
+    });
 
-      let request = transaction.objectStore(storeName).delete(key);
+    // Only add the eventListener for ``success``, if a callback function is
+    // provided.
+    if (deleteSuccessCallback !== undefined) {
       request.addEventListener("success", () => {
-        console.info("DELETE successful");
+        console.info("deleteByKey(): DELETE successful");
 
         deleteSuccessCallback();
-      });
-      request.addEventListener("error", (re) => {
-        console.error("DELETE had an error");
-        console.error(re.target.error);
       });
     }
   }
 
-  getAll(storeName, successCallback=((result) => {})) {
+  /**
+   * Update many items in the database.
+   *
+   * @param storeName The name of the store.
+   * @param bulkData An array of data objects to be update in the store.
+   * @param transSuccessCallback Callback function that is executed when the
+   *                             transaction was successful.
+   *                             Default: ``undefined``.
+   *
+   * Please note: ``transSuccessCallback`` is wrapped in an object literal, see
+   * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   *
+   * The method iterates over all elements in the ObjectStore, tries to find
+   * a corresponding item in ``bulkData`` and then updates all attributes of
+   * the element and writes the updated object back to the ObjectStore.
+   *
+   * FIXME: How ObjectStore items are matched to items in ``bulkData`` is
+   *        currently hardcoded. The cursor's ``key`` is matched against an
+   *        attribute ``id``. THIS IS TOO TIGHTLY COUPLED!
+   */
+  bulkUpdate(storeName, bulkData, { transSuccessCallback=undefined } = {}) {
+
+    let transaction = this.#getTransaction(storeName, "readwrite", {transSuccessCallback: transSuccessCallback});
+
+    let request = transaction.objectStore(storeName).openCursor(null, "next");
+    let current;
+    let elem;
+
+    request.addEventListener("success", (e) => {
+      let cursor = e.target.result;
+
+      if (cursor) {
+        current = cursor.value;
+        elem = bulkData.find((needle) => needle.id === cursor.key);
+        if (elem !== undefined) {
+          // Found a corresponding item in the bulkData, perform the update!
+          Object.keys(current).forEach((k) => {
+            if (elem[k] !== undefined)
+              current[k] = elem[k];
+          });
+
+          cursor.update(current);
+        }
+
+        cursor.continue();
+      }
+    });
+  }
+
+  // https://stackoverflow.com/a/25055070
+  getAll(storeName, successCallback=(() => {}), { dataIndex=undefined } = {}) {
     // console.debug(`getAll() from "${storeName}"`);
 
-    if (this.dbHandle) {
-      let request = this.dbHandle.transaction(storeName).objectStore(storeName).openCursor(null, IDBCursor.NEXT);
-      let results = [];
+    let transaction = this.#getTransaction(storeName, "readonly");
 
-      request.addEventListener("success", (e) => {
-        let cursor = e.target.result;
-        if (cursor) {
-          // console.debug("Key: " + cursor.key + " Value: " + cursor.value);
-          results.push(cursor.value);
-          cursor.continue();
-        } else {
-          // console.debug("Finished! " + results);
-          successCallback(results);
-        }
-      });
+    let store = transaction.objectStore(storeName);
+    let request;
+    let results = [];
 
-      request.addEventListener("error", (e) => {
-        console.error(`Error while fetching items from ${storeName}`);
-        console.error(e.target.error);
-      });
+    if (dataIndex === undefined) {
+      request = store.openCursor(null, "next");
+    } else {
+      request = store.index(dataIndex).openCursor(null, "next");
     }
+
+    request.addEventListener("success", (e) => {
+      let cursor = e.target.result;
+      if (cursor) {
+        // console.debug("Key: " + cursor.key + " Value: " + cursor.value);
+        results.push(cursor.value);
+        cursor.continue();
+      } else {
+        // console.debug("Finished! " + results);
+        successCallback(results);
+      }
+    });
+
+    request.addEventListener("error", (e) => {
+      console.error(`getAll(): Error while fetching items from ${storeName}`);
+      console.error(e.target.error);
+    });
   }
 }
 
@@ -371,7 +501,17 @@ class PaletteItem {
  * be instantiated when the DOM is ready!
  */
 class ColorizerInterface {
+
+  // Private attributes
+
+  // These attributes are required to make Drag'n'Drop of PaletteItems work
+  #draggedItem;
+  #dropTarget;
+
   constructor(engine) {
+
+    this.#draggedItem = null;
+    this.#dropTarget = null;
 
     // Store a reference to the ``ColorizerEngine``
     this.engine = engine;
@@ -494,6 +634,46 @@ class ColorizerInterface {
 
     let listItem = document.createElement("li");
     listItem.setAttribute("palette-color-id", paletteItem.id);
+    listItem.setAttribute("draggable", true);
+    listItem.addEventListener("dragstart", (e) => {
+      // console.debug(`DragStart of ${e.currentTarget.getAttribute("palette-color-id")} (${e.target} / ${e.currentTarget})`);
+
+      this.#draggedItem = e.currentTarget;
+    });
+    listItem.addEventListener("dragend", (e) => {
+      // console.debug(`DragEnd of ${e.currentTarget.getAttribute("palette-color-id")} (${e.target} / ${e.currentTarget})`);
+
+      if ((this.#draggedItem !== null) && (this.#dropTarget !== null)) {
+        // console.info("Successful drag!");
+        // console.debug(`draggedItem: ${this.#draggedItem.getAttribute("palette-color-id")} (${this.#draggedItem})`);
+        // console.debug(`dropTarget: ${this.#dropTarget.getAttribute("palette-color-id")} (${this.#dropTarget})`);
+
+        this.engine.reorderPalette(this.#draggedItem.getAttribute("palette-color-id"), this.#dropTarget.getAttribute("palette-color-id"));
+      }
+
+      this.#draggedItem = null;
+      this.#dropTarget = null;
+    });
+    listItem.addEventListener("dragenter", (e) => {
+      if (e.currentTarget.contains(e.relatedTarget))
+        return;
+
+      if (this.#draggedItem === e.currentTarget)
+        return;
+
+      // console.debug(`DragEnter on ${e.currentTarget.getAttribute("palette-color-id")} (${e.target} / ${e.currentTarget})`);
+      this.#dropTarget = e.currentTarget;
+    });
+    listItem.addEventListener("dragleave", (e) => {
+      if (e.currentTarget.contains(e.relatedTarget))
+        return;
+
+      if (e.target !== e.currentTarget)
+        return;
+
+      // console.debug(`DragLeave on ${e.target} / ${e.currentTarget}`);
+      this.#dropTarget = null;
+    });
 
     elem = document.createElement("span");
     elem.textContent = paletteItem.toRgbHex();
@@ -682,6 +862,13 @@ class ColorizerEngine {
           keyPath: "paletteItemID",
           autoIncrement: true,
         },
+        indices: [
+          {
+            indexName: "sorting",
+            keyPath: "sorting",
+            options: {},
+          },
+        ],
       },
     ];
 
@@ -692,7 +879,7 @@ class ColorizerEngine {
     //
     // The ``successCallback`` must be explicitly bound to ``this``. See
     // https://stackoverflow.com/a/59060545 for reference!
-    this.db.openDatabase({stores: dbStores, successCallback: this.refreshPaletteFromDB.bind(this)});
+    this.db.openDatabase(dbStores, this.refreshPaletteFromDB.bind(this));
   }
 
   /**
@@ -734,21 +921,22 @@ class ColorizerEngine {
       this.#palette = [];
 
       // Create PaletteItem instances
+      //
+      // The ``sorting`` attribute is refreshed every time. This makes
+      // reordering of the palette easy (implementation-wise). See
+      // ``reorderPalette()`` for the details.
+      let newSorting = 1;
       result.forEach((item) => {
         this.#palette.push(new PaletteItem(
           item.red, item.green, item.blue,
-          { sorting: item.sorting, id: item.paletteItemID },
+          { sorting: newSorting * 5, id: item.paletteItemID },
         ));
-      });
-
-      // Sort the palette
-      this.#palette.sort((a, b) => {
-        return a.sorting - b.sorting;
+        newSorting++;
       });
 
       // Notify the Observers
       this.#notifyPaletteObservers();
-    });
+    }, { dataIndex: "sorting" });
   }
 
   /**
@@ -774,6 +962,38 @@ class ColorizerEngine {
     // console.debug(`deleteItemByID(): ${id}`);
 
     this.db.deleteByKey(this.#paletteStoreName, id, {transSuccessCallback: this.refreshPaletteFromDB.bind(this)});
+  }
+
+  /**
+   * Put a PaletteItem instance to a new position in the palette.
+   *
+   * @param itemID The ID of the PaletteItem to be moved.
+   * @param insertAfterID The ID of the PaletteItem that was the drop target,
+   *                      the PaletteItem specified by ``itemID`` will be
+   *                      inserted after this element.
+   */
+  reorderPalette(itemID, insertAfterID) {
+    // console.debug(`reorderPalette(): ${itemID} to ${insertAfterID}`);
+
+    const item = this.#palette.find((needle) => needle.id === Number(itemID));
+    const insertAfter = this.#palette.find((needle) => needle.id === Number(insertAfterID));
+
+    // Set ``sorting`` to a new value, depending on the *direction* of the
+    // move.
+    //
+    // in ``refreshPaletteFromDB()``, the ``sorting`` attributes are set to
+    // new values on every refresh. There is always room for another item
+    // between two items, so this is safe.
+    //
+    // But it requires the update of all paletteItems in the database after
+    // this modification (see below).
+    if (item.sorting < insertAfter.sorting) {
+      item.sorting = insertAfter.sorting + 1;
+    } else {
+      item.sorting = insertAfter.sorting - 1;
+    }
+
+    this.db.bulkUpdate(this.#paletteStoreName, this.#palette, {transSuccessCallback: this.refreshPaletteFromDB.bind(this)});
   }
 }
 
