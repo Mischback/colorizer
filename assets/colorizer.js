@@ -636,15 +636,15 @@ class ColorizerInterface {
     listItem.setAttribute("palette-color-id", paletteItem.id);
     listItem.setAttribute("draggable", true);
     listItem.addEventListener("dragstart", (e) => {
-      console.debug(`DragStart of ${e.currentTarget.getAttribute("palette-color-id")} (${e.target} / ${e.currentTarget})`);
+      // console.debug(`DragStart of ${e.currentTarget.getAttribute("palette-color-id")} (${e.target} / ${e.currentTarget})`);
 
       this.#draggedItem = e.currentTarget;
     });
     listItem.addEventListener("dragend", (e) => {
-      console.debug(`DragEnd of ${e.currentTarget.getAttribute("palette-color-id")} (${e.target} / ${e.currentTarget})`);
+      // console.debug(`DragEnd of ${e.currentTarget.getAttribute("palette-color-id")} (${e.target} / ${e.currentTarget})`);
 
       if ((this.#draggedItem !== null) && (this.#dropTarget !== null)) {
-        console.info("Successful drag!");
+        // console.info("Successful drag!");
         // console.debug(`draggedItem: ${this.#draggedItem.getAttribute("palette-color-id")} (${this.#draggedItem})`);
         // console.debug(`dropTarget: ${this.#dropTarget.getAttribute("palette-color-id")} (${this.#dropTarget})`);
 
@@ -661,11 +661,8 @@ class ColorizerInterface {
       if (this.#draggedItem === e.currentTarget)
         return;
 
-      console.debug(`DragEnter on ${e.currentTarget.getAttribute("palette-color-id")} (${e.target} / ${e.currentTarget})`);
+      // console.debug(`DragEnter on ${e.currentTarget.getAttribute("palette-color-id")} (${e.target} / ${e.currentTarget})`);
       this.#dropTarget = e.currentTarget;
-
-      // console.debug(`draggedItem: ${this.#draggedItem.getAttribute("palette-color-id")} (${this.#draggedItem})`);
-      // console.debug(`dropTarget: ${this.#dropTarget.getAttribute("palette-color-id")} (${this.#dropTarget})`);
     });
     listItem.addEventListener("dragleave", (e) => {
       if (e.currentTarget.contains(e.relatedTarget))
@@ -674,17 +671,9 @@ class ColorizerInterface {
       if (e.target !== e.currentTarget)
         return;
 
-      console.debug(`DragLeave on ${e.target} / ${e.currentTarget}`);
+      // console.debug(`DragLeave on ${e.target} / ${e.currentTarget}`);
       this.#dropTarget = null;
     });
-
-    // TODO: This handler does not work, most likely it is blocked by child
-    //       elements
-    // listItem.addEventListener("drop", (e) => {
-    //   e.preventDefault();
-    //   e.stopPropagation();
-    //   console.info(`Drop on ${e.target} / ${e.currentTarget}`);
-    // });
 
     elem = document.createElement("span");
     elem.textContent = paletteItem.toRgbHex();
