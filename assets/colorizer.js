@@ -978,8 +978,8 @@ class ColorizerEngine {
     const item = this.#palette.find((needle) => needle.id === Number(itemID));
     const insertAfter = this.#palette.find((needle) => needle.id === Number(insertAfterID));
 
-    // Set ``sorting`` to a value bigger than the corresponding value of the
-    // target.
+    // Set ``sorting`` to a new value, depending on the *direction* of the
+    // move.
     //
     // in ``refreshPaletteFromDB()``, the ``sorting`` attributes are set to
     // new values on every refresh. There is always room for another item
@@ -987,7 +987,11 @@ class ColorizerEngine {
     //
     // But it requires the update of all paletteItems in the database after
     // this modification (see below).
-    item.sorting = insertAfter.sorting + 1;
+    if (item.sorting < insertAfter.sorting) {
+      item.sorting = insertAfter.sorting + 1;
+    } else {
+      item.sorting = insertAfter.sorting - 1;
+    }
 
     this.db.bulkUpdate(this.#paletteStoreName, this.#palette, {transSuccessCallback: this.refreshPaletteFromDB.bind(this)});
   }
