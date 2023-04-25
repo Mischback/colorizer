@@ -247,16 +247,21 @@ class DBInterface {
     }
   }
 
-  getAll(storeName, successCallback=(() => {})) {
+  // https://stackoverflow.com/a/25055070
+  getAll(storeName, successCallback=(() => {}), { dataIndex=undefined } = {}) {
     // console.debug(`getAll() from "${storeName}"`);
 
-    if (this.#dbHandle === undefined) {
-      console.error("getAll(): No handle to the database");
-      return;
-    }
+    let transaction = this.#getTransaction(storeName, "readonly");
 
-    let request = this.#dbHandle.transaction(storeName).objectStore(storeName).openCursor(null, IDBCursor.NEXT);
+    let store = transaction.objectStore(storeName);
+    let request;
     let results = [];
+
+    if (dataIndex === undefined) {
+      request = store.openCursor(null, "next");
+    } else {
+      request = store.index(dataIndex).openCursor(null, "next");
+    }
 
     request.addEventListener("success", (e) => {
       let cursor = e.target.result;
@@ -824,14 +829,9 @@ class ColorizerEngine {
         ));
       });
 
-      // Sort the palette
-      this.#palette.sort((a, b) => {
-        return a.sorting - b.sorting;
-      });
-
       // Notify the Observers
       this.#notifyPaletteObservers();
-    });
+    }, { dataIndex: "sorting" });
   }
 
   /**
