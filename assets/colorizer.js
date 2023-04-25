@@ -247,9 +247,29 @@ class DBInterface {
     }
   }
 
-  bulkUpdate(storeName, bulkData) {
+  /**
+   * Update many items in the database.
+   *
+   * @param storeName The name of the store.
+   * @param bulkData An array of data objects to be update in the store.
+   * @param transSuccessCallback Callback function that is executed when the
+   *                             transaction was successful.
+   *                             Default: ``undefined``.
+   *
+   * Please note: ``transSuccessCallback`` is wrapped in an object literal, see
+   * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   *
+   * The method iterates over all elements in the ObjectStore, tries to find
+   * a corresponding item in ``bulkData`` and then updates all attributes of
+   * the element and writes the updated object back to the ObjectStore.
+   *
+   * FIXME: How ObjectStore items are matched to items in ``bulkData`` is
+   *        currently hardcoded. The cursor's ``key`` is matched against an
+   *        attribute ``id``. THIS IS TOO TIGHTLY COUPLED!
+   */
+  bulkUpdate(storeName, bulkData, { transSuccessCallback=undefined } = {}) {
 
-    let transaction = this.#getTransaction(storeName, "readwrite");
+    let transaction = this.#getTransaction(storeName, "readwrite", {transSuccessCallback: transSuccessCallback});
 
     let request = transaction.objectStore(storeName).openCursor(null, "next");
     let current;
@@ -261,12 +281,15 @@ class DBInterface {
       if (cursor) {
         current = cursor.value;
         elem = bulkData.find((needle) => needle.id === cursor.key);
-        Object.keys(current).forEach((k) => {
-          if (elem[k] !== undefined)
-            current[k] = elem[k];
-        });
+        if (elem !== undefined) {
+          // Found a corresponding item in the bulkData, perform the update!
+          Object.keys(current).forEach((k) => {
+            if (elem[k] !== undefined)
+              current[k] = elem[k];
+          });
 
-        cursor.update(current);
+          cursor.update(current);
+        }
 
         cursor.continue();
       }
@@ -952,18 +975,32 @@ class ColorizerEngine {
     this.db.deleteByKey(this.#paletteStoreName, id, {transSuccessCallback: this.refreshPaletteFromDB.bind(this)});
   }
 
+  /**
+   * Put a PaletteItem instance to a new position in the palette.
+   *
+   * @param itemID The ID of the PaletteItem to be moved.
+   * @param insertAfterID The ID of the PaletteItem that was the drop target,
+   *                      the PaletteItem specified by ``itemID`` will be
+   *                      inserted after this element.
+   */
   reorderPalette(itemID, insertAfterID) {
-    console.debug(`reorderPalette(): ${itemID} to ${insertAfterID}`);
+    // console.debug(`reorderPalette(): ${itemID} to ${insertAfterID}`);
 
     const item = this.#palette.find((needle) => needle.id === Number(itemID));
-    console.info(item);
     const insertAfter = this.#palette.find((needle) => needle.id === Number(insertAfterID));
-    console.info(insertAfter);
 
+    // Set ``sorting`` to a value bigger than the corresponding value of the
+    // target.
+    //
+    // in ``refreshPaletteFromDB()``, the ``sorting`` attributes are set to
+    // new values on every refresh. There is always room for another item
+    // between two items, so this is safe.
+    //
+    // But it requires the update of all paletteItems in the database after
+    // this modification (see below).
     item.sorting = insertAfter.sorting + 1;
-    console.log(item);
 
-    this.db.bulkUpdate(this.#paletteStoreName, this.#palette);
+    this.db.bulkUpdate(this.#paletteStoreName, this.#palette, {transSuccessCallback: this.refreshPaletteFromDB.bind(this)});
   }
 }
 
