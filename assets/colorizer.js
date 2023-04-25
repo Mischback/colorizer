@@ -452,7 +452,17 @@ class PaletteItem {
  * be instantiated when the DOM is ready!
  */
 class ColorizerInterface {
+
+  // Private attributes
+
+  // These attributes are required to make Drag'n'Drop of PaletteItems work
+  #draggedItem;
+  #dropTarget;
+
   constructor(engine) {
+
+    this.#draggedItem = null;
+    this.#dropTarget = null;
 
     // Store a reference to the ``ColorizerEngine``
     this.engine = engine;
@@ -575,6 +585,57 @@ class ColorizerInterface {
 
     let listItem = document.createElement("li");
     listItem.setAttribute("palette-color-id", paletteItem.id);
+    listItem.setAttribute("draggable", true);
+    listItem.addEventListener("dragstart", (e) => {
+      console.debug(`DragStart of ${e.currentTarget.getAttribute("palette-color-id")} (${e.target} / ${e.currentTarget})`);
+
+      this.#draggedItem = e.currentTarget;
+    });
+    listItem.addEventListener("dragend", (e) => {
+      console.debug(`DragEnd of ${e.currentTarget.getAttribute("palette-color-id")} (${e.target} / ${e.currentTarget})`);
+
+      if ((this.#draggedItem !== null) && (this.#dropTarget !== null)) {
+        console.info("Successful drag!");
+        // console.debug(`draggedItem: ${this.#draggedItem.getAttribute("palette-color-id")} (${this.#draggedItem})`);
+        // console.debug(`dropTarget: ${this.#dropTarget.getAttribute("palette-color-id")} (${this.#dropTarget})`);
+
+        this.engine.moveItemInPalette(this.#draggedItem.getAttribute("palette-color-id"), this.#dropTarget.getAttribute("palette-color-id"));
+      }
+
+      this.#draggedItem = null;
+      this.#dropTarget = null;
+    });
+    listItem.addEventListener("dragenter", (e) => {
+      if (e.currentTarget.contains(e.relatedTarget))
+        return;
+
+      if (this.#draggedItem === e.currentTarget)
+        return;
+
+      console.debug(`DragEnter on ${e.currentTarget.getAttribute("palette-color-id")} (${e.target} / ${e.currentTarget})`);
+      this.#dropTarget = e.currentTarget;
+
+      // console.debug(`draggedItem: ${this.#draggedItem.getAttribute("palette-color-id")} (${this.#draggedItem})`);
+      // console.debug(`dropTarget: ${this.#dropTarget.getAttribute("palette-color-id")} (${this.#dropTarget})`);
+    });
+    listItem.addEventListener("dragleave", (e) => {
+      if (e.currentTarget.contains(e.relatedTarget))
+        return;
+
+      if (e.target !== e.currentTarget)
+        return;
+
+      console.debug(`DragLeave on ${e.target} / ${e.currentTarget}`);
+      this.#dropTarget = null;
+    });
+
+    // TODO: This handler does not work, most likely it is blocked by child
+    //       elements
+    // listItem.addEventListener("drop", (e) => {
+    //   e.preventDefault();
+    //   e.stopPropagation();
+    //   console.info(`Drop on ${e.target} / ${e.currentTarget}`);
+    // });
 
     elem = document.createElement("span");
     elem.textContent = paletteItem.toRgbHex();
@@ -857,6 +918,10 @@ class ColorizerEngine {
     // console.debug(`deleteItemByID(): ${id}`);
 
     this.db.deleteByKey(this.#paletteStoreName, id, {transSuccessCallback: this.refreshPaletteFromDB.bind(this)});
+  }
+
+  moveItemInPalette(itemID, insertAfterID) {
+    console.debug(`moveItemInPalette(): ${itemID} to ${insertAfterID}`);
   }
 }
 
