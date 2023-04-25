@@ -39,14 +39,35 @@ class DBInterface {
    * Open (and initialize) the database as required.
    *
    * @param stores A list of stores in the database.
+   *               The required format of ``stores`` is described below.
    * @param successCallback A function to execute on successfully opening the
    *                        database. Default: a ``noop`` function.
    *
    * The method opens the database and stores a handle to it internally. It
    * will take care of proper initialization, depending on the instance's
-   * ``dbVersion`` and the ``stores``.
+   * ``dbVersion`` and the ``stores`` parameter.
    *
    * When the database is successfully opened, ``successCallback`` is executed.
+   *
+   * The ``stores`` parameter
+   * ------------------------
+   *
+   * ``stores`` should be an ``Array`` of objects providing the following
+   * attributes:
+   *   - ``name``: The name of the store to be created.
+   *   - ``options``: Options of that store, as specified here:
+   *     https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/createObjectStore#parameters
+   *   - ``indices``: An ``Array`` of objects providing the following attributs:
+   *     - ``indexName``: The name of the index.
+   *     - ``keyPath``: The attribute to work on.
+   *     - ``options``: Options of that index, as specified here:
+   *       https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore/createIndex#parameters
+   *
+   * The ``stores`` parameter is internally evaluated in the ``upgradeneeded``
+   * handler and provides the required setup of the IndexedDB instance for the
+   * application. With the current implementation it is possible to create
+   * instances of ``ObjectStore`` as required and provide the means to create
+   * indices (instances of ``IDBIndex``) as required.
    */
   openDatabase(stores=[], successCallback=(() => {})) {
     if (!window.indexedDB) {
@@ -74,9 +95,16 @@ class DBInterface {
       this.#dbHandle = e.target.result;
 
       // Initialize the ObjectStores
-      stores.forEach((store) => {
-        console.info(`Creating ObjectStore "${store.name}"`);
-        this.#dbHandle.createObjectStore(store.name, store.options);
+      stores.forEach((storeConfig) => {
+        console.info(`Creating ObjectStore "${storeConfig.name}"`);
+        const store = this.#dbHandle.createObjectStore(storeConfig.name, storeConfig.options);
+
+        if (Array.isArray(storeConfig.indices)) {
+          storeConfig.indices.forEach((indexConfig) => {
+            console.info(`Creating index "${indexConfig.indexName}" for objectStore "${storeConfig.name}"`);
+            store.createIndex(indexConfig.indexName, indexConfig.keyPath, indexConfig.options);
+          });
+        }
       });
     });
   }
@@ -730,6 +758,13 @@ class ColorizerEngine {
           keyPath: "paletteItemID",
           autoIncrement: true,
         },
+        indices: [
+          {
+            indexName: "sorting",
+            keyPath: "sorting",
+            options: {},
+          },
+        ],
       },
     ];
 
