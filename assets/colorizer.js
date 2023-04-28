@@ -533,10 +533,12 @@ class ColorizerColorInputForm {
     if (this.form === null) {
       throw new Error("Missing required DOM element with id '#color-add-form'");
     }
+
     this.inputPick = document.querySelector("#new-color-pick");
     if (this.inputPick === null) {
       throw new Error("Missing required DOM element with id '#new-color-pick'");
     }
+
     this.inputHex = document.querySelector("#new-color-hex");
     if (this.inputHex === null) {
       throw new Error("Missing required DOM element with id '#new-color-hex'");
@@ -544,18 +546,37 @@ class ColorizerColorInputForm {
     // Attach a validation pattern to the hex-based input.
     this.inputHex.pattern = "#[0-9A-Fa-f]{6}";
 
+    this.inputRgbR = document.querySelector("#new-color-rgb-r");
+    if (this.inputRgbR === null) {
+      throw new Error("Missing required DOM element with id '#new-color-rgb-r'");
+    }
+
+    this.inputRgbG = document.querySelector("#new-color-rgb-g");
+    if (this.inputRgbG === null) {
+      throw new Error("Missing required DOM element with id '#new-color-rgb-g'");
+    }
+
+    this.inputRgbB = document.querySelector("#new-color-rgb-b");
+    if (this.inputRgbB === null) {
+      throw new Error("Missing required DOM element with id '#new-color-rgb-b'");
+    }
+
     // Attach event handlers to the DOM elements
     this.form.addEventListener("submit", (e) => {
       this.#submitCallback(e);
     });
     this.inputPick.addEventListener("change", this.#setColorFromInputPick.bind(this));
     this.inputHex.addEventListener("input", this.#setColorFromInputHex.bind(this));
+    this.inputRgbR.addEventListener("input", this.#setColorFromInputRgb.bind(this));
+    this.inputRgbG.addEventListener("input", this.#setColorFromInputRgb.bind(this));
+    this.inputRgbB.addEventListener("input", this.#setColorFromInputRgb.bind(this));
 
     // Initialize the list of Observers
     this.#currentColorObservers = [];
 
     this.registerColorObserver(this.#updateInputPick.bind(this));
     this.registerColorObserver(this.#updateInputHex.bind(this));
+    this.registerColorObserver(this.#updateInputRgb.bind(this));
 
     // FIXME: This is only for development!
     this.registerColorObserver((c) => {
@@ -645,6 +666,22 @@ class ColorizerColorInputForm {
   }
 
   /**
+   * Set ``#currentColor`` from the RGB input fields.
+   *
+   * @param e The DOM event.
+   *
+   * This method is attached as an EventHandler to the RGB-related input
+   * fields, see this class's ``constructor()``.
+   */
+  #setColorFromInputRgb(e) {
+    this.#setCurrentColor({
+      r: this.inputRgbR.value,
+      g: this.inputRgbG.value,
+      b: this.inputRgbB.value,
+    });
+  }
+
+  /**
    * Update the color picker input field.
    *
    * @param newColor The new color as provided by ``#currentColor``.
@@ -666,6 +703,20 @@ class ColorizerColorInputForm {
    */
   #updateInputHex(newColor) {
     this.inputHex.value = ColorizerUtility.rgbToHex(newColor.r, newColor.g, newColor.b);
+  }
+
+  /**
+   * Update the RGB input fields.
+   *
+   * @param newColor The new color as provided by ``#currentColor``.
+   *
+   * This method is attached as an Observer to the class's ``#currentColor``
+   * attribute.
+   */
+  #updateInputRgb(newColor) {
+    this.inputRgbR.value = newColor.r;
+    this.inputRgbG.value = newColor.g;
+    this.inputRgbB.value = newColor.b;
   }
 }
 
