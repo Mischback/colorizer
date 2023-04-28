@@ -510,8 +510,18 @@ class ColorizerColorInputForm {
   // (e.g. in the ``constructor()``).
   #currentColor;
   #currentColorObservers;
+  #submitCallback;
 
-  constructor() {
+  constructor(submitCallback=undefined) {
+    // Fetch the #submitCallback or provide a generic one.
+    if (submitCallback !== undefined) {
+      this.#submitCallback = submitCallback;
+    } else {
+      this.#submitCallback = ((e) => {
+        console.info(`Submitting form, #currentColor: (${this.#currentColor.r}, ${this.#currentColor.g}, ${this.#currentColor.b})`);
+      });
+    }
+
     // Get the DOM elements of the <form>
     //
     // The form's elements are fetched by their ``id`` attribute, which is -
@@ -519,6 +529,10 @@ class ColorizerColorInputForm {
     //
     // Because this class can't work without these DOM elements, instances of
     // ``Error`` are thrown if one of the required elements can't be found.
+    this.form = document.querySelector("#color-add-form");
+    if (this.form === null) {
+      throw new Error("Missing required DOM element with id '#color-add-form'");
+    }
     this.inputPick = document.querySelector("#new-color-pick");
     if (this.inputPick === null) {
       throw new Error("Missing required DOM element with id '#new-color-pick'");
@@ -531,6 +545,9 @@ class ColorizerColorInputForm {
     this.inputHex.pattern = "#[0-9A-Fa-f]{6}";
 
     // Attach event handlers to the DOM elements
+    this.form.addEventListener("submit", (e) => {
+      this.#submitCallback(e);
+    });
     this.inputPick.addEventListener("change", this.#setColorFromInputPick.bind(this));
     this.inputHex.addEventListener("input", this.#setColorFromInputHex.bind(this));
 
@@ -585,6 +602,17 @@ class ColorizerColorInputForm {
     this.#currentColorObservers.forEach((cb) => {
       cb(this.#currentColor);
     });
+  }
+
+  /**
+   * Get the value of ``#currentColor``.
+   *
+   * @returns The value of ``#currentColor``, provided as object.
+   *
+   * This is the exernally available interface to access ``#currentColor``.
+   */
+  getCurrentColor() {
+    return this.#currentColor;
   }
 
   /**
@@ -673,7 +701,9 @@ class ColorizerInterface {
     this.engine = engine;
 
     // Initialize the color input form
-    this.colorInputForm = new ColorizerColorInputForm();
+    this.colorInputForm = new ColorizerColorInputForm(
+      this.addItemToPalette.bind(this)
+    );
 
     // Get DOM elements
     this.ctrl_toggle = document.querySelector("#ctrl-toggle");
@@ -712,7 +742,8 @@ class ColorizerInterface {
     });
 
     this.color_add_form_hex.addEventListener("submit", (e) => {
-      this.color_add_hex_submit(e);
+      console.debug("SUBMIT EventListener of ColorizerInterface");
+      // this.color_add_hex_submit(e);
     });
 
     // Register Observer callbacks for the engine's palette
@@ -988,6 +1019,27 @@ class ColorizerInterface {
     let item = new PaletteItem(color[0], color[1], color[2]);
 
     this.engine.addItemToPalette(item);
+  }
+
+  /**
+   * Add an item to the palette.
+   *
+   * @param e The DOM event.
+   *
+   * This method is intended to handle the ``colorInputForm``'s ``submit``
+   * event by fetching the form's current color and then calling the
+   * ``engine``'s ``addItemToPalette()`` method, which will take care of the
+   * database persistence.
+   */
+  addItemToPalette(e) {
+    // console.debug("addItemToPalette()");
+
+    // don't actually submit the form, intercept with this code
+    e.preventDefault();
+
+    let color = this.colorInputForm.getCurrentColor();
+    // console.debug(`color: (${color.r}, ${color.g}, ${color.b})`);
+    this.engine.addItemToPalette(new PaletteItem(color.r, color.g, color.b));
   }
 }
 
