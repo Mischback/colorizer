@@ -716,16 +716,6 @@ class ColorizerInterface {
       console.error("Missing required element with id '#ctrl'");
     }
 
-    this.color_add_form_hex = document.querySelector("#color-add-form");
-    if (this.color_add_form_hex === null) {
-      console.error("Missing required element with id '#color-add-form'");
-    }
-
-    this.color_add_input_hex = document.querySelector("#new-color-hex");
-    if (this.color_add_input_hex === null) {
-      console.error("Missing required element with id '#new-color-hex'");
-    }
-
     this.contrast_grid = document.querySelector("#contrast-grid");
     if (this.contrast_grid === null) {
       console.error("Missing required element with id '#contrast-grid'");
@@ -739,11 +729,6 @@ class ColorizerInterface {
     // Apply EventHandler functions
     this.ctrl_toggle.addEventListener("click", (e) => {
       this.ctrl_toggle_click(e);
-    });
-
-    this.color_add_form_hex.addEventListener("submit", (e) => {
-      console.debug("SUBMIT EventListener of ColorizerInterface");
-      // this.color_add_hex_submit(e);
     });
 
     // Register Observer callbacks for the engine's palette
@@ -968,6 +953,30 @@ class ColorizerInterface {
   }
 
   /**
+   * Add an item to the palette.
+   *
+   * @param e The DOM event.
+   *
+   * This method is intended to handle the ``colorInputForm``'s ``submit``
+   * event by fetching the form's current color and then calling the
+   * ``engine``'s ``addItemToPalette()`` method, which will take care of the
+   * database persistence.
+   *
+   * The method is supplied to ``ColorizerColorInputForm``'s constructor in
+   * this class's ``constructor()``.
+   */
+  addItemToPalette(e) {
+    // console.debug("addItemToPalette()");
+
+    // don't actually submit the form, intercept with this code
+    e.preventDefault();
+
+    let color = this.colorInputForm.getCurrentColor();
+    // console.debug(`color: (${color.r}, ${color.g}, ${color.b})`);
+    this.engine.addItemToPalette(new PaletteItem(color.r, color.g, color.b));
+  }
+
+  /**
    * *Click* event handler for the button to remove palette items/colors.
    *
    * @param e The DOM's ``click`` event.
@@ -993,53 +1002,6 @@ class ColorizerInterface {
       this.ctrl_toggle.textContent = "<";
       this.ctrl_container.style.cssText = "left: 0;";
     }
-  }
-
-  /**
-   * *Submit* event handler for the form that is meant to add new colors by
-   * hex values.
-   *
-   * @param e The DOM's ``submit`` event.
-   *
-   * The method parses the hex string into actual R, G and B values (using
-   * the ``ColorizerUtility.hexToRgb`` function), creates a temporary instance
-   * of ``PaletteItem`` and asks the engine to add this item to the actual
-   * palette.
-   */
-  color_add_hex_submit(e) {
-    // don't actually submit the form, intercept with this code
-    e.preventDefault();
-
-    console.debug(`Adding color by hex value: ${this.color_add_input_hex.value}`);
-    let color = ColorizerUtility.hexToRgb(this.color_add_input_hex.value);
-    if (color === null)
-      // leave the function if the input can not be parsed as hex color code
-      return;
-
-    let item = new PaletteItem(color[0], color[1], color[2]);
-
-    this.engine.addItemToPalette(item);
-  }
-
-  /**
-   * Add an item to the palette.
-   *
-   * @param e The DOM event.
-   *
-   * This method is intended to handle the ``colorInputForm``'s ``submit``
-   * event by fetching the form's current color and then calling the
-   * ``engine``'s ``addItemToPalette()`` method, which will take care of the
-   * database persistence.
-   */
-  addItemToPalette(e) {
-    // console.debug("addItemToPalette()");
-
-    // don't actually submit the form, intercept with this code
-    e.preventDefault();
-
-    let color = this.colorInputForm.getCurrentColor();
-    // console.debug(`color: (${color.r}, ${color.g}, ${color.b})`);
-    this.engine.addItemToPalette(new PaletteItem(color.r, color.g, color.b));
   }
 }
 
