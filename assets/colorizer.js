@@ -489,12 +489,90 @@ class PaletteItem {
 }
 
 
+class ColorizerColorInputForm {
+
+  // Private Attributes
+  //
+  // This is only the declaration, initialization has to be done elsewhere
+  // (e.g. in the ``constructor()``).
+  #currentColor;
+  #currentColorObservers;
+
+  constructor() {
+    // Get the DOM elements of the <form>
+    //
+    // The form's elements are fetched by their ``id`` attribute, which is -
+    // as of now - hardcoded here.
+    //
+    // Because this class can't work without these DOM elements, instances of
+    // ``Error`` are thrown if one of the required elements can't be found.
+    this.colorInputPick = document.querySelector("#new-color-pick");
+    if (this.colorInputPick === null) {
+      throw new Error("Missing required DOM element with id '#new-color-pick'");
+    }
+    this.colorInputHex = document.querySelector("#new-color-hex");
+    if (this.colorInputHex === null) {
+      throw new Error("Missing required DOM element with id '#new-color-hex'");
+    }
+
+    // Initialize the list of Observers
+    this.#currentColorObservers = [];
+
+    // FIXME: This is only for development!
+    this.registerColorObserver((c) => {
+      console.info(`[DEBUG] Color Change: (${c.r}, ${c.g}, ${c.b})`);
+    });
+
+    // Initialize the #currentColor attribute
+    this.#setCurrentColor();
+  }
+
+  /**
+   * Register a callback function for color updates.
+   *
+   * @param cb The callback to be executed. It will be called with the
+   *           value of ``#currentColor``.
+   *
+   * Part of the quick and dirty implementation of the Observer pattern. See
+   * the class's attribute ``#currentColorObservers`` and the
+   * ``#setCurrentColor()`` method.
+   */
+  registerColorObserver(cb) {
+    this.#currentColorObservers.push(cb);
+  }
+
+  /**
+   * Set the ``#currentColor`` attribute.
+   *
+   * @param r Red component of the new color.
+   * @param g Green component of the new color.
+   * @param b Blue component of the new color.
+   *
+   * Please note: ``r``, ``g`` and ``b`` are wrapped in an object literal, see
+   * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   *
+   * This method is **private**.
+   *
+   * Part of the quick and dirty implementation of the Observer pattern. See
+   * the class's attribute ``#currentColorObservers`` and the
+   * ``registerColorObserver()`` method.
+   */
+  #setCurrentColor({r = 0, g = 0, b = 0} = {}) {
+    this.#currentColor = { r: r, g: g, b: b};
+
+    this.#currentColorObservers.forEach((cb) => {
+      cb(this.#currentColor);
+    });
+  }
+}
+
+
 /**
  * All interface-related stuff wrapped in a dedicated class.
  *
  * @param engine A reference to the ``ColorizerEngine`` instance.
  *
- * The constructor does all of the heavy lifting: it retrieves the elemens
+ * The constructor does all of the heavy lifting: it retrieves the elements
  * from the DOM and attaches the corresponding event handlers.
  *
  * This follows the idea of progressive enhancement, meaning this class **must**
@@ -503,6 +581,9 @@ class PaletteItem {
 class ColorizerInterface {
 
   // Private attributes
+  //
+  // This is only the declaration, initialization has to be done elsewhere
+  // (e.g. in the ``constructor()``).
 
   // These attributes are required to make Drag'n'Drop of PaletteItems work
   #draggedItem;
@@ -515,6 +596,9 @@ class ColorizerInterface {
 
     // Store a reference to the ``ColorizerEngine``
     this.engine = engine;
+
+    // Initialize the color input form
+    this.colorInputForm = new ColorizerColorInputForm();
 
     // Get DOM elements
     this.ctrl_toggle = document.querySelector("#ctrl-toggle");
@@ -832,8 +916,10 @@ class ColorizerInterface {
 
 class ColorizerEngine {
 
-  // Declare **private** variables.
-  // They need initalisation, e.g. in the constructor.
+  // Private Attributes
+  //
+  // This is only the declaration, initialization has to be done elsewhere
+  // (e.g. in the ``constructor()``).
   #palette;
   #paletteObservers;
   #paletteStoreName;
