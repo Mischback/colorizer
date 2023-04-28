@@ -527,9 +527,9 @@ class ColorizerInterface {
       console.error("Missing required element with id '#ctrl'");
     }
 
-    this.color_add_form_hex = document.querySelector("#color-add-hex");
+    this.color_add_form_hex = document.querySelector("#color-add-form");
     if (this.color_add_form_hex === null) {
-      console.error("Missing required element with id '#color-add-hex'");
+      console.error("Missing required element with id '#color-add-form'");
     }
 
     this.color_add_input_hex = document.querySelector("#new-color-hex");

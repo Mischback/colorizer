@@ -13,15 +13,30 @@
       <h1>Colorizer</h1>
       <p>A tool to build color palettes while considering contrast values.</p>
     </header>
+
     <section id="ctrl">
       <button id="ctrl-toggle">&gt;</button>
+
       <section id="color-add">
-        <form id="color-add-hex">
-          <label for="new-color-hex">New Color:</label>
-          <input id="new-color-hex" type="text" required>
-          <button>Add</button>
-        </form>
+        <h3>Add new Color</h3>
+        <div>
+          <form id="color-add-form">
+            <fieldset>
+              <legend>Hex / Color Picker input</legend>
+              <div>
+                <label for="new-color-pick">New Color:</label>
+                <input id="new-color-pick" type="color">
+              </div>
+              <div>
+                <label for="new-color-hex">Hex Input:</label>
+                <input id="new-color-hex" type="text">
+              </div>
+            </fieldset>
+            <button type="submit">Add</button>
+          </form>
+        </div>
       </section>
+
       <section id="color-palette">
           <ul></ul>
       </section>
