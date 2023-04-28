@@ -785,7 +785,8 @@ class ColorizerInterface {
     // Register Observer callbacks for the engine's palette
     this.engine.registerPaletteObserver(this.buildContrastGrid.bind(this));
     this.engine.registerPaletteObserver(this.updatePaletteDisplay.bind(this));
-    this.engine.registerPaletteObserver(this.clearInputFieldsOnPaletteUpdate.bind(this));
+    // TODO: Currently disabled, see TODO notice in the method's documentation!
+    // this.engine.registerPaletteObserver(this.clearInputFieldsOnPaletteUpdate.bind(this));
   }
 
   /**
@@ -995,12 +996,13 @@ class ColorizerInterface {
    *
    * This is a quick and dirty solution, but should work without major
    * drawbacks.
+   *
+   * TODO: This method is currently **not attached** to the palette, meaning
+   *       that the form's input fields are not cleared/resetted but will
+   *       provide the last added color for future use.
    */
   clearInputFieldsOnPaletteUpdate() {
-    // FIXME: This is no longer required/desired with the new input form in
-    //        ``ColorizerColorInputForm``!
-    // this.color_add_input_hex.value = "";
-    console.warn("[FIXME] Clearing input fields!");
+    console.debug("[NOTE] Clearing input fields disabled (see TODO of this method)");
   }
 
   /**
