@@ -346,7 +346,7 @@ const ColorizerUtility = {
    * @param hexColor The hex-formatted color code, provided as ``string``.
    * @returns ``array`` with dedicated R, G and B values.
    */
-  hexToRGB: function(hexColor) {
+  hexToRgb: function(hexColor) {
     let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexColor);
 
     return result ? [
@@ -519,21 +519,30 @@ class ColorizerColorInputForm {
     //
     // Because this class can't work without these DOM elements, instances of
     // ``Error`` are thrown if one of the required elements can't be found.
-    this.colorInputPick = document.querySelector("#new-color-pick");
-    if (this.colorInputPick === null) {
+    this.inputPick = document.querySelector("#new-color-pick");
+    if (this.inputPick === null) {
       throw new Error("Missing required DOM element with id '#new-color-pick'");
     }
-    this.colorInputHex = document.querySelector("#new-color-hex");
-    if (this.colorInputHex === null) {
+    this.inputHex = document.querySelector("#new-color-hex");
+    if (this.inputHex === null) {
       throw new Error("Missing required DOM element with id '#new-color-hex'");
     }
+    // Attach a validation pattern to the hex-based input.
+    this.inputHex.pattern = "#[0-9A-Fa-f]{6}";
+
+    // Attach event handlers to the DOM elements
+    this.inputPick.addEventListener("change", this.#setColorFromInputPick.bind(this));
+    this.inputHex.addEventListener("input", this.#setColorFromInputHex.bind(this));
 
     // Initialize the list of Observers
     this.#currentColorObservers = [];
 
+    this.registerColorObserver(this.#updateInputPick.bind(this));
+    this.registerColorObserver(this.#updateInputHex.bind(this));
+
     // FIXME: This is only for development!
     this.registerColorObserver((c) => {
-      console.info(`[DEBUG] Color Change: (${c.r}, ${c.g}, ${c.b})`);
+      console.debug(`[DEBUG] Color Change: (${c.r}, ${c.g}, ${c.b})`);
     });
 
     // Initialize the #currentColor attribute
@@ -576,6 +585,59 @@ class ColorizerColorInputForm {
     this.#currentColorObservers.forEach((cb) => {
       cb(this.#currentColor);
     });
+  }
+
+  /**
+   * Set ``#currentColor`` from the color picker input field.
+   *
+   * @param e The DOM event.
+   *
+   * This method is attached as an EventHandler to the input field, see this
+   * class's ``constructor()``.
+   */
+  #setColorFromInputPick(e) {
+    let rgbColor = ColorizerUtility.hexToRgb(this.inputPick.value);
+    this.#setCurrentColor({r: rgbColor[0], g: rgbColor[1], b: rgbColor[2]});
+  }
+
+  /**
+   * Set ``#currentColor`` from the hex-based input field.
+   *
+   * @param e The DOM event.
+   *
+   * This method is attached as an EventHandler to the input field, see this
+   * class's ``constructor()``.
+   */
+  #setColorFromInputHex(e) {
+    // Check validity to minimize updates **while** editing the value
+    if (e.target.validity.valid) {
+      let rgbColor = ColorizerUtility.hexToRgb(this.inputHex.value);
+      this.#setCurrentColor({r: rgbColor[0], g: rgbColor[1], b: rgbColor[2]});
+    }
+  }
+
+  /**
+   * Update the color picker input field.
+   *
+   * @param newColor The new color as provided by ``#currentColor``.
+   *
+   * This method is attached as an Observer to the class's ``#currentColor``
+   * attribute.
+   */
+  #updateInputPick(newColor) {
+    this.inputPick.value = ColorizerUtility.rgbToHex(newColor.r, newColor.g, newColor.b);
+  }
+
+  /**
+   * Update the hex-based input field.
+   *
+   * @param newColor The new color as provided by ``#currentColor``.
+   *
+   * This method is attached as an Observer to the class's ``#currentColor``
+   * attribute.
+   */
+  #updateInputHex(newColor) {
+    this.inputHex.value = ColorizerUtility.rgbToHex(newColor.r, newColor.g, newColor.b);
   }
 }
 
@@ -868,7 +930,10 @@ class ColorizerInterface {
    * drawbacks.
    */
   clearInputFieldsOnPaletteUpdate() {
-    this.color_add_input_hex.value = "";
+    // FIXME: This is no longer required/desired with the new input form in
+    //        ``ColorizerColorInputForm``!
+    // this.color_add_input_hex.value = "";
+    console.warn("[FIXME] Clearing input fields!");
   }
 
   /**
@@ -906,7 +971,7 @@ class ColorizerInterface {
    * @param e The DOM's ``submit`` event.
    *
    * The method parses the hex string into actual R, G and B values (using
-   * the ``ColorizerUtility.hexToRGB`` function), creates a temporary instance
+   * the ``ColorizerUtility.hexToRgb`` function), creates a temporary instance
    * of ``PaletteItem`` and asks the engine to add this item to the actual
    * palette.
    */
@@ -915,7 +980,7 @@ class ColorizerInterface {
     e.preventDefault();
 
     console.debug(`Adding color by hex value: ${this.color_add_input_hex.value}`);
-    let color = ColorizerUtility.hexToRGB(this.color_add_input_hex.value);
+    let color = ColorizerUtility.hexToRgb(this.color_add_input_hex.value);
     if (color === null)
       // leave the function if the input can not be parsed as hex color code
       return;
