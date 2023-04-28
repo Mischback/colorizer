@@ -357,6 +357,20 @@ const ColorizerUtility = {
   },
 
   /**
+   * Convert a color in RGB notation to hex-based notation.
+   *
+   * @param red Red Component of the color.
+   * @param green Green Component of the color.
+   * @param blue Blue component of the color.
+   * @returns ``string`` with the color in hex-based notation (``#RRGGBB``).
+   *
+   * The implementation is based on https://stackoverflow.com/a/5624139
+   */
+  rgbToHex: function(red, green, blue) {
+    return "#" + (1 << 24 | red << 16 | green << 8 | blue).toString(16).slice(1);
+  },
+
+  /**
    * Map a given contrast value to its W3C category.
    *
    * @param contrastValue A contrast value as number, most likely a ``float``.
@@ -479,12 +493,11 @@ class PaletteItem {
   /**
    * Return the color in hex notation.
    *
-   * The string includes the ``#``.
-   *
-   * The implementation is based on https://stackoverflow.com/a/5624139
+   * The string is of the form ``#RRGGBB``, as returned by
+   * ``ColorizerUtility.rgbToHex()``.
    */
   toRgbHex() {
-    return "#" + (1 << 24 | this.red << 16 | this.green << 8 | this.blue).toString(16).slice(1);
+    return ColorizerUtility.rgbToHex(this.red, this.green, this.blue);
   }
 }
 
