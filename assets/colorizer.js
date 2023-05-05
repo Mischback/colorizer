@@ -429,7 +429,7 @@ const ColorizerUtility = {
 
     let max = Math.max(red, green, blue);
     let min = Math.min(red, green, blue);
-    let [hue, sat, light] = [0, 0, (min + max) / 2];
+    let [hue, sat, light] = [NaN, 0, (min + max) / 2];
     let d = max - min;
 
     if (d !== 0) {
@@ -708,6 +708,7 @@ class ColorizerColorInputForm {
    * @param r Red component of the new color.
    * @param g Green component of the new color.
    * @param b Blue component of the new color.
+   * @param cause Which input causes this update? Given as a ``string``.
    *
    * Please note: ``r``, ``g`` and ``b`` are wrapped in an object literal, see
    * https://2ality.com/2011/11/keyword-parameters.html for reference.
@@ -718,11 +719,11 @@ class ColorizerColorInputForm {
    * the class's attribute ``#currentColorObservers`` and the
    * ``registerColorObserver()`` method.
    */
-  #setCurrentColor({r = 0, g = 0, b = 0} = {}) {
+  #setCurrentColor({r = 0, g = 0, b = 0, cause = ""} = {}) {
     this.#currentColor = { r: r, g: g, b: b};
 
     this.#currentColorObservers.forEach((cb) => {
-      cb(this.#currentColor);
+      cb(this.#currentColor, cause);
     });
   }
 
@@ -800,12 +801,9 @@ class ColorizerColorInputForm {
     this.#setCurrentColor({
       r: rgb[0],
       g: rgb[1],
-      b: rgb[2]
+      b: rgb[2],
+      cause: "hsl"
     });
-
-    // this.inputHslH.value = hue;
-    // this.inputHslS.value = sat;
-    // this.inputHslL.value = light;
   }
 
   /**
@@ -846,9 +844,40 @@ class ColorizerColorInputForm {
     this.inputRgbB.value = newColor.b;
   }
 
-  #updateInputHsl(newColor) {
+  /**
+   * Update the HSL input fields.
+   *
+   * @param newColor The new color as provided by ``#currentColor``.
+   * @param cause Which input did cause this update?
+   *
+   * This method is attached as an Observer to the class's ``#currentColor``
+   * attribute.
+   */
+  #updateInputHsl(newColor, cause) {
+
+    // Do nothing, if the change of color was caused by the HSL inputs.
+    // This ensures, that changes in the HSL inputs are not breaking.
+    //
+    // The internal color model is RGB, so changes to the HSL inputs are
+    // translated directly to RGB. While converting RGB back to HSL, there are
+    // *jumps* in hue, saturation and lightness, which are not desired.
+    //
+    // As of now, if the new color is caused by HSL inputs, the input fields
+    // are simply not updated.
+    //
+    // FIXME: This might need attention when HWB input is implemented, as the
+    //        ``H`` component is shared between these!
+    if (cause === "hsl") return;
+
     let hsl = ColorizerUtility.rgbToHsl(newColor.r, newColor.g, newColor.b);
-    let hue = ColorizerUtility.twoDecimalPlaces(hsl[0]);
+
+    let hue;
+    if (isNaN(hsl[0])) {
+      hue = ColorizerUtility.twoDecimalPlaces(0);
+    } else {
+      hue = ColorizerUtility.twoDecimalPlaces(hsl[0]);
+    }
+
     let sat = ColorizerUtility.twoDecimalPlaces(hsl[1]);
     let light = ColorizerUtility.twoDecimalPlaces(hsl[2]);
 
