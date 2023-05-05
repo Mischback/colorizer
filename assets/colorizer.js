@@ -742,11 +742,14 @@ class ColorizerInterface {
   // These attributes are required to make Drag'n'Drop of PaletteItems work
   #draggedItem;
   #dropTarget;
+  // This tracks the state of the control panel
+  #ctrlContainerExpanded;
 
   constructor(engine) {
 
     this.#draggedItem = null;
     this.#dropTarget = null;
+    this.#ctrlContainerExpanded = false;
 
     // Store a reference to the ``ColorizerEngine``
     this.engine = engine;
@@ -1048,12 +1051,16 @@ class ColorizerInterface {
    * @param e The DOM's ``click`` event.
    */
   ctrl_toggle_click(e) {
-    if (this.ctrl_toggle.textContent === "<") {
-      this.ctrl_toggle.textContent = ">";
-      this.ctrl_container.style.cssText = "";
+    if (this.#ctrlContainerExpanded === true) {
+      this.#ctrlContainerExpanded = false;
+      this.ctrl_toggle.textContent = "expand";
+      this.ctrl_container.classList.remove("ctrl-expanded");
+      this.ctrl_container.classList.add("ctrl-collapsed");
     } else {
-      this.ctrl_toggle.textContent = "<";
-      this.ctrl_container.style.cssText = "left: 0;";
+      this.#ctrlContainerExpanded = true;
+      this.ctrl_toggle.textContent = "collapse";
+      this.ctrl_container.classList.remove("ctrl-collapsed");
+      this.ctrl_container.classList.add("ctrl-expanded");
     }
   }
 }

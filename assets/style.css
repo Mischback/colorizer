@@ -29,11 +29,14 @@ body > header {
  */
 #ctrl {
   --dim-ctrl-panel-width: 75vw;
+  --dim-ctrl-panel-shadow-width: 15px;
 
   /* size and position */
   position: absolute;
   top: 1rem;
-  left: calc(-1 * var(--dim-ctrl-panel-width));
+  /* The *horizontal position is controlled by the following classes, which are
+   * applied by the ``ColorizerInterface`` class.
+   */
   width: var(--dim-ctrl-panel-width);
   height: calc(100vh - 5rem);
 
@@ -45,9 +48,17 @@ body > header {
     0 0 3px 1px rgb(0 0 0 / 90%);
 }
 
+.ctrl-collapsed {
+  left: calc(-1 * var(--dim-ctrl-panel-width) + var(--dim-ctrl-panel-shadow-width));
+}
+.ctrl-expanded {
+  left: calc(-1 * var(--dim-ctrl-panel-shadow-width));
+}
+
 #ctrl > #ctrl-toggle {
   position: absolute;
   top: 1.75rem;
   right: -1rem;
+  writing-mode: vertical-lr;
   font-size: 1.5rem;
 }
