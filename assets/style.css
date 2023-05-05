@@ -248,13 +248,15 @@ body > header {
   text-align: center;
 }
 
-#color-add-form .component-input > input {
+#color-add-form .rgb-input input {
   /* FIXME: Working for Windows' default monospace font, might not
             work for any monospace (system) font stack! */
-  /* FIXME: ``3em`` is working for 3 digit input, e.g. numbers between 0 and
-            255 with step 1. If HSL/HSB is to support decimals, this has to be
-            covered in dedicated directives! */
   width: 3.5em;
+  text-align: right;
+}
+
+#color-add-form .hsl-input input {
+  width: 6em;
   text-align: right;
 }
 
