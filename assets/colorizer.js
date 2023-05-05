@@ -359,9 +359,9 @@ const ColorizerUtility = {
   /**
    * Convert a color in RGB notation to hex-based notation.
    *
-   * @param red Red Component of the color.
-   * @param green Green Component of the color.
-   * @param blue Blue component of the color.
+   * @param red Red component of the color in range 0..255.
+   * @param green Green component of the color in range 0..255.
+   * @param blue Blue component of the color in range 0..255.
    * @returns ``string`` with the color in hex-based notation (``#RRGGBB``).
    *
    * The implementation is based on https://stackoverflow.com/a/5624139
@@ -381,10 +381,11 @@ const ColorizerUtility = {
    * @param light Lightness of the color, given in range 0..100 (this allows
    *              *percent-based* input, but **you must not** input percent
    *              values!).
-   * @returns ``array`` with dedicated R, G and B values.
+   * @returns ``array`` with dedicated R, G and B values in range 0..255.
    *
    * The implementation is based on
-   * https://www.w3.org/TR/css-color-4/#hsl-to-rgb
+   * https://www.w3.org/TR/css-color-4/#hsl-to-rgb with only minimal
+   * modifications to adjust the output of the function.
    */
   hslToRgb: function(hue, sat, light) {
     hue = hue % 360;
@@ -405,6 +406,46 @@ const ColorizerUtility = {
     }
 
     return [norm(f(0)), norm(f(8)), norm(f(4))];
+  },
+
+  /**
+   * Convert a color in RGB notation to hex-based notation.
+   *
+   * @param red Red component of the color in range 0..255.
+   * @param green Green component of the color in range 0..255.
+   * @param blue Blue component of the color in range 0..255.
+   * @returns ``array`` with values for hue, saturation and lightness where
+   *          ``hue`` is given in degress in range 0..360 and ``saturation``
+   *          and ``lightness`` are given as percentages in range 0..100.
+   *
+   * The implementation is based on
+   * https://www.w3.org/TR/css-color-4/#rgb-to-hsl with only minimal
+   * modifications to adjust the input of the function.
+   */
+  rgbToHsl: function(red, green, blue) {
+    red /= 255;
+    green /= 255;
+    blue /= 255;
+
+    let max = Math.max(red, green, blue);
+    let min = Math.min(red, green, blue);
+    let [hue, sat, light] = [0, 0, (min + max) / 2];
+    let d = max - min;
+
+    if (d !== 0) {
+      sat = (light === 0 || light === 1)
+          ? 0
+          : (max - light) / Math.min(light, 1 - light);
+
+      switch (max) {
+        case red:   hue = (green - blue) / d + (green < blue ? 6 : 0); break;
+        case green: hue = (blue - red) / d + 2; break;
+        case blue:  hue = (red - green) / d + 4; break;
+      }
+      hue = hue * 60;
+    }
+
+    return [hue, sat * 100, light * 100];
   },
 
   /**
@@ -636,6 +677,7 @@ class ColorizerColorInputForm {
     this.registerColorObserver(this.#updateInputPick.bind(this));
     this.registerColorObserver(this.#updateInputHex.bind(this));
     this.registerColorObserver(this.#updateInputRgb.bind(this));
+    this.registerColorObserver(this.#updateInputHsl.bind(this));
 
     // FIXME: This is only for development!
     this.registerColorObserver((c) => {
@@ -802,6 +844,17 @@ class ColorizerColorInputForm {
     this.inputRgbR.value = newColor.r;
     this.inputRgbG.value = newColor.g;
     this.inputRgbB.value = newColor.b;
+  }
+
+  #updateInputHsl(newColor) {
+    let hsl = ColorizerUtility.rgbToHsl(newColor.r, newColor.g, newColor.b);
+    let hue = ColorizerUtility.twoDecimalPlaces(hsl[0]);
+    let sat = ColorizerUtility.twoDecimalPlaces(hsl[1]);
+    let light = ColorizerUtility.twoDecimalPlaces(hsl[2]);
+
+    this.inputHslH.value = hue;
+    this.inputHslS.value = sat;
+    this.inputHslL.value = light;
   }
 }
 
