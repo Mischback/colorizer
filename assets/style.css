@@ -3,3 +3,51 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+:root {
+  --dim-border-radius: 5px;
+
+  font-family: Verdana, sans-serif;
+  font-size: 16px;
+  color: #e2e2e2;
+  background-color: #666666;
+}
+
+/** General elements */
+
+
+/** Overall structure */
+
+body > header {
+  margin: 1px 0 1rem 0;
+  padding: 0.5em 1em 1em 1em;
+  text-align: right;
+}
+
+/* The "control panel" is meant to be collapsible and contains all
+ * "interactive" elements of the application.
+ */
+#ctrl {
+  --dim-ctrl-panel-width: 75vw;
+
+  /* size and position */
+  position: absolute;
+  top: 1rem;
+  left: calc(-1 * var(--dim-ctrl-panel-width));
+  width: var(--dim-ctrl-panel-width);
+  height: calc(100vh - 5rem);
+
+  padding: 1em;
+  background-color: #444444;
+  border-top-right-radius: calc(6 * var(--dim-border-radius));
+  border-bottom-right-radius: calc(2 * var(--dim-border-radius));
+  box-shadow: inset 0 0 10px 0px rgb(255 255 255 / 90%),
+    0 0 3px 1px rgb(0 0 0 / 90%);
+}
+
+#ctrl > #ctrl-toggle {
+  position: absolute;
+  top: 1.75rem;
+  right: -1rem;
+  font-size: 1.5rem;
+}
