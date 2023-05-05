@@ -371,6 +371,43 @@ const ColorizerUtility = {
   },
 
   /**
+   * Convert a color in HSL notation to dedicated RGB values.
+   *
+   * @param hue Hue of the color, given in *deg*. Internally normalized to a
+   *            range of 360deg.
+   * @param sat Saturation of the color, given in range 0..100 (this allows
+   *            *percent-based* input, but **you must not** input percent
+   *            values!).
+   * @param light Lightness of the color, given in range 0..100 (this allows
+   *              *percent-based* input, but **you must not** input percent
+   *              values!).
+   * @returns ``array`` with dedicated R, G and B values.
+   *
+   * The implementation is based on
+   * https://www.w3.org/TR/css-color-4/#hsl-to-rgb
+   */
+  hslToRgb: function(hue, sat, light) {
+    hue = hue % 360;
+    if (hue < 0)
+      hue += 360;
+
+    sat /= 100;
+    light /= 100;
+
+    function f(n) {
+      let k = (n + hue/30) % 12;
+      let a = sat * Math.min(light, 1 - light);
+      return light - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+    }
+
+    function norm(n) {
+      return Math.round(n * 255);
+    }
+
+    return [norm(f(0)), norm(f(8)), norm(f(4))];
+  },
+
+  /**
    * Map a given contrast value to its W3C category.
    *
    * @param contrastValue A contrast value as number, most likely a ``float``.
@@ -443,6 +480,10 @@ const ColorizerUtility = {
         : Math.pow((v+0.055) / 1.055, 2,4);
     });
     return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+  },
+
+  twoDecimalPlaces: function(num) {
+    return parseFloat(num).toFixed(2);
   },
 }
 
@@ -561,6 +602,21 @@ class ColorizerColorInputForm {
       throw new Error("Missing required DOM element with id '#new-color-rgb-b'");
     }
 
+    this.inputHslH = document.querySelector("#new-color-hsl-h");
+    if (this.inputHslH === null) {
+      throw new Error("Missing required DOM element with id '#new-color-hsl-h'");
+    }
+
+    this.inputHslS = document.querySelector("#new-color-hsl-s");
+    if (this.inputHslS === null) {
+      throw new Error("Missing required DOM element with id '#new-color-hsl-s'");
+    }
+
+    this.inputHslL = document.querySelector("#new-color-hsl-l");
+    if (this.inputHslL === null) {
+      throw new Error("Missing required DOM element with id '#new-color-hsl-l'");
+    }
+
     // Attach event handlers to the DOM elements
     this.form.addEventListener("submit", (e) => {
       this.#submitCallback(e);
@@ -570,6 +626,9 @@ class ColorizerColorInputForm {
     this.inputRgbR.addEventListener("input", this.#setColorFromInputRgb.bind(this));
     this.inputRgbG.addEventListener("input", this.#setColorFromInputRgb.bind(this));
     this.inputRgbB.addEventListener("input", this.#setColorFromInputRgb.bind(this));
+    this.inputHslH.addEventListener("input", this.#setColorFromInputHsl.bind(this));
+    this.inputHslS.addEventListener("input", this.#setColorFromInputHsl.bind(this));
+    this.inputHslL.addEventListener("input", this.#setColorFromInputHsl.bind(this));
 
     // Initialize the list of Observers
     this.#currentColorObservers = [];
@@ -679,6 +738,32 @@ class ColorizerColorInputForm {
       g: this.inputRgbG.value,
       b: this.inputRgbB.value,
     });
+  }
+
+  /**
+   * Set ``#currentColor`` from the HSL input fields.
+   *
+   * @param e The DOM event.
+   *
+   * This method is attached as an EventHandler to the HSL-related input
+   * fields, see this class's ``constructor()``.
+   */
+  #setColorFromInputHsl(e) {
+    let hue = ColorizerUtility.twoDecimalPlaces(this.inputHslH.value);
+    let sat = ColorizerUtility.twoDecimalPlaces(this.inputHslS.value);
+    let light = ColorizerUtility.twoDecimalPlaces(this.inputHslL.value);
+
+    let rgb = ColorizerUtility.hslToRgb(hue, sat, light);
+
+    this.#setCurrentColor({
+      r: rgb[0],
+      g: rgb[1],
+      b: rgb[2]
+    });
+
+    // this.inputHslH.value = hue;
+    // this.inputHslS.value = sat;
+    // this.inputHslL.value = light;
   }
 
   /**
