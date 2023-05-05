@@ -85,3 +85,39 @@ body > header {
 #ctrl > #ctrl-toggle:hover {
   background: linear-gradient(to bottom, #eedd99 2%, #ffcc00 5% 95%, #666666 98%);
 }
+
+
+/* Contrast Grid
+ *
+ * This is the general layout of the contrast grid.
+ *
+ * Please note, that some styling-related attributes, like the
+ * ``.grid-element``'s foreground and background color are set dynamically
+ * using the ``style`` attribute from within the ``ColorizerEngine`` JS code.
+ */
+
+#contrast-grid {
+  display: inline-block;
+  margin: 1em 1em 1em 3rem;
+  padding: 1em;
+}
+
+.grid-element {
+  padding: 0.5em;
+  font-size: 0.7em;
+  display: inline-block;
+  width: 6em;
+  height: 6em;
+  text-align: right;
+  /* FIXME: Check / adjust color! */
+  border: 1px solid #000;
+}
+
+.grid-element .w3cat {
+  font-weight: bold;
+  font-size: 2em;
+}
+
+.grid-element .color-value {
+  font-weight: bold;
+}
