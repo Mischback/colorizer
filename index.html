@@ -20,11 +20,13 @@
       <section id="color-add">
         <h3>Add new Color</h3>
         <form id="color-add-form">
-          <fieldset>
+          <fieldset class="color-input">
             <legend>Hex / Color Picker input</legend>
             <div>
               <label for="new-color-pick">New Color:</label>
-              <input id="new-color-pick" type="color">
+              <div id="new-color-pick-wrapper">
+                <input id="new-color-pick" type="color">
+              </div>
             </div>
             <div>
               <label for="new-color-hex">Hex Input:</label>
@@ -33,15 +35,15 @@
           </fieldset>
           <fieldset>
             <legend>RGB input</legend>
-            <div>
+            <div class="component-input">
               <label for="new-color-rgb-r">R:</label>
               <input id="new-color-rgb-r" type="number" min="0" max="255">
             </div>
-            <div>
+            <div class="component-input">
               <label for="new-color-rgb-g">G:</label>
               <input id="new-color-rgb-g" type="number" min="0" max="255">
             </div>
-            <div>
+            <div class="component-input">
               <label for="new-color-rgb-b">B:</label>
               <input id="new-color-rgb-b" type="number" min="0" max="255">
             </div>

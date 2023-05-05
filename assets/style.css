@@ -142,6 +142,7 @@ body > header {
  */
 
 #color-palette ul {
+  margin: 0 1em;
   padding: 0;
   list-style: none;
 }
@@ -177,4 +178,104 @@ body > header {
   border: 1px solid #000;
   /* TODO: Is this legit? Or should this be based on ``em`` instead? */
   border-radius: 5px;
+}
+
+
+
+/* Color Add Form
+ *
+ * This is the form to add colors to the paltte. It is displayed in the
+ * control panel.
+ */
+#color-add-form {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 1em;
+  margin: 1em;
+}
+
+#color-add-form > fieldset {
+  flex: 1 1 auto;
+  padding: 0.5em;
+  border: 1px solid #c3c3c3;
+  position: relative;
+}
+#color-add-form > fieldset > legend {
+  color: #c3c3c3;
+  background-color: #444444;
+  border-right: 1px solid #c3c3c3;
+  border-left: 1px solid #c3c3c3;
+  padding: 0 0.5em;
+  position: absolute;
+  top: -0.6em;
+  right: 1em;
+}
+
+#color-add-form > button {
+  flex: 0 0 100%;
+  font-size: 1.5em;
+}
+
+#color-add-form input {
+  font-size: 1.5em;
+  margin: 0.25em 0;
+  padding: 0.1em 0.25em;
+  border: 1px solid #666666;
+  border-bottom-color: #e2e2e2;
+  background-color: #666666;
+  color: #e2e2e2;
+  /* FIXME: Define an actual monospace (system) font stack! */
+  font-family: monospace;
+}
+
+#color-add-form label {
+  display: inline-block;
+}
+
+#color-add-form .component-input > label {
+  /* FIXME: Working for Windows' ``Verdana`` font, might not work for any
+            (system) font stack! */
+  width: 1.5em;
+}
+
+#color-add-form .color-input label {
+  /* FIXME: Working for Windows' ``Verdana`` font, might not work for any
+            (system) font stack! */
+  width: 6em;
+}
+
+#color-add-form #new-color-hex {
+  /* Note: Width is working for Windows's and Ubuntu's default monospace font. */
+  width: 5em;
+  text-align: center;
+}
+
+#color-add-form .component-input > input {
+  /* FIXME: Working for Windows' default monospace font, might not
+            work for any monospace (system) font stack! */
+  /* FIXME: ``3em`` is working for 3 digit input, e.g. numbers between 0 and
+            255 with step 1. If HSL/HSB is to support decimals, this has to be
+            covered in dedicated directives! */
+  width: 3.5em;
+  text-align: right;
+}
+
+/* based on https://stackoverflow.com/a/65021768 */
+#color-add-form #new-color-pick {
+  padding: 0;
+  width: 150%;
+  height: 150%;
+  margin: -25%;
+  background-color: #000000;  /* Should not even be visible! */
+}
+#color-add-form #new-color-pick-wrapper {
+  /* ``width`` and ``height`` should be synchronized with ``#new-color-hex``
+   * ``width``.
+   */
+  width: 5em;
+  height: 5em;
+  display: inline-block;
+  font-size: 1.5em;
+  overflow: hidden;
+  border: 1px solid #e2e2e2;
 }
