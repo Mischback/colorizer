@@ -15,6 +15,22 @@
 
 /** General elements */
 
+button {
+  padding: 0.25em 0.5em;
+  font-weight: bold;
+  border-radius: var(--dim-border-radius);
+  border: none;
+  color: #444444;
+  background: linear-gradient(to bottom, #e2e2e2 5%, #c3c3c3 15% 40%, #a0a0a0 50% 90%, #666666 95%);
+  box-shadow: 0 0 3px 2px rgb(0 0 0 / 60%);
+}
+button:hover {
+  /* FIXME: Check / adjust colors!
+   *        Bottom / darkest color needs tinting!
+   */
+  background: linear-gradient(to bottom, #eedd99 5%, #ffcc00 15% 40%, #eeaa00 50% 90%, #666666 95%);
+}
+
 
 /** Overall structure */
 
@@ -40,7 +56,7 @@ body > header {
   width: var(--dim-ctrl-panel-width);
   height: calc(100vh - 5rem);
 
-  padding: 1em;
+  padding: 1em 2em;
   background-color: #444444;
   border-top-right-radius: calc(6 * var(--dim-border-radius));
   border-bottom-right-radius: calc(2 * var(--dim-border-radius));
@@ -49,7 +65,7 @@ body > header {
 }
 
 .ctrl-collapsed {
-  left: calc(-1 * var(--dim-ctrl-panel-width) + var(--dim-ctrl-panel-shadow-width));
+  left: calc(-1 * var(--dim-ctrl-panel-width) + var(--dim-ctrl-panel-shadow-width) + 10px);
 }
 .ctrl-expanded {
   left: calc(-1 * var(--dim-ctrl-panel-shadow-width));
@@ -58,7 +74,14 @@ body > header {
 #ctrl > #ctrl-toggle {
   position: absolute;
   top: 1.75rem;
-  right: -1rem;
-  writing-mode: vertical-lr;
+  right: -1.25rem;
   font-size: 1.5rem;
+
+  /* simulate flipping the button 90deg */
+  writing-mode: vertical-lr;
+  padding: 0.5em 0.25em;
+  background: linear-gradient(to bottom, #e2e2e2 2%, #c3c3c3 5% 95%, #666666 98%);
+}
+#ctrl > #ctrl-toggle:hover {
+  background: linear-gradient(to bottom, #eedd99 2%, #ffcc00 5% 95%, #666666 98%);
 }
