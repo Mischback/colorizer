@@ -766,12 +766,10 @@ class ColorizerColorInputForm {
   /**
    * Set ``#currentColor`` from the color picker input field.
    *
-   * @param e The DOM event.
-   *
    * This method is attached as an EventHandler to the input field, see this
    * class's ``constructor()``.
    */
-  #setColorFromInputPick(e) {
+  #setColorFromInputPick() {
     let rgbColor = ColorizerUtility.hexToRgb(this.inputPick.value);
     this.#setCurrentColor({r: rgbColor[0], g: rgbColor[1], b: rgbColor[2]});
   }
@@ -779,12 +777,10 @@ class ColorizerColorInputForm {
   /**
    * Set ``#currentColor`` from the hex-based input field.
    *
-   * @param e The DOM event.
-   *
    * This method is attached as an EventHandler to the input field, see this
    * class's ``constructor()``.
    */
-  #setColorFromInputHex(e) {
+  #setColorFromInputHex() {
     // Check validity to minimize updates **while** editing the value
     if (this.inputHex.validity.valid) {
       let rgbColor = ColorizerUtility.hexToRgb(this.inputHex.value);
@@ -795,12 +791,10 @@ class ColorizerColorInputForm {
   /**
    * Set ``#currentColor`` from the RGB input fields.
    *
-   * @param e The DOM event.
-   *
    * This method is attached as an EventHandler to the RGB-related input
    * fields, see this class's ``constructor()``.
    */
-  #setColorFromInputRgb(e) {
+  #setColorFromInputRgb() {
     this.#setCurrentColor({
       r: this.#getNormalizedNumberInput(this.inputRgbR, {max: 255}),
       g: this.#getNormalizedNumberInput(this.inputRgbG, {max: 255}),
@@ -811,12 +805,10 @@ class ColorizerColorInputForm {
   /**
    * Set ``#currentColor`` from the HSL input fields.
    *
-   * @param e The DOM event.
-   *
    * This method is attached as an EventHandler to the HSL-related input
    * fields, see this class's ``constructor()``.
    */
-  #setColorFromInputHsl(e) {
+  #setColorFromInputHsl() {
     let hue = ColorizerUtility.twoDecimalPlaces(
       this.#getNormalizedNumberInput(this.inputHslH, {wrap: 360})
     );
