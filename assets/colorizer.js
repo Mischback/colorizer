@@ -736,6 +736,8 @@ class ColorizerColorInputForm {
    * Please note: ``r``, ``g`` and ``b`` are wrapped in an object literal, see
    * https://2ality.com/2011/11/keyword-parameters.html for reference.
    *
+   * ``r``, ``g`` and ``b`` are internally normalized to range 0..255.
+   *
    * This method is **private**.
    *
    * Part of the quick and dirty implementation of the Observer pattern. See
@@ -743,7 +745,7 @@ class ColorizerColorInputForm {
    * ``registerColorObserver()`` method.
    */
   #setCurrentColor({r = 0, g = 0, b = 0, cause = ""} = {}) {
-    this.#currentColor = { r: r, g: g, b: b};
+    this.#currentColor = { r: r % 256, g: g % 256, b: b % 256};
 
     this.#currentColorObservers.forEach((cb) => {
       cb(this.#currentColor, cause);
@@ -800,9 +802,9 @@ class ColorizerColorInputForm {
    */
   #setColorFromInputRgb(e) {
     this.#setCurrentColor({
-      r: this.inputRgbR.value,
-      g: this.inputRgbG.value,
-      b: this.inputRgbB.value,
+      r: this.#getNormalizedNumberInput(this.inputRgbR, {max: 255}),
+      g: this.#getNormalizedNumberInput(this.inputRgbG, {max: 255}),
+      b: this.#getNormalizedNumberInput(this.inputRgbB, {max: 255}),
     });
   }
 
@@ -815,9 +817,15 @@ class ColorizerColorInputForm {
    * fields, see this class's ``constructor()``.
    */
   #setColorFromInputHsl(e) {
-    let hue = ColorizerUtility.twoDecimalPlaces(this.inputHslH.value % 360);
-    let sat = ColorizerUtility.twoDecimalPlaces(this.inputHslS.value % 100);
-    let light = ColorizerUtility.twoDecimalPlaces(this.inputHslL.value % 100);
+    let hue = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputHslH, {wrap: 360})
+    );
+    let sat = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputHslS, {max: 100})
+    );
+    let light = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputHslL, {max: 100})
+    );
 
     let rgb = ColorizerUtility.hslToRgb(hue, sat, light);
 
@@ -894,9 +902,15 @@ class ColorizerColorInputForm {
 
     switch (cause) {
       case "hsl":
-        hue = ColorizerUtility.twoDecimalPlaces(this.inputHslH.value % 360);
-        sat = ColorizerUtility.twoDecimalPlaces(this.inputHslS.value % 100);
-        light = ColorizerUtility.twoDecimalPlaces(this.inputHslL.value % 100);
+        hue = ColorizerUtility.twoDecimalPlaces(
+          this.#getNormalizedNumberInput(this.inputHslH, {wrap: 360})
+        );
+        sat = ColorizerUtility.twoDecimalPlaces(
+          this.#getNormalizedNumberInput(this.inputHslS, {max: 100})
+        );
+        light = ColorizerUtility.twoDecimalPlaces(
+          this.#getNormalizedNumberInput(this.inputHslL, {max: 100})
+        );
         break;
       default:
         let hsl = ColorizerUtility.rgbToHsl(newColor.r, newColor.g, newColor.b);
@@ -915,6 +929,36 @@ class ColorizerColorInputForm {
     this.inputHslH.value = hue;
     this.inputHslS.value = sat;
     this.inputHslL.value = light;
+  }
+
+  /**
+   * Get the value of an input and normalize it for the internal usage.
+   *
+   * @param input The reference to the input field.
+   * @param max The allowed maximum value.
+   * @param wrap The value to wrap the value (this is applying a modulo
+   *             operation).
+   * @returns ``Number``
+   *
+   * Please note: ``max`` and ``wrap`` are wrapped in an object literal, see
+   * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   */
+  #getNormalizedNumberInput(input, {max=undefined, wrap=undefined} = {}) {
+    let val = Number(input.value);
+
+    if (max !== undefined) {
+      if (val > max) {
+        return max;
+      } else {
+        return val;
+      }
+    }
+
+    if (wrap !== undefined) {
+      return val % wrap;
+    }
+
+    return val;
   }
 }
 
