@@ -786,7 +786,7 @@ class ColorizerColorInputForm {
    */
   #setColorFromInputHex(e) {
     // Check validity to minimize updates **while** editing the value
-    if (e.target.validity.valid) {
+    if (this.inputHex.validity.valid) {
       let rgbColor = ColorizerUtility.hexToRgb(this.inputHex.value);
       this.#setCurrentColor({r: rgbColor[0], g: rgbColor[1], b: rgbColor[2]});
     }
