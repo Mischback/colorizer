@@ -867,19 +867,27 @@ class ColorizerColorInputForm {
     //
     // FIXME: This might need attention when HWB input is implemented, as the
     //        ``H`` component is shared between these!
-    if (cause === "hsl") return;
+    let hue, sat, light;
 
-    let hsl = ColorizerUtility.rgbToHsl(newColor.r, newColor.g, newColor.b);
+    switch (cause) {
+      case "hsl":
+        hue = ColorizerUtility.twoDecimalPlaces(this.inputHslH.value % 360);
+        sat = ColorizerUtility.twoDecimalPlaces(this.inputHslS.value % 100);
+        light = ColorizerUtility.twoDecimalPlaces(this.inputHslL.value % 100);
+        break;
+      default:
+        let hsl = ColorizerUtility.rgbToHsl(newColor.r, newColor.g, newColor.b);
 
-    let hue;
-    if (isNaN(hsl[0])) {
-      hue = ColorizerUtility.twoDecimalPlaces(0);
-    } else {
-      hue = ColorizerUtility.twoDecimalPlaces(hsl[0]);
+        if (isNaN(hsl[0])) {
+          hue = ColorizerUtility.twoDecimalPlaces(0);
+        } else {
+          hue = ColorizerUtility.twoDecimalPlaces(hsl[0]);
+        }
+
+        sat = ColorizerUtility.twoDecimalPlaces(hsl[1]);
+        light = ColorizerUtility.twoDecimalPlaces(hsl[2]);
+        break;
     }
-
-    let sat = ColorizerUtility.twoDecimalPlaces(hsl[1]);
-    let light = ColorizerUtility.twoDecimalPlaces(hsl[2]);
 
     this.inputHslH.value = hue;
     this.inputHslS.value = sat;
