@@ -878,15 +878,10 @@ class ColorizerColorInputForm {
    */
   #updateInputHsl(newColor, cause) {
 
-    // Do nothing, if the change of color was caused by the HSL inputs.
-    // This ensures, that changes in the HSL inputs are not breaking.
+    // While processing inputs from HSL, just keep the input fields in the
+    // accepted range.
     //
-    // The internal color model is RGB, so changes to the HSL inputs are
-    // translated directly to RGB. While converting RGB back to HSL, there are
-    // *jumps* in hue, saturation and lightness, which are not desired.
-    //
-    // As of now, if the new color is caused by HSL inputs, the input fields
-    // are simply not updated.
+    // By default, convert the internal RGB into its HSL representation.
     //
     // FIXME: This might need attention when HWB input is implemented, as the
     //        ``H`` component is shared between these!
