@@ -255,7 +255,8 @@ body > header {
   text-align: right;
 }
 
-#color-add-form .hsl-input input {
+#color-add-form .hsl-input input,
+#color-add-form .hwb-input input {
   width: 4.5em;
   text-align: right;
 }

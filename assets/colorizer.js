@@ -660,6 +660,21 @@ class ColorizerColorInputForm {
       throw new Error("Missing required DOM element with id '#new-color-hsl-l'");
     }
 
+    this.inputHwbH = document.querySelector("#new-color-hwb-h");
+    if (this.inputHwbH === null) {
+      throw new Error("Missing required DOM element with id '#new-color-hwb-h'");
+    }
+
+    this.inputHwbW = document.querySelector("#new-color-hwb-w");
+    if (this.inputHwbW === null) {
+      throw new Error("Missing required DOM element with id '#new-color-hwb-w'");
+    }
+
+    this.inputHwbB = document.querySelector("#new-color-hwb-b");
+    if (this.inputHwbB === null) {
+      throw new Error("Missing required DOM element with id '#new-color-hwb-b'");
+    }
+
     // Attach event handlers to the DOM elements
     this.form.addEventListener("submit", (e) => {
       this.#submitCallback(e);
