@@ -251,12 +251,12 @@ body > header {
 #color-add-form .rgb-input input {
   /* FIXME: Working for Windows' default monospace font, might not
             work for any monospace (system) font stack! */
-  width: 3.5em;
+  width: 2.5em;
   text-align: right;
 }
 
 #color-add-form .hsl-input input {
-  width: 6em;
+  width: 4.5em;
   text-align: right;
 }
 
