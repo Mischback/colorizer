@@ -593,6 +593,7 @@ class ColorizerColorInputForm {
   #currentColor;
   #currentColorObservers;
   #submitCallback;
+  #inputDebounce;
 
   constructor(submitCallback=undefined) {
     // Fetch the #submitCallback or provide a generic one.
@@ -603,6 +604,7 @@ class ColorizerColorInputForm {
         console.info(`Submitting form, #currentColor: (${this.#currentColor.r}, ${this.#currentColor.g}, ${this.#currentColor.b})`);
       });
     }
+    this.#inputDebounce = 500;
 
     // Get the DOM elements of the <form>
     //
@@ -663,13 +665,13 @@ class ColorizerColorInputForm {
       this.#submitCallback(e);
     });
     this.inputPick.addEventListener("change", this.#setColorFromInputPick.bind(this));
-    this.inputHex.addEventListener("input", this.#setColorFromInputHex.bind(this));
-    this.inputRgbR.addEventListener("input", this.#setColorFromInputRgb.bind(this));
-    this.inputRgbG.addEventListener("input", this.#setColorFromInputRgb.bind(this));
-    this.inputRgbB.addEventListener("input", this.#setColorFromInputRgb.bind(this));
-    this.inputHslH.addEventListener("input", this.#setColorFromInputHsl.bind(this));
-    this.inputHslS.addEventListener("input", this.#setColorFromInputHsl.bind(this));
-    this.inputHslL.addEventListener("input", this.#setColorFromInputHsl.bind(this));
+    this.inputHex.addEventListener("input", this.#debounce(this.#setColorFromInputHex.bind(this), this.#inputDebounce));
+    this.inputRgbR.addEventListener("input", this.#debounce(this.#setColorFromInputRgb.bind(this), this.#inputDebounce));
+    this.inputRgbG.addEventListener("input", this.#debounce(this.#setColorFromInputRgb.bind(this), this.#inputDebounce));
+    this.inputRgbB.addEventListener("input", this.#debounce(this.#setColorFromInputRgb.bind(this), this.#inputDebounce));
+    this.inputHslH.addEventListener("input", this.#debounce(this.#setColorFromInputHsl.bind(this), this.#inputDebounce));
+    this.inputHslS.addEventListener("input", this.#debounce(this.#setColorFromInputHsl.bind(this), this.#inputDebounce));
+    this.inputHslL.addEventListener("input", this.#debounce(this.#setColorFromInputHsl.bind(this), this.#inputDebounce));
 
     // Initialize the list of Observers
     this.#currentColorObservers = [];
@@ -686,6 +688,27 @@ class ColorizerColorInputForm {
 
     // Initialize the #currentColor attribute
     this.#setCurrentColor();
+  }
+
+  /**
+   * Debounce an HTML form input.
+   *
+   * @param fn The actual event handler function.
+   * @param d The desired debounce time.
+   *
+   * This class attaches event handlers to the various input fields, which will
+   * modify the internal color value. As these ``input`` fields allow keyboard
+   * input, a slight *debouncing* improves the user experience, as it allows
+   * the users to complete typing the desired value, before updating the
+   * color and thus executing further callbacks (e.g. the *Observers* to
+   * ``currentColor``.
+   */
+  #debounce(fn, d) {
+    let timer;
+    return function() {
+      clearTimeout(timer);
+      timer = setTimeout(fn, d);
+    }
   }
 
   /**
