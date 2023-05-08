@@ -792,9 +792,9 @@ class ColorizerColorInputForm {
    * fields, see this class's ``constructor()``.
    */
   #setColorFromInputHsl(e) {
-    let hue = ColorizerUtility.twoDecimalPlaces(this.inputHslH.value);
-    let sat = ColorizerUtility.twoDecimalPlaces(this.inputHslS.value);
-    let light = ColorizerUtility.twoDecimalPlaces(this.inputHslL.value);
+    let hue = ColorizerUtility.twoDecimalPlaces(this.inputHslH.value % 360);
+    let sat = ColorizerUtility.twoDecimalPlaces(this.inputHslS.value % 100);
+    let light = ColorizerUtility.twoDecimalPlaces(this.inputHslL.value % 100);
 
     let rgb = ColorizerUtility.hslToRgb(hue, sat, light);
 
