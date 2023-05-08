@@ -194,7 +194,7 @@ body > header {
 
 #color-add-form > fieldset {
   flex: 1 1 auto;
-  padding: 0.5em;
+  padding: 1em 0.5em 0.5em;
   border: 1px solid #c3c3c3;
   position: relative;
 }
