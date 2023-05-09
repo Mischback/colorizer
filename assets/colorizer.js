@@ -743,67 +743,25 @@ class ColorizerColorInputForm {
     //
     // Because this class can't work without these DOM elements, instances of
     // ``Error`` are thrown if one of the required elements can't be found.
-    this.form = document.querySelector("#color-add-form");
-    if (this.form === null) {
-      throw new Error("Missing required DOM element with id '#color-add-form'");
-    }
+    this.form = this.#getDomElementById("#color-add-form");
 
-    this.inputPick = document.querySelector("#new-color-pick");
-    if (this.inputPick === null) {
-      throw new Error("Missing required DOM element with id '#new-color-pick'");
-    }
+    this.inputPick = this.#getDomElementById("#new-color-pick");
 
-    this.inputHex = document.querySelector("#new-color-hex");
-    if (this.inputHex === null) {
-      throw new Error("Missing required DOM element with id '#new-color-hex'");
-    }
+    this.inputHex = this.#getDomElementById("#new-color-hex");
     // Attach a validation pattern to the hex-based input.
     this.inputHex.pattern = "#[0-9A-Fa-f]{6}";
 
-    this.inputRgbR = document.querySelector("#new-color-rgb-r");
-    if (this.inputRgbR === null) {
-      throw new Error("Missing required DOM element with id '#new-color-rgb-r'");
-    }
+    this.inputRgbR = this.#getDomElementById("#new-color-rgb-r");
+    this.inputRgbG = this.#getDomElementById("#new-color-rgb-g");
+    this.inputRgbB = this.#getDomElementById("#new-color-rgb-b");
 
-    this.inputRgbG = document.querySelector("#new-color-rgb-g");
-    if (this.inputRgbG === null) {
-      throw new Error("Missing required DOM element with id '#new-color-rgb-g'");
-    }
+    this.inputHslH = this.#getDomElementById("#new-color-hsl-h");
+    this.inputHslS = this.#getDomElementById("#new-color-hsl-s");
+    this.inputHslL = this.#getDomElementById("#new-color-hsl-l");
 
-    this.inputRgbB = document.querySelector("#new-color-rgb-b");
-    if (this.inputRgbB === null) {
-      throw new Error("Missing required DOM element with id '#new-color-rgb-b'");
-    }
-
-    this.inputHslH = document.querySelector("#new-color-hsl-h");
-    if (this.inputHslH === null) {
-      throw new Error("Missing required DOM element with id '#new-color-hsl-h'");
-    }
-
-    this.inputHslS = document.querySelector("#new-color-hsl-s");
-    if (this.inputHslS === null) {
-      throw new Error("Missing required DOM element with id '#new-color-hsl-s'");
-    }
-
-    this.inputHslL = document.querySelector("#new-color-hsl-l");
-    if (this.inputHslL === null) {
-      throw new Error("Missing required DOM element with id '#new-color-hsl-l'");
-    }
-
-    this.inputHwbH = document.querySelector("#new-color-hwb-h");
-    if (this.inputHwbH === null) {
-      throw new Error("Missing required DOM element with id '#new-color-hwb-h'");
-    }
-
-    this.inputHwbW = document.querySelector("#new-color-hwb-w");
-    if (this.inputHwbW === null) {
-      throw new Error("Missing required DOM element with id '#new-color-hwb-w'");
-    }
-
-    this.inputHwbB = document.querySelector("#new-color-hwb-b");
-    if (this.inputHwbB === null) {
-      throw new Error("Missing required DOM element with id '#new-color-hwb-b'");
-    }
+    this.inputHwbH = this.#getDomElementById("#new-color-hwb-h");
+    this.inputHwbW = this.#getDomElementById("#new-color-hwb-w");
+    this.inputHwbB = this.#getDomElementById("#new-color-hwb-b");
 
     // Attach event handlers to the DOM elements
     this.form.addEventListener("submit", (e) => {
@@ -858,6 +816,24 @@ class ColorizerColorInputForm {
       clearTimeout(timer);
       timer = setTimeout(fn, d);
     }
+  }
+
+  /**
+   * Get a DOM element by its ``id`` attribute.
+   *
+   * @param domId The DOM element's ``id`` attribute.
+   * @returns A reference to the actual DOM element.
+   *
+   * This is an internal utility function to provide general error handling.
+   * Please note that ``Error`` is not actually handled, because the absence of
+   * a required DOM element is considered a non-recoverable error.
+   */
+  #getDomElementById(domId) {
+    let tmp = document.querySelector(domId);
+    if (tmp === null) {
+      throw new Error(`Missing required DOM element with id '${domId}'`);
+    }
+    return tmp;
   }
 
   /**
