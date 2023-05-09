@@ -344,7 +344,7 @@ const ColorizerUtility = {
    * Convert a hex-formatted color code to dedicated RGB values.
    *
    * @param hexColor The hex-formatted color code, provided as ``string``.
-   * @returns ``array`` with dedicated R, G and B values.
+   * @returns ``array`` with dedicated R, G and B values in range [0..255].
    */
   hexToRgb: function(hexColor) {
     let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexColor);
@@ -359,9 +359,9 @@ const ColorizerUtility = {
   /**
    * Convert a color in RGB notation to hex-based notation.
    *
-   * @param red Red component of the color in range 0..255.
-   * @param green Green component of the color in range 0..255.
-   * @param blue Blue component of the color in range 0..255.
+   * @param red Red component of the color in range [0..255].
+   * @param green Green component of the color in range [0..255].
+   * @param blue Blue component of the color in range [0..255].
    * @returns ``string`` with the color in hex-based notation (``#RRGGBB``).
    *
    * The implementation is based on https://stackoverflow.com/a/5624139
@@ -375,17 +375,21 @@ const ColorizerUtility = {
    *
    * @param hue Hue of the color, given in *deg*. Internally normalized to a
    *            range of 360deg.
-   * @param sat Saturation of the color, given in range 0..100 (this allows
-   *            *percent-based* input, but **you must not** input percent
-   *            values!).
-   * @param light Lightness of the color, given in range 0..100 (this allows
-   *              *percent-based* input, but **you must not** input percent
-   *              values!).
-   * @returns ``array`` with dedicated R, G and B values in range 0..255.
+   * @param sat Saturation of the color, given in range [0..100] (this allows
+   *            *percent-based* input, but **you must not** include the percent
+   *            sign!).
+   * @param light Lightness of the color, given in range [0..100] (this allows
+   *              *percent-based* input, but **you must not** include the
+   *              percent sign!).
+   * @returns ``array`` with dedicated R, G and B values in range [0..1].
    *
-   * The implementation is based on
-   * https://www.w3.org/TR/css-color-4/#hsl-to-rgb with only minimal
-   * modifications to adjust the output of the function.
+   * The implementation is directly fetched from
+   * https://www.w3.org/TR/css-color-4/#hsl-to-rgb and returns the result R, G
+   * and B values in range [0..1]. As ``ColorizerEngine`` expects the R, G and
+   * B values in range [0..255], see ``hslToNormalizedRgb()`` for internal use.
+   *
+   * The normalization is not integrated into this function, because the
+   * HWB-conversion functions require the original interface.
    */
   hslToRgb: function(hue, sat, light) {
     hue = hue % 360;
@@ -401,11 +405,34 @@ const ColorizerUtility = {
       return light - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
     }
 
-    function norm(n) {
-      return Math.round(n * 255);
-    }
+    return [f(0), f(8), f(4)];
+  },
 
-    return [norm(f(0)), norm(f(8)), norm(f(4))];
+  /**
+   * Convert a color in HSL notation to normalized RGB values.
+   *
+   * @param hue Hue of the color, given in *deg*. Internally normalized to a
+   *            range of 360deg.
+   * @param sat Saturation of the color, given in range [0..100] (this allows
+   *            *percent-based* input, but **you must not** include the percent
+   *            sign!).
+   * @param light Lightness of the color, given in range [0..100] (this allows
+   *              *percent-based* input, but **you must not** include the
+   *              percent sign!).
+   * @returns ``array`` with dedicated R, G and B values in range [0..255].
+   *
+   * This function applies normalization to the result of ``hslToRgb()``,
+   * bringing the R, G and B values to a range of [0..255], using
+   * ``normalizeRgb()``.
+   */
+  hslToNormalizedRgb: function(hue, sat, light) {
+    let rgb = ColorizerUtility.hslToRgb(hue, sat, light)
+
+    return [
+      ColorizerUtility.normalizeRgb(rgb[0]),
+      ColorizerUtility.normalizeRgb(rgb[1]),
+      ColorizerUtility.normalizeRgb(rgb[2]),
+    ];
   },
 
   /**
@@ -449,6 +476,16 @@ const ColorizerUtility = {
   },
 
   /**
+   * Normalize a value in range [0..1] to range [0..255].
+   *
+   * @param n The number to normalize, expected in range [0..1].
+   * @returns ``Number`` in range [0..255].
+   */
+  normalizeRgb: function(n) {
+    return Math.round(n * 255);
+  },
+
+  /**
    * Map a given contrast value to its W3C category.
    *
    * @param contrastValue A contrast value as number, most likely a ``float``.
@@ -479,10 +516,10 @@ const ColorizerUtility = {
    *
    * @param c1 One color.
    * @param c2 The other color.
-   * @returns The contrast ratio, a value between 1..21.
+   * @returns The contrast ratio, a value between [1..21].
    *
    * The *common notation* of contrast values is something like ``6.1:1``. This
-   * function would then return ``6.1``.
+   * function would return ``6.1`` in that case.
    *
    * The formula is taken from
    * https://www.w3.org/TR/WCAG20/#contrast-ratiodef but the implementation is
@@ -687,6 +724,9 @@ class ColorizerColorInputForm {
     this.inputHslH.addEventListener("input", this.#debounce(this.#setColorFromInputHsl.bind(this), this.#inputDebounce));
     this.inputHslS.addEventListener("input", this.#debounce(this.#setColorFromInputHsl.bind(this), this.#inputDebounce));
     this.inputHslL.addEventListener("input", this.#debounce(this.#setColorFromInputHsl.bind(this), this.#inputDebounce));
+    this.inputHwbH.addEventListener("input", this.#debounce(this.#setColorFromInputHwb.bind(this), this.#inputDebounce));
+    this.inputHwbW.addEventListener("input", this.#debounce(this.#setColorFromInputHwb.bind(this), this.#inputDebounce));
+    this.inputHwbB.addEventListener("input", this.#debounce(this.#setColorFromInputHwb.bind(this), this.#inputDebounce));
 
     // Initialize the list of Observers
     this.#currentColorObservers = [];
@@ -834,13 +874,40 @@ class ColorizerColorInputForm {
       this.#getNormalizedNumberInput(this.inputHslL, {max: 100})
     );
 
-    let rgb = ColorizerUtility.hslToRgb(hue, sat, light);
+    let rgb = ColorizerUtility.hslToNormalizedRgb(hue, sat, light);
 
     this.#setCurrentColor({
       r: rgb[0],
       g: rgb[1],
       b: rgb[2],
       cause: "hsl"
+    });
+  }
+
+  /**
+   * Set ``#currentColor`` from the HWB input fields.
+   *
+   * This method is attached as an EventHandler to the HWB-related input
+   * fields, see this class's ``constructor()``.
+   */
+  #setColorFromInputHwb() {
+    let hue = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputHwbH, {wrap: 360})
+    );
+    let white = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputHwbW, {max: 100})
+    );
+    let black = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputHwbB, {max: 100})
+    );
+
+    let rgb = ColorizerUtility.hwbToRgb(hue, white, black);
+
+    this.#setCurrentColor({
+      r: rgb[0],
+      g: rgb[1],
+      b: rgb[2],
+      cause: "hwb"
     });
   }
 
