@@ -1054,39 +1054,39 @@ class ColorizerColorInputForm {
    */
   #updateInputHsl(newColor, cause) {
 
-    // While processing inputs from HSL, just keep the input fields in the
-    // accepted range.
-    //
-    // By default, convert the internal RGB into its HSL representation.
-    //
-    // FIXME: This might need attention when HWB input is implemented, as the
-    //        ``H`` component is shared between these!
     let hue, sat, light;
 
-    switch (cause) {
-      case "hsl":
+    if (cause === "hsl") {
+      // While processing inputs from HSL, just keep the input fields in the
+      // accepted range.
+      hue = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputHslH, {wrap: 360})
+      );
+      sat = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputHslS, {max: 100})
+      );
+      light = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputHslL, {max: 100})
+      );
+    } else {
+      // Other causes must be handled by RGB to HSL conversion...
+      let hsl = ColorizerUtility.rgbToHsl(newColor.r, newColor.g, newColor.b);
+
+      if (isNaN(hsl[0])) {
+        hue = ColorizerUtility.twoDecimalPlaces(0);
+      } else {
+        hue = ColorizerUtility.twoDecimalPlaces(hsl[0]);
+      }
+
+      sat = ColorizerUtility.twoDecimalPlaces(hsl[1]);
+      light = ColorizerUtility.twoDecimalPlaces(hsl[2]);
+
+      // ... but if the cause was HWB input, synchronize the ``hue`` component
+      if (cause === "hwb") {
         hue = ColorizerUtility.twoDecimalPlaces(
-          this.#getNormalizedNumberInput(this.inputHslH, {wrap: 360})
+          this.#getNormalizedNumberInput(this.inputHwbH, {wrap: 360})
         );
-        sat = ColorizerUtility.twoDecimalPlaces(
-          this.#getNormalizedNumberInput(this.inputHslS, {max: 100})
-        );
-        light = ColorizerUtility.twoDecimalPlaces(
-          this.#getNormalizedNumberInput(this.inputHslL, {max: 100})
-        );
-        break;
-      default:
-        let hsl = ColorizerUtility.rgbToHsl(newColor.r, newColor.g, newColor.b);
-
-        if (isNaN(hsl[0])) {
-          hue = ColorizerUtility.twoDecimalPlaces(0);
-        } else {
-          hue = ColorizerUtility.twoDecimalPlaces(hsl[0]);
-        }
-
-        sat = ColorizerUtility.twoDecimalPlaces(hsl[1]);
-        light = ColorizerUtility.twoDecimalPlaces(hsl[2]);
-        break;
+      }
     }
 
     this.inputHslH.value = hue;
@@ -1105,39 +1105,39 @@ class ColorizerColorInputForm {
    */
   #updateInputHwb(newColor, cause) {
 
-    // While processing inputs from HWB, just keep the input fields in the
-    // accepted range.
-    //
-    // By default, convert the internal RGB into its HWB representation.
-    //
-    // FIXME: This might need attention when HSL input is implemented, as the
-    //        ``H`` component is shared between these!
     let hue, white, black;
 
-    switch (cause) {
-      case "hwb":
+    if (cause === "hwb") {
+      // While processing inputs from HWB, just keep the input fields in the
+      // accepted range.
+      hue = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputHwbH, {wrap: 360})
+      );
+      white = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputHwbW, {max: 100})
+      );
+      black = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputHwbB, {max: 100})
+      );
+    } else {
+      // Other causes must be handled by RGB to HWB conversion...
+      let hwb = ColorizerUtility.rgbToHwb(newColor.r, newColor.g, newColor.b);
+
+      if (isNaN(hwb[0])) {
+        hue = ColorizerUtility.twoDecimalPlaces(0);
+      } else {
+        hue = ColorizerUtility.twoDecimalPlaces(hwb[0]);
+      }
+
+      white = ColorizerUtility.twoDecimalPlaces(hwb[1]);
+      black = ColorizerUtility.twoDecimalPlaces(hwb[2]);
+
+      // ... but if the cause was HSL input, synchronize the ``hue`` component
+      if (cause === "hsl") {
         hue = ColorizerUtility.twoDecimalPlaces(
-          this.#getNormalizedNumberInput(this.inputHwbH, {wrap: 360})
+          this.#getNormalizedNumberInput(this.inputHslH, {wrap: 360})
         );
-        white = ColorizerUtility.twoDecimalPlaces(
-          this.#getNormalizedNumberInput(this.inputHwbW, {max: 100})
-        );
-        black = ColorizerUtility.twoDecimalPlaces(
-          this.#getNormalizedNumberInput(this.inputHwbB, {max: 100})
-        );
-        break;
-      default:
-        let hwb = ColorizerUtility.rgbToHwb(newColor.r, newColor.g, newColor.b);
-
-        if (isNaN(hwb[0])) {
-          hue = ColorizerUtility.twoDecimalPlaces(0);
-        } else {
-          hue = ColorizerUtility.twoDecimalPlaces(hwb[0]);
-        }
-
-        white = ColorizerUtility.twoDecimalPlaces(hwb[1]);
-        black = ColorizerUtility.twoDecimalPlaces(hwb[2]);
-        break;
+      }
     }
 
     this.inputHwbH.value = hue;
