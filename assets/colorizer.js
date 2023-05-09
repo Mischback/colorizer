@@ -1218,12 +1218,39 @@ class ColorizerColorInputForm {
     this.inputHwbB.value = black;
   }
 
+  /**
+   * Update the OkLCH input fields.
+   *
+   * @param newColor The new color as provided by ``#currentColor``.
+   * @param cause Which input did cause this update?
+   *
+   * This method is attached as an Observer to the class's ``#currentColor``
+   * attribute.
+   */
   #updateInputOklch(newColor, cause) {
-    let oklch = ColorizerUtility.rgbToOklch(newColor.r, newColor.g, newColor.b);
+    let light, chroma, hue;
 
-    this.inputOklchL.value = ColorizerUtility.twoDecimalPlaces(oklch[0]);
-    this.inputOklchC.value = ColorizerUtility.twoDecimalPlaces(oklch[1]);
-    this.inputOklchH.value = ColorizerUtility.twoDecimalPlaces(oklch[2]);
+    if (cause === "oklch") {
+      light = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputOklchL, {max: 100})
+      );
+      chroma = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputOklchC, {max: 100})
+      );
+      hue = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputOklchH, {wrap: 360})
+      );
+    } else {
+      let oklch = ColorizerUtility.rgbToOklch(newColor.r, newColor.g, newColor.b);
+
+      light = ColorizerUtility.twoDecimalPlaces(oklch[0]);
+      chroma = ColorizerUtility.twoDecimalPlaces(oklch[1]);
+      hue = ColorizerUtility.twoDecimalPlaces(oklch[2]);
+    }
+
+    this.inputOklchL.value = light;
+    this.inputOklchC.value = chroma;
+    this.inputOklchH.value = hue;
   }
 
   /**
