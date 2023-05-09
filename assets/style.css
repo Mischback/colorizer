@@ -256,7 +256,8 @@ body > header {
 }
 
 #color-add-form .hsl-input input,
-#color-add-form .hwb-input input {
+#color-add-form .hwb-input input,
+#color-add-form .oklch-input input {
   width: 4.5em;
   text-align: right;
 }
