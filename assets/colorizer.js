@@ -499,14 +499,14 @@ const ColorizerUtility = {
   },
 
   /**
-   * Convert a color in RGB notation to hex-based notation.
+   * Convert a color in RGB notation to HSL notation.
    *
-   * @param red Red component of the color in range 0..255.
-   * @param green Green component of the color in range 0..255.
-   * @param blue Blue component of the color in range 0..255.
+   * @param red Red component of the color in range [0..255].
+   * @param green Green component of the color in range [0..255].
+   * @param blue Blue component of the color in range [0..255].
    * @returns ``array`` with values for hue, saturation and lightness where
-   *          ``hue`` is given in degress in range 0..360 and ``saturation``
-   *          and ``lightness`` are given as percentages in range 0..100.
+   *          ``hue`` is given in degress in range [0..360] and ``saturation``
+   *          and ``lightness`` are given as percentages in range [0..100].
    *
    * The implementation is based on
    * https://www.w3.org/TR/css-color-4/#rgb-to-hsl with only minimal
@@ -536,6 +536,36 @@ const ColorizerUtility = {
     }
 
     return [hue, sat * 100, light * 100];
+  },
+
+  /**
+   * Convert a color in RGB notation to HSL notation.
+   *
+   * @param red Red component of the color in range [0..255].
+   * @param green Green component of the color in range [0..255].
+   * @param blue Blue component of the color in range [0..255].
+   * @returns ``array`` with values for hue, white and black where ``hue`` is
+   *          given in degress in range [0..360] and ``white`` and ``black``
+   *          are given as percentages in range [0..100].
+   *
+   * The implementation is based on
+   * https://www.w3.org/TR/css-color-4/#rgb-to-hwb with only minimal
+   * modifications to adjust the input of the function.
+   *
+   * Internally, this relies on ``rgbToHsl()`` to determine the ``hue``.
+   */
+  rgbToHwb: function(red, green, blue) {
+    let hsl = ColorizerUtility.rgbToHsl(red, green, blue);
+
+    // Normalization of the input parameters **after** calling ``rgbToHsl()``,
+    // as that function applies its own normalization!
+    red /= 255;
+    green /= 255;
+    blue /= 255;
+
+    let white = Math.min(red, green, blue);
+    let black = 1 - Math.max(red, green, blue);
+    return [hsl[0], white * 100, black * 100];
   },
 
   /**
@@ -798,6 +828,7 @@ class ColorizerColorInputForm {
     this.registerColorObserver(this.#updateInputHex.bind(this));
     this.registerColorObserver(this.#updateInputRgb.bind(this));
     this.registerColorObserver(this.#updateInputHsl.bind(this));
+    this.registerColorObserver(this.#updateInputHwb.bind(this));
 
     // FIXME: This is only for development!
     this.registerColorObserver((c) => {
@@ -1061,6 +1092,57 @@ class ColorizerColorInputForm {
     this.inputHslH.value = hue;
     this.inputHslS.value = sat;
     this.inputHslL.value = light;
+  }
+
+  /**
+   * Update the HWB input fields.
+   *
+   * @param newColor The new color as provided by ``#currentColor``.
+   * @param cause Which input did cause this update?
+   *
+   * This method is attached as an Observer to the class's ``#currentColor``
+   * attribute.
+   */
+  #updateInputHwb(newColor, cause) {
+
+    // While processing inputs from HWB, just keep the input fields in the
+    // accepted range.
+    //
+    // By default, convert the internal RGB into its HWB representation.
+    //
+    // FIXME: This might need attention when HSL input is implemented, as the
+    //        ``H`` component is shared between these!
+    let hue, white, black;
+
+    switch (cause) {
+      case "hwb":
+        hue = ColorizerUtility.twoDecimalPlaces(
+          this.#getNormalizedNumberInput(this.inputHwbH, {wrap: 360})
+        );
+        white = ColorizerUtility.twoDecimalPlaces(
+          this.#getNormalizedNumberInput(this.inputHwbW, {max: 100})
+        );
+        black = ColorizerUtility.twoDecimalPlaces(
+          this.#getNormalizedNumberInput(this.inputHwbB, {max: 100})
+        );
+        break;
+      default:
+        let hwb = ColorizerUtility.rgbToHwb(newColor.r, newColor.g, newColor.b);
+
+        if (isNaN(hwb[0])) {
+          hue = ColorizerUtility.twoDecimalPlaces(0);
+        } else {
+          hue = ColorizerUtility.twoDecimalPlaces(hwb[0]);
+        }
+
+        white = ColorizerUtility.twoDecimalPlaces(hwb[1]);
+        black = ColorizerUtility.twoDecimalPlaces(hwb[2]);
+        break;
+    }
+
+    this.inputHwbH.value = hue;
+    this.inputHwbW.value = white;
+    this.inputHwbB.value = black;
   }
 
   /**
