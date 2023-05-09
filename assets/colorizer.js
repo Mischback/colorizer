@@ -568,6 +568,30 @@ const ColorizerUtility = {
     return [hsl[0], white * 100, black * 100];
   },
 
+  /**
+   * Convert a color in RGB notation OkLCH color space/notation.
+   *
+   * @param red Red component of the color in range [0..255].
+   * @param green Green component of the color in range [0..255].
+   * @param blue Blue component of the color in range [0..255].
+   * @returns ``array`` with values for light, chroma and hue, where ``light``
+   *          and ``chroma`` are given in range [0..100] and ``hue`` in
+   *          degress in range [0..360].
+   *
+   * The implementation is purely based on
+   * https://www.w3.org/TR/css-color-4/#predefined-to-lab-oklab with the
+   * actual source code derived from
+   * https://www.w3.org/TR/css-color-4/#color-conversion-code with only
+   * minimal adjustments to adjust the input ranges.
+   *
+   * Obviously, the separate functions are merged into this single function.
+   * This might be subject to change.
+   *
+   * Please note, that the OkLCH color space / notation offers a wider spectrum
+   * of colors than RGB. As ``ColorizerEngine`` is built around RGB internally,
+   * this sacrifices some of the *resolution* of OkLCH (much more relevant for
+   * ``oklchToRgb()``).
+   */
   rgbToOklch: function(red, green, blue) {
     // The actual functions are taken from here:
     // https://www.w3.org/TR/css-color-4/#color-conversion-code
@@ -623,7 +647,102 @@ const ColorizerUtility = {
     let hue = Math.atan2(oklab[2], oklab[1]) * 180 / Math.PI;
     let chroma = Math.sqrt(oklab[1] ** 2 + oklab[2] ** 2);
 
+    if (hue < 0)
+      hue += 360;
+
     return [oklab[0] * 100, chroma * 100, hue];
+  },
+
+  /**
+   * Convert a color in OkLCH color space/notation to normalized RGB values.
+   *
+   * @param light The (perceived) lightness of the color, given in range
+   *              [0..100] (this allows *percent-based* input, but **you must
+   *              not** include the percent sign!).
+   * @param chroma The (perceived) intensity of the color, given in range
+   *              [0..100] (this allows *percent-based* input, but **you must
+   *              not** include the percent sign!).
+   * @param hue Hue of the color, given in *deg*. Internally normalized to a
+   *            range of 360deg.
+   * @returns ``array`` with dedicated R, G and B values in range [0..255].
+   *
+   * The implementation is purely based on
+   * https://www.w3.org/TR/css-color-4/#oklab-lab-to-predefined
+   * actual source code derived from
+   * https://www.w3.org/TR/css-color-4/#color-conversion-code with only
+   * minimal adjustments to adjust the input ranges.
+   *
+   * Obviously, the separate functions are merged into this single function.
+   * This might be subject to change.
+   *
+   * Please note, that the OkLCH color space / notation offers a wider spectrum
+   * of colors than RGB. As ``ColorizerEngine`` is built around RGB internally,
+   * this sacrifices some of the *resolution* of OkLCH (especially, because
+   * calculated component values below ``0`` are disregarded).
+   */
+  oklchToRgb: function(light, chroma, hue) {
+
+    // 0. Normalize input if required
+    light /= 100;
+    chroma /= 100;
+    hue = hue % 360;
+    if (hue < 0)
+      hue += 360;
+
+    // 1. Convert from OkLCH to OkLAB
+    let oklab = [
+      light,
+      chroma * Math.cos(hue * Math.PI / 180),
+      chroma * Math.sin(hue * Math.PI / 180),
+    ];
+    console.log(`oklab: ${oklab}`);
+
+    // 2. Convert OkLAB to D65-adapted XYZ
+    const mLmsToXyz = [
+      [  1.2268798733741557,  -0.5578149965554813,   0.28139105017721583 ],
+      [ -0.04057576262431372,  1.1122868293970594,  -0.07171106666151701 ],
+      [ -0.07637294974672142, -0.4214933239627914,   1.5869240244272418  ]
+    ];
+    const mOklabToLms = [
+      [ 0.99999999845051981432,  0.39633779217376785678,   0.21580375806075880339  ],
+      [ 1.0000000088817607767,  -0.1055613423236563494,   -0.063854174771705903402 ],
+      [ 1.0000000546724109177,  -0.089484182094965759684, -1.2914855378640917399   ]
+    ];
+    let lmsNl = ColorizerUtility.multiplyMatrices(mOklabToLms, oklab);
+    let xyz = ColorizerUtility.multiplyMatrices(mLmsToXyz, lmsNl.map(c => c ** 3));
+    console.log(`xyz: ${xyz}`);
+
+    // 3. Convert from D65-adapted XYZ to linear RGB
+    const mXyzToRgb = [
+      [   12831 /   3959,    -329 /    214, -1974 /   3959 ],
+      [ -851781 / 878810, 1648619 / 878810, 36519 / 878810 ],
+      [     705 /  12673,   -2585 /  12673,   705 /    667 ],
+    ];
+    let rgb = ColorizerUtility.multiplyMatrices(mXyzToRgb, xyz);
+    console.log(`linear RGB: ${rgb}`);
+
+    // 4. Convert from linear RGB to gamma-encoded RGB
+    rgb = rgb.map((val) => {
+      let sign = val < 0 ? -1 : 1;
+      let abs = Math.abs(val);
+
+      if (abs > 0.0031308)
+        return sign * (1.055 * Math.pow(abs, 1/2.4) - 0.055);
+
+      return 12.92 * val;
+    });
+
+    // FIXME: This is experimental! Simply disregard negative values!
+    // TODO: Integrated normalization for output. This might be moved into a
+    //       dedicated function ``oklchToNormalizedRgb()`` to match HSL / HWB
+    //       functions.
+    rgb = rgb.map((val) => {
+      if (val < 0)
+        return 0;
+      return ColorizerUtility.normalizeRgb(val);
+    });
+
+    return rgb;
   },
 
   /**
@@ -636,6 +755,17 @@ const ColorizerUtility = {
     return Math.round(n * 255);
   },
 
+  /**
+   * Multiply two matrices.
+   *
+   * @param A First matrix.
+   * @param B Second matrix.
+   * @returns The product.
+   *
+   * This implementation is fetched from
+   * https://www.w3.org/TR/css-color-4/multiply-matrices.js which is licensed
+   * under MIT aswell.
+   */
   multiplyMatrices: function(A, B) {
     let m = A.length;
 
@@ -874,6 +1004,9 @@ class ColorizerColorInputForm {
     this.inputHwbH.addEventListener("input", this.#debounce(this.#setColorFromInputHwb.bind(this), this.#inputDebounce));
     this.inputHwbW.addEventListener("input", this.#debounce(this.#setColorFromInputHwb.bind(this), this.#inputDebounce));
     this.inputHwbB.addEventListener("input", this.#debounce(this.#setColorFromInputHwb.bind(this), this.#inputDebounce));
+    this.inputOklchL.addEventListener("input", this.#debounce(this.#setColorFromInputOklch.bind(this), this.#inputDebounce));
+    this.inputOklchC.addEventListener("input", this.#debounce(this.#setColorFromInputOklch.bind(this), this.#inputDebounce));
+    this.inputOklchH.addEventListener("input", this.#debounce(this.#setColorFromInputOklch.bind(this), this.#inputDebounce));
 
     // Initialize the list of Observers
     this.#currentColorObservers = [];
@@ -1075,6 +1208,33 @@ class ColorizerColorInputForm {
       g: rgb[1],
       b: rgb[2],
       cause: "hwb"
+    });
+  }
+
+  /**
+   * Set ``#currentColor`` from the OkLCH input fields.
+   *
+   * This method is attached as an EventHandler to the OkLCH-related input
+   * fields, see this class's ``constructor()``.
+   */
+  #setColorFromInputOklch() {
+    let light = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputOklchL, {max: 100})
+    );
+    let chroma = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputOklchC, {max: 100})
+    );
+    let hue = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputOklchH, {wrap: 360})
+    );
+
+    let rgb = ColorizerUtility.oklchToRgb(light, chroma, hue);
+
+    this.#setCurrentColor({
+      r: rgb[0],
+      g: rgb[1],
+      b: rgb[2],
+      cause: "oklch"
     });
   }
 
