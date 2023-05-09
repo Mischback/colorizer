@@ -568,6 +568,64 @@ const ColorizerUtility = {
     return [hsl[0], white * 100, black * 100];
   },
 
+  rgbToOklch: function(red, green, blue) {
+    // The actual functions are taken from here:
+    // https://www.w3.org/TR/css-color-4/#color-conversion-code
+    //
+    // The overall method is described here:
+    // https://www.w3.org/TR/css-color-4/#predefined-to-lab-oklab
+
+    // 0. Provide the matching interface!
+    red /= 255;
+    green /= 255;
+    blue /= 255;
+    let rgb = [red, green, blue];
+    // console.log(`Denormalized RGB array: ${rgb}`);
+
+    // 1. Convert from gamma-encoded RGB to linear-light RGB
+    rgb = rgb.map((val) => {
+      let sign = val < 0 ? -1 : 1;
+      let abs = Math.abs(val);
+
+      if (abs < 0.04045)
+        return val / 12.92;
+
+      return sign * (Math.pow((abs + 0.055) / 1.055, 2.4));
+    });
+    // console.log(`Linear-light RGB array: ${rgb}`);
+
+    // 2. Convert from linear RGB to CIE XYZ
+    const mRgbToXyz = [
+      [ 506752 / 1228815,  87881 / 245763,   12673 /   70218 ],
+      [  87098 /  409605, 175762 / 245763,   12673 /  175545 ],
+      [   7918 /  409605,  87881 / 737289, 1001167 / 1053270 ],
+    ];
+    let xyz = ColorizerUtility.multiplyMatrices(mRgbToXyz, rgb);
+    // console.log(`XYZ: ${xyz}`);
+
+    // 3. (Ensure D65 whitepoint) --> sRGB is already D65
+    // 4. Convert from D65-adapted XYZ to Oklab
+    const mXyzToLms = [
+      [ 0.8190224432164319,    0.3619062562801221,   -0.12887378261216414  ],
+      [ 0.0329836671980271,    0.9292868468965546,     0.03614466816999844 ],
+      [ 0.048177199566046255,  0.26423952494422764,    0.6335478258136937  ]
+    ];
+    const mLmsToOklab = [
+      [  0.2104542553,   0.7936177850,  -0.0040720468 ],
+      [  1.9779984951,  -2.4285922050,   0.4505937099 ],
+      [  0.0259040371,   0.7827717662,  -0.8086757660 ]
+    ];
+    let lms = ColorizerUtility.multiplyMatrices(mXyzToLms, xyz);
+    let oklab = ColorizerUtility.multiplyMatrices(mLmsToOklab, lms.map(c => Math.cbrt(c)));
+    // console.log(`Oklab: ${oklab}`);
+
+    // 5. Convert from Oklab to Oklch
+    let hue = Math.atan2(oklab[2], oklab[1]) * 180 / Math.PI;
+    let chroma = Math.sqrt(oklab[1] ** 2 + oklab[2] ** 2);
+
+    return [oklab[0] * 100, chroma * 100, hue];
+  },
+
   /**
    * Normalize a value in range [0..1] to range [0..255].
    *
@@ -576,6 +634,40 @@ const ColorizerUtility = {
    */
   normalizeRgb: function(n) {
     return Math.round(n * 255);
+  },
+
+  multiplyMatrices: function(A, B) {
+    let m = A.length;
+
+    if (!Array.isArray(A[0])) {
+      // A is vector, convert to [[a, b, c, ...]]
+      A = [A];
+    }
+
+    if (!Array.isArray(B[0])) {
+      // B is vector, convert to [[a], [b], [c], ...]]
+      B = B.map(x => [x]);
+    }
+
+    let p = B[0].length;
+    let B_cols = B[0].map((_, i) => B.map(x => x[i])); // transpose B
+    let product = A.map(row => B_cols.map(col => {
+      if (!Array.isArray(row)) {
+        return col.reduce((a, c) => a + c * row, 0);
+      }
+
+      return row.reduce((a, c, i) => a + c * (col[i] || 0), 0);
+    }));
+
+    if (m === 1) {
+      product = product[0]; // Avoid [[a, b, c, ...]]
+    }
+
+    if (p === 1) {
+      return product.map(x => x[0]); // Avoid [[a], [b], [c], ...]]
+    }
+
+    return product;
   },
 
   /**
@@ -791,6 +883,7 @@ class ColorizerColorInputForm {
     this.registerColorObserver(this.#updateInputRgb.bind(this));
     this.registerColorObserver(this.#updateInputHsl.bind(this));
     this.registerColorObserver(this.#updateInputHwb.bind(this));
+    this.registerColorObserver(this.#updateInputOklch.bind(this));
 
     // FIXME: This is only for development!
     this.registerColorObserver((c) => {
@@ -1123,6 +1216,14 @@ class ColorizerColorInputForm {
     this.inputHwbH.value = hue;
     this.inputHwbW.value = white;
     this.inputHwbB.value = black;
+  }
+
+  #updateInputOklch(newColor, cause) {
+    let oklch = ColorizerUtility.rgbToOklch(newColor.r, newColor.g, newColor.b);
+
+    this.inputOklchL.value = ColorizerUtility.twoDecimalPlaces(oklch[0]);
+    this.inputOklchC.value = ColorizerUtility.twoDecimalPlaces(oklch[1]);
+    this.inputOklchH.value = ColorizerUtility.twoDecimalPlaces(oklch[2]);
   }
 
   /**
