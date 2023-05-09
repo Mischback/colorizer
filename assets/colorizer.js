@@ -436,6 +436,69 @@ const ColorizerUtility = {
   },
 
   /**
+   * Convert a color in HWB notation to dedicated RGB values.
+   *
+   * @param hue Hue of the color, given in *deg*. Internally normalized to a
+   *            range of 360deg.
+   * @param white The amount of *white* to mix into the color, given in range
+   *              [0..100] (this allows *percent-based* input, but **you must
+   *              not** include the percent sign!).
+   * @param black The amount of *black* to mix into the color, given in range
+   *              [0..100] (this allows *percent-based* input, but **you must
+   *              not** include the percent sign!).
+   * @returns ``array`` with dedicated R, G and B values in range [0..1].
+   *
+   * The implementation is directly fetched from
+   * https://www.w3.org/TR/css-color-4/#hwb-to-rgb and returns the result R, G
+   * and B values in range [0..1]. As ``ColorizerEngine`` expects the R, G and
+   * B values in range [0..255], see ``hwbToNormalizedRgb()`` for internal use.
+   */
+  hwbToRgb: function(hue, white, black) {
+    white /= 100;
+    black /= 100;
+
+    if (white + black >= 1) {
+      let grey = white / (white + black);
+      return [grey, grey, grey];
+    }
+
+    let rgb = ColorizerUtility.hslToRgb(hue, 100, 50);
+    for (let i = 0; i < 3; i++) {
+      rgb[i] *= (1 - white - black);
+      rgb[i] += white;
+    }
+
+    return [rgb[0], rgb[1], rgb[2]];
+  },
+
+  /**
+   * Convert a color in HWB notation to normalized RGB values.
+   *
+   * @param hue Hue of the color, given in *deg*. Internally normalized to a
+   *            range of 360deg.
+   * @param white The amount of *white* to mix into the color, given in range
+   *              [0..100] (this allows *percent-based* input, but **you must
+   *              not** include the percent sign!).
+   * @param black The amount of *black* to mix into the color, given in range
+   *              [0..100] (this allows *percent-based* input, but **you must
+   *              not** include the percent sign!).
+   * @returns ``array`` with dedicated R, G and B values in range [0..255].
+   *
+   * This function applies normalization to the result of ``hwbToRgb()``,
+   * bringing the R, G and B values to a range of [0..255], using
+   * ``normalizeRgb()``.
+   */
+  hwbToNormalizedRgb: function(hue, white, black) {
+    let rgb = ColorizerUtility.hwbToRgb(hue, white, black);
+
+    return [
+      ColorizerUtility.normalizeRgb(rgb[0]),
+      ColorizerUtility.normalizeRgb(rgb[1]),
+      ColorizerUtility.normalizeRgb(rgb[2]),
+    ];
+  },
+
+  /**
    * Convert a color in RGB notation to hex-based notation.
    *
    * @param red Red component of the color in range 0..255.
@@ -901,7 +964,7 @@ class ColorizerColorInputForm {
       this.#getNormalizedNumberInput(this.inputHwbB, {max: 100})
     );
 
-    let rgb = ColorizerUtility.hwbToRgb(hue, white, black);
+    let rgb = ColorizerUtility.hwbToNormalizedRgb(hue, white, black);
 
     this.#setCurrentColor({
       r: rgb[0],
