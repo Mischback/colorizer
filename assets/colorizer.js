@@ -763,6 +763,10 @@ class ColorizerColorInputForm {
     this.inputHwbW = this.#getDomElementById("#new-color-hwb-w");
     this.inputHwbB = this.#getDomElementById("#new-color-hwb-b");
 
+    this.inputOklchL = this.#getDomElementById("#new-color-oklch-l");
+    this.inputOklchC = this.#getDomElementById("#new-color-oklch-c");
+    this.inputOklchH = this.#getDomElementById("#new-color-oklch-h");
+
     // Attach event handlers to the DOM elements
     this.form.addEventListener("submit", (e) => {
       this.#submitCallback(e);
