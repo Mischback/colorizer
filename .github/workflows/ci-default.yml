@@ -4,7 +4,7 @@ name: CI (default)
 #        included in the default branch.
 on:
   push:
-    branches: [development, feat/v2-overall, feat/setup-node]
+    branches: [development, feat/v2-overall]
   pull_request:
     branches: [development, feat/v2-overall]
 
