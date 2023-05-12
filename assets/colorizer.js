@@ -344,9 +344,9 @@ const ColorizerUtility = {
    * Convert a hex-formatted color code to dedicated RGB values.
    *
    * @param hexColor The hex-formatted color code, provided as ``string``.
-   * @returns ``array`` with dedicated R, G and B values.
+   * @returns ``array`` with dedicated R, G and B values in range [0..255].
    */
-  hexToRGB: function(hexColor) {
+  hexToRgb: function(hexColor) {
     let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexColor);
 
     return result ? [
@@ -354,6 +354,450 @@ const ColorizerUtility = {
       parseInt(result[2], 16),
       parseInt(result[3], 16)
     ] : null;
+  },
+
+  /**
+   * Convert a color in RGB notation to hex-based notation.
+   *
+   * @param red Red component of the color in range [0..255].
+   * @param green Green component of the color in range [0..255].
+   * @param blue Blue component of the color in range [0..255].
+   * @returns ``string`` with the color in hex-based notation (``#RRGGBB``).
+   *
+   * The implementation is based on https://stackoverflow.com/a/5624139
+   */
+  rgbToHex: function(red, green, blue) {
+    return "#" + (1 << 24 | red << 16 | green << 8 | blue).toString(16).slice(1);
+  },
+
+  /**
+   * Convert a color in HSL notation to dedicated RGB values.
+   *
+   * @param hue Hue of the color, given in *deg*. Internally normalized to a
+   *            range of 360deg.
+   * @param sat Saturation of the color, given in range [0..100] (this allows
+   *            *percent-based* input, but **you must not** include the percent
+   *            sign!).
+   * @param light Lightness of the color, given in range [0..100] (this allows
+   *              *percent-based* input, but **you must not** include the
+   *              percent sign!).
+   * @returns ``array`` with dedicated R, G and B values in range [0..1].
+   *
+   * The implementation is directly fetched from
+   * https://www.w3.org/TR/css-color-4/#hsl-to-rgb and returns the result R, G
+   * and B values in range [0..1]. As ``ColorizerEngine`` expects the R, G and
+   * B values in range [0..255], see ``hslToNormalizedRgb()`` for internal use.
+   *
+   * The normalization is not integrated into this function, because the
+   * HWB-conversion functions require the original interface.
+   */
+  hslToRgb: function(hue, sat, light) {
+    hue = hue % 360;
+    if (hue < 0)
+      hue += 360;
+
+    sat /= 100;
+    light /= 100;
+
+    function f(n) {
+      let k = (n + hue/30) % 12;
+      let a = sat * Math.min(light, 1 - light);
+      return light - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+    }
+
+    return [f(0), f(8), f(4)];
+  },
+
+  /**
+   * Convert a color in HSL notation to normalized RGB values.
+   *
+   * @param hue Hue of the color, given in *deg*. Internally normalized to a
+   *            range of 360deg.
+   * @param sat Saturation of the color, given in range [0..100] (this allows
+   *            *percent-based* input, but **you must not** include the percent
+   *            sign!).
+   * @param light Lightness of the color, given in range [0..100] (this allows
+   *              *percent-based* input, but **you must not** include the
+   *              percent sign!).
+   * @returns ``array`` with dedicated R, G and B values in range [0..255].
+   *
+   * This function applies normalization to the result of ``hslToRgb()``,
+   * bringing the R, G and B values to a range of [0..255], using
+   * ``normalizeRgb()``.
+   */
+  hslToNormalizedRgb: function(hue, sat, light) {
+    let rgb = ColorizerUtility.hslToRgb(hue, sat, light)
+
+    return [
+      ColorizerUtility.normalizeRgb(rgb[0]),
+      ColorizerUtility.normalizeRgb(rgb[1]),
+      ColorizerUtility.normalizeRgb(rgb[2]),
+    ];
+  },
+
+  /**
+   * Convert a color in HWB notation to dedicated RGB values.
+   *
+   * @param hue Hue of the color, given in *deg*. Internally normalized to a
+   *            range of 360deg.
+   * @param white The amount of *white* to mix into the color, given in range
+   *              [0..100] (this allows *percent-based* input, but **you must
+   *              not** include the percent sign!).
+   * @param black The amount of *black* to mix into the color, given in range
+   *              [0..100] (this allows *percent-based* input, but **you must
+   *              not** include the percent sign!).
+   * @returns ``array`` with dedicated R, G and B values in range [0..1].
+   *
+   * The implementation is directly fetched from
+   * https://www.w3.org/TR/css-color-4/#hwb-to-rgb and returns the result R, G
+   * and B values in range [0..1]. As ``ColorizerEngine`` expects the R, G and
+   * B values in range [0..255], see ``hwbToNormalizedRgb()`` for internal use.
+   */
+  hwbToRgb: function(hue, white, black) {
+    white /= 100;
+    black /= 100;
+
+    if (white + black >= 1) {
+      let grey = white / (white + black);
+      return [grey, grey, grey];
+    }
+
+    let rgb = ColorizerUtility.hslToRgb(hue, 100, 50);
+    for (let i = 0; i < 3; i++) {
+      rgb[i] *= (1 - white - black);
+      rgb[i] += white;
+    }
+
+    return [rgb[0], rgb[1], rgb[2]];
+  },
+
+  /**
+   * Convert a color in HWB notation to normalized RGB values.
+   *
+   * @param hue Hue of the color, given in *deg*. Internally normalized to a
+   *            range of 360deg.
+   * @param white The amount of *white* to mix into the color, given in range
+   *              [0..100] (this allows *percent-based* input, but **you must
+   *              not** include the percent sign!).
+   * @param black The amount of *black* to mix into the color, given in range
+   *              [0..100] (this allows *percent-based* input, but **you must
+   *              not** include the percent sign!).
+   * @returns ``array`` with dedicated R, G and B values in range [0..255].
+   *
+   * This function applies normalization to the result of ``hwbToRgb()``,
+   * bringing the R, G and B values to a range of [0..255], using
+   * ``normalizeRgb()``.
+   */
+  hwbToNormalizedRgb: function(hue, white, black) {
+    let rgb = ColorizerUtility.hwbToRgb(hue, white, black);
+
+    return [
+      ColorizerUtility.normalizeRgb(rgb[0]),
+      ColorizerUtility.normalizeRgb(rgb[1]),
+      ColorizerUtility.normalizeRgb(rgb[2]),
+    ];
+  },
+
+  /**
+   * Convert a color in RGB notation to HSL notation.
+   *
+   * @param red Red component of the color in range [0..255].
+   * @param green Green component of the color in range [0..255].
+   * @param blue Blue component of the color in range [0..255].
+   * @returns ``array`` with values for hue, saturation and lightness where
+   *          ``hue`` is given in degress in range [0..360] and ``saturation``
+   *          and ``lightness`` are given as percentages in range [0..100].
+   *
+   * The implementation is based on
+   * https://www.w3.org/TR/css-color-4/#rgb-to-hsl with only minimal
+   * modifications to adjust the input of the function.
+   */
+  rgbToHsl: function(red, green, blue) {
+    red /= 255;
+    green /= 255;
+    blue /= 255;
+
+    let max = Math.max(red, green, blue);
+    let min = Math.min(red, green, blue);
+    let [hue, sat, light] = [NaN, 0, (min + max) / 2];
+    let d = max - min;
+
+    if (d !== 0) {
+      sat = (light === 0 || light === 1)
+          ? 0
+          : (max - light) / Math.min(light, 1 - light);
+
+      switch (max) {
+        case red:   hue = (green - blue) / d + (green < blue ? 6 : 0); break;
+        case green: hue = (blue - red) / d + 2; break;
+        case blue:  hue = (red - green) / d + 4; break;
+      }
+      hue = hue * 60;
+    }
+
+    return [hue, sat * 100, light * 100];
+  },
+
+  /**
+   * Convert a color in RGB notation to HSL notation.
+   *
+   * @param red Red component of the color in range [0..255].
+   * @param green Green component of the color in range [0..255].
+   * @param blue Blue component of the color in range [0..255].
+   * @returns ``array`` with values for hue, white and black where ``hue`` is
+   *          given in degress in range [0..360] and ``white`` and ``black``
+   *          are given as percentages in range [0..100].
+   *
+   * The implementation is based on
+   * https://www.w3.org/TR/css-color-4/#rgb-to-hwb with only minimal
+   * modifications to adjust the input of the function.
+   *
+   * Internally, this relies on ``rgbToHsl()`` to determine the ``hue``.
+   */
+  rgbToHwb: function(red, green, blue) {
+    let hsl = ColorizerUtility.rgbToHsl(red, green, blue);
+
+    // Normalization of the input parameters **after** calling ``rgbToHsl()``,
+    // as that function applies its own normalization!
+    red /= 255;
+    green /= 255;
+    blue /= 255;
+
+    let white = Math.min(red, green, blue);
+    let black = 1 - Math.max(red, green, blue);
+    return [hsl[0], white * 100, black * 100];
+  },
+
+  /**
+   * Convert a color in RGB notation OkLCH color space/notation.
+   *
+   * @param red Red component of the color in range [0..255].
+   * @param green Green component of the color in range [0..255].
+   * @param blue Blue component of the color in range [0..255].
+   * @returns ``array`` with values for light, chroma and hue, where ``light``
+   *          and ``chroma`` are given in range [0..100] and ``hue`` in
+   *          degress in range [0..360].
+   *
+   * The implementation is purely based on
+   * https://www.w3.org/TR/css-color-4/#predefined-to-lab-oklab with the
+   * actual source code derived from
+   * https://www.w3.org/TR/css-color-4/#color-conversion-code with only
+   * minimal adjustments to adjust the input ranges.
+   *
+   * Obviously, the separate functions are merged into this single function.
+   * This might be subject to change.
+   *
+   * Please note, that the OkLCH color space / notation offers a wider spectrum
+   * of colors than RGB. As ``ColorizerEngine`` is built around RGB internally,
+   * this sacrifices some of the *resolution* of OkLCH (much more relevant for
+   * ``oklchToRgb()``).
+   */
+  rgbToOklch: function(red, green, blue) {
+    // The actual functions are taken from here:
+    // https://www.w3.org/TR/css-color-4/#color-conversion-code
+    //
+    // The overall method is described here:
+    // https://www.w3.org/TR/css-color-4/#predefined-to-lab-oklab
+
+    // 0. Provide the matching interface!
+    red /= 255;
+    green /= 255;
+    blue /= 255;
+    let rgb = [red, green, blue];
+    // console.log(`Denormalized RGB array: ${rgb}`);
+
+    // 1. Convert from gamma-encoded RGB to linear-light RGB
+    rgb = rgb.map((val) => {
+      let sign = val < 0 ? -1 : 1;
+      let abs = Math.abs(val);
+
+      if (abs < 0.04045)
+        return val / 12.92;
+
+      return sign * (Math.pow((abs + 0.055) / 1.055, 2.4));
+    });
+    // console.log(`Linear-light RGB array: ${rgb}`);
+
+    // 2. Convert from linear RGB to CIE XYZ
+    const mRgbToXyz = [
+      [ 506752 / 1228815,  87881 / 245763,   12673 /   70218 ],
+      [  87098 /  409605, 175762 / 245763,   12673 /  175545 ],
+      [   7918 /  409605,  87881 / 737289, 1001167 / 1053270 ],
+    ];
+    let xyz = ColorizerUtility.multiplyMatrices(mRgbToXyz, rgb);
+    // console.log(`XYZ: ${xyz}`);
+
+    // 3. (Ensure D65 whitepoint) --> sRGB is already D65
+    // 4. Convert from D65-adapted XYZ to Oklab
+    const mXyzToLms = [
+      [ 0.8190224432164319,    0.3619062562801221,   -0.12887378261216414  ],
+      [ 0.0329836671980271,    0.9292868468965546,     0.03614466816999844 ],
+      [ 0.048177199566046255,  0.26423952494422764,    0.6335478258136937  ]
+    ];
+    const mLmsToOklab = [
+      [  0.2104542553,   0.7936177850,  -0.0040720468 ],
+      [  1.9779984951,  -2.4285922050,   0.4505937099 ],
+      [  0.0259040371,   0.7827717662,  -0.8086757660 ]
+    ];
+    let lms = ColorizerUtility.multiplyMatrices(mXyzToLms, xyz);
+    let oklab = ColorizerUtility.multiplyMatrices(mLmsToOklab, lms.map(c => Math.cbrt(c)));
+    // console.log(`Oklab: ${oklab}`);
+
+    // 5. Convert from Oklab to Oklch
+    let hue = Math.atan2(oklab[2], oklab[1]) * 180 / Math.PI;
+    let chroma = Math.sqrt(oklab[1] ** 2 + oklab[2] ** 2);
+
+    if (hue < 0)
+      hue += 360;
+
+    return [oklab[0] * 100, chroma * 100, hue];
+  },
+
+  /**
+   * Convert a color in OkLCH color space/notation to normalized RGB values.
+   *
+   * @param light The (perceived) lightness of the color, given in range
+   *              [0..100] (this allows *percent-based* input, but **you must
+   *              not** include the percent sign!).
+   * @param chroma The (perceived) intensity of the color, given in range
+   *              [0..100] (this allows *percent-based* input, but **you must
+   *              not** include the percent sign!).
+   * @param hue Hue of the color, given in *deg*. Internally normalized to a
+   *            range of 360deg.
+   * @returns ``array`` with dedicated R, G and B values in range [0..255].
+   *
+   * The implementation is purely based on
+   * https://www.w3.org/TR/css-color-4/#oklab-lab-to-predefined
+   * actual source code derived from
+   * https://www.w3.org/TR/css-color-4/#color-conversion-code with only
+   * minimal adjustments to adjust the input ranges.
+   *
+   * Obviously, the separate functions are merged into this single function.
+   * This might be subject to change.
+   *
+   * Please note, that the OkLCH color space / notation offers a wider spectrum
+   * of colors than RGB. As ``ColorizerEngine`` is built around RGB internally,
+   * this sacrifices some of the *resolution* of OkLCH (especially, because
+   * calculated component values below ``0`` are disregarded).
+   */
+  oklchToRgb: function(light, chroma, hue) {
+
+    // 0. Normalize input if required
+    light /= 100;
+    chroma /= 100;
+    hue = hue % 360;
+    if (hue < 0)
+      hue += 360;
+
+    // 1. Convert from OkLCH to OkLAB
+    let oklab = [
+      light,
+      chroma * Math.cos(hue * Math.PI / 180),
+      chroma * Math.sin(hue * Math.PI / 180),
+    ];
+    console.log(`oklab: ${oklab}`);
+
+    // 2. Convert OkLAB to D65-adapted XYZ
+    const mLmsToXyz = [
+      [  1.2268798733741557,  -0.5578149965554813,   0.28139105017721583 ],
+      [ -0.04057576262431372,  1.1122868293970594,  -0.07171106666151701 ],
+      [ -0.07637294974672142, -0.4214933239627914,   1.5869240244272418  ]
+    ];
+    const mOklabToLms = [
+      [ 0.99999999845051981432,  0.39633779217376785678,   0.21580375806075880339  ],
+      [ 1.0000000088817607767,  -0.1055613423236563494,   -0.063854174771705903402 ],
+      [ 1.0000000546724109177,  -0.089484182094965759684, -1.2914855378640917399   ]
+    ];
+    let lmsNl = ColorizerUtility.multiplyMatrices(mOklabToLms, oklab);
+    let xyz = ColorizerUtility.multiplyMatrices(mLmsToXyz, lmsNl.map(c => c ** 3));
+    console.log(`xyz: ${xyz}`);
+
+    // 3. Convert from D65-adapted XYZ to linear RGB
+    const mXyzToRgb = [
+      [   12831 /   3959,    -329 /    214, -1974 /   3959 ],
+      [ -851781 / 878810, 1648619 / 878810, 36519 / 878810 ],
+      [     705 /  12673,   -2585 /  12673,   705 /    667 ],
+    ];
+    let rgb = ColorizerUtility.multiplyMatrices(mXyzToRgb, xyz);
+    console.log(`linear RGB: ${rgb}`);
+
+    // 4. Convert from linear RGB to gamma-encoded RGB
+    rgb = rgb.map((val) => {
+      let sign = val < 0 ? -1 : 1;
+      let abs = Math.abs(val);
+
+      if (abs > 0.0031308)
+        return sign * (1.055 * Math.pow(abs, 1/2.4) - 0.055);
+
+      return 12.92 * val;
+    });
+
+    // FIXME: This is experimental! Simply disregard negative values!
+    // TODO: Integrated normalization for output. This might be moved into a
+    //       dedicated function ``oklchToNormalizedRgb()`` to match HSL / HWB
+    //       functions.
+    rgb = rgb.map((val) => {
+      if (val < 0)
+        return 0;
+      return ColorizerUtility.normalizeRgb(val);
+    });
+
+    return rgb;
+  },
+
+  /**
+   * Normalize a value in range [0..1] to range [0..255].
+   *
+   * @param n The number to normalize, expected in range [0..1].
+   * @returns ``Number`` in range [0..255].
+   */
+  normalizeRgb: function(n) {
+    return Math.round(n * 255);
+  },
+
+  /**
+   * Multiply two matrices.
+   *
+   * @param A First matrix.
+   * @param B Second matrix.
+   * @returns The product.
+   *
+   * This implementation is fetched from
+   * https://www.w3.org/TR/css-color-4/multiply-matrices.js which is licensed
+   * under MIT aswell.
+   */
+  multiplyMatrices: function(A, B) {
+    let m = A.length;
+
+    if (!Array.isArray(A[0])) {
+      // A is vector, convert to [[a, b, c, ...]]
+      A = [A];
+    }
+
+    if (!Array.isArray(B[0])) {
+      // B is vector, convert to [[a], [b], [c], ...]]
+      B = B.map(x => [x]);
+    }
+
+    let p = B[0].length;
+    let B_cols = B[0].map((_, i) => B.map(x => x[i])); // transpose B
+    let product = A.map(row => B_cols.map(col => {
+      if (!Array.isArray(row)) {
+        return col.reduce((a, c) => a + c * row, 0);
+      }
+
+      return row.reduce((a, c, i) => a + c * (col[i] || 0), 0);
+    }));
+
+    if (m === 1) {
+      product = product[0]; // Avoid [[a, b, c, ...]]
+    }
+
+    if (p === 1) {
+      return product.map(x => x[0]); // Avoid [[a], [b], [c], ...]]
+    }
+
+    return product;
   },
 
   /**
@@ -387,10 +831,10 @@ const ColorizerUtility = {
    *
    * @param c1 One color.
    * @param c2 The other color.
-   * @returns The contrast ratio, a value between 1..21.
+   * @returns The contrast ratio, a value between [1..21].
    *
    * The *common notation* of contrast values is something like ``6.1:1``. This
-   * function would then return ``6.1``.
+   * function would return ``6.1`` in that case.
    *
    * The formula is taken from
    * https://www.w3.org/TR/WCAG20/#contrast-ratiodef but the implementation is
@@ -424,11 +868,15 @@ const ColorizerUtility = {
   luminance: function(red, green, blue) {
     var a = [red, green, blue].map(function(v) {
       v /= 255;
-      return v <= 0.03928
+      return v <= 0.04045
         ? v / 12.92
         : Math.pow((v+0.055) / 1.055, 2,4);
     });
     return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+  },
+
+  twoDecimalPlaces: function(num) {
+    return parseFloat(num).toFixed(2);
   },
 }
 
@@ -479,12 +927,520 @@ class PaletteItem {
   /**
    * Return the color in hex notation.
    *
-   * The string includes the ``#``.
-   *
-   * The implementation is based on https://stackoverflow.com/a/5624139
+   * The string is of the form ``#RRGGBB``, as returned by
+   * ``ColorizerUtility.rgbToHex()``.
    */
   toRgbHex() {
-    return "#" + (1 << 24 | this.red << 16 | this.green << 8 | this.blue).toString(16).slice(1);
+    return ColorizerUtility.rgbToHex(this.red, this.green, this.blue);
+  }
+}
+
+
+class ColorizerColorInputForm {
+
+  // Private Attributes
+  //
+  // This is only the declaration, initialization has to be done elsewhere
+  // (e.g. in the ``constructor()``).
+  #currentColor;
+  #currentColorObservers;
+  #submitCallback;
+  #inputDebounce;
+
+  constructor(submitCallback=undefined) {
+    // Fetch the #submitCallback or provide a generic one.
+    if (submitCallback !== undefined) {
+      this.#submitCallback = submitCallback;
+    } else {
+      this.#submitCallback = ((e) => {
+        console.info(`Submitting form, #currentColor: (${this.#currentColor.r}, ${this.#currentColor.g}, ${this.#currentColor.b})`);
+      });
+    }
+    this.#inputDebounce = 500;
+
+    // Get the DOM elements of the <form>
+    //
+    // The form's elements are fetched by their ``id`` attribute, which is -
+    // as of now - hardcoded here.
+    //
+    // Because this class can't work without these DOM elements, instances of
+    // ``Error`` are thrown if one of the required elements can't be found.
+    this.form = this.#getDomElementById("#color-add-form");
+
+    this.inputPick = this.#getDomElementById("#new-color-pick");
+
+    this.inputHex = this.#getDomElementById("#new-color-hex");
+    // Attach a validation pattern to the hex-based input.
+    this.inputHex.pattern = "#[0-9A-Fa-f]{6}";
+
+    this.inputRgbR = this.#getDomElementById("#new-color-rgb-r");
+    this.inputRgbG = this.#getDomElementById("#new-color-rgb-g");
+    this.inputRgbB = this.#getDomElementById("#new-color-rgb-b");
+
+    this.inputHslH = this.#getDomElementById("#new-color-hsl-h");
+    this.inputHslS = this.#getDomElementById("#new-color-hsl-s");
+    this.inputHslL = this.#getDomElementById("#new-color-hsl-l");
+
+    this.inputHwbH = this.#getDomElementById("#new-color-hwb-h");
+    this.inputHwbW = this.#getDomElementById("#new-color-hwb-w");
+    this.inputHwbB = this.#getDomElementById("#new-color-hwb-b");
+
+    this.inputOklchL = this.#getDomElementById("#new-color-oklch-l");
+    this.inputOklchC = this.#getDomElementById("#new-color-oklch-c");
+    this.inputOklchH = this.#getDomElementById("#new-color-oklch-h");
+
+    // Attach event handlers to the DOM elements
+    this.form.addEventListener("submit", (e) => {
+      this.#submitCallback(e);
+    });
+    this.inputPick.addEventListener("change", this.#setColorFromInputPick.bind(this));
+    this.inputHex.addEventListener("input", this.#debounce(this.#setColorFromInputHex.bind(this), this.#inputDebounce));
+    this.inputRgbR.addEventListener("input", this.#debounce(this.#setColorFromInputRgb.bind(this), this.#inputDebounce));
+    this.inputRgbG.addEventListener("input", this.#debounce(this.#setColorFromInputRgb.bind(this), this.#inputDebounce));
+    this.inputRgbB.addEventListener("input", this.#debounce(this.#setColorFromInputRgb.bind(this), this.#inputDebounce));
+    this.inputHslH.addEventListener("input", this.#debounce(this.#setColorFromInputHsl.bind(this), this.#inputDebounce));
+    this.inputHslS.addEventListener("input", this.#debounce(this.#setColorFromInputHsl.bind(this), this.#inputDebounce));
+    this.inputHslL.addEventListener("input", this.#debounce(this.#setColorFromInputHsl.bind(this), this.#inputDebounce));
+    this.inputHwbH.addEventListener("input", this.#debounce(this.#setColorFromInputHwb.bind(this), this.#inputDebounce));
+    this.inputHwbW.addEventListener("input", this.#debounce(this.#setColorFromInputHwb.bind(this), this.#inputDebounce));
+    this.inputHwbB.addEventListener("input", this.#debounce(this.#setColorFromInputHwb.bind(this), this.#inputDebounce));
+    this.inputOklchL.addEventListener("input", this.#debounce(this.#setColorFromInputOklch.bind(this), this.#inputDebounce));
+    this.inputOklchC.addEventListener("input", this.#debounce(this.#setColorFromInputOklch.bind(this), this.#inputDebounce));
+    this.inputOklchH.addEventListener("input", this.#debounce(this.#setColorFromInputOklch.bind(this), this.#inputDebounce));
+
+    // Initialize the list of Observers
+    this.#currentColorObservers = [];
+
+    this.registerColorObserver(this.#updateInputPick.bind(this));
+    this.registerColorObserver(this.#updateInputHex.bind(this));
+    this.registerColorObserver(this.#updateInputRgb.bind(this));
+    this.registerColorObserver(this.#updateInputHsl.bind(this));
+    this.registerColorObserver(this.#updateInputHwb.bind(this));
+    this.registerColorObserver(this.#updateInputOklch.bind(this));
+
+    // FIXME: This is only for development!
+    this.registerColorObserver((c) => {
+      console.debug(`[DEBUG] Color Change: (${c.r}, ${c.g}, ${c.b})`);
+    });
+
+    // Initialize the #currentColor attribute
+    this.#setCurrentColor();
+  }
+
+  /**
+   * Debounce an HTML form input.
+   *
+   * @param fn The actual event handler function.
+   * @param d The desired debounce time.
+   *
+   * This class attaches event handlers to the various input fields, which will
+   * modify the internal color value. As these ``input`` fields allow keyboard
+   * input, a slight *debouncing* improves the user experience, as it allows
+   * the users to complete typing the desired value, before updating the
+   * color and thus executing further callbacks (e.g. the *Observers* to
+   * ``currentColor``.
+   */
+  #debounce(fn, d) {
+    let timer;
+    return function() {
+      clearTimeout(timer);
+      timer = setTimeout(fn, d);
+    }
+  }
+
+  /**
+   * Get a DOM element by its ``id`` attribute.
+   *
+   * @param domId The DOM element's ``id`` attribute.
+   * @returns A reference to the actual DOM element.
+   *
+   * This is an internal utility function to provide general error handling.
+   * Please note that ``Error`` is not actually handled, because the absence of
+   * a required DOM element is considered a non-recoverable error.
+   */
+  #getDomElementById(domId) {
+    let tmp = document.querySelector(domId);
+    if (tmp === null) {
+      throw new Error(`Missing required DOM element with id '${domId}'`);
+    }
+    return tmp;
+  }
+
+  /**
+   * Register a callback function for color updates.
+   *
+   * @param cb The callback to be executed. It will be called with the
+   *           value of ``#currentColor``.
+   *
+   * Part of the quick and dirty implementation of the Observer pattern. See
+   * the class's attribute ``#currentColorObservers`` and the
+   * ``#setCurrentColor()`` method.
+   */
+  registerColorObserver(cb) {
+    this.#currentColorObservers.push(cb);
+  }
+
+  /**
+   * Set the ``#currentColor`` attribute.
+   *
+   * @param r Red component of the new color.
+   * @param g Green component of the new color.
+   * @param b Blue component of the new color.
+   * @param cause Which input causes this update? Given as a ``string``.
+   *
+   * Please note: ``r``, ``g`` and ``b`` are wrapped in an object literal, see
+   * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   *
+   * ``r``, ``g`` and ``b`` are internally normalized to range 0..255.
+   *
+   * This method is **private**.
+   *
+   * Part of the quick and dirty implementation of the Observer pattern. See
+   * the class's attribute ``#currentColorObservers`` and the
+   * ``registerColorObserver()`` method.
+   */
+  #setCurrentColor({r = 0, g = 0, b = 0, cause = ""} = {}) {
+    this.#currentColor = { r: r % 256, g: g % 256, b: b % 256};
+
+    this.#currentColorObservers.forEach((cb) => {
+      cb(this.#currentColor, cause);
+    });
+  }
+
+  /**
+   * Get the value of ``#currentColor``.
+   *
+   * @returns The value of ``#currentColor``, provided as object.
+   *
+   * This is the exernally available interface to access ``#currentColor``.
+   */
+  getCurrentColor() {
+    return this.#currentColor;
+  }
+
+  /**
+   * Set ``#currentColor`` from the color picker input field.
+   *
+   * This method is attached as an EventHandler to the input field, see this
+   * class's ``constructor()``.
+   */
+  #setColorFromInputPick() {
+    let rgbColor = ColorizerUtility.hexToRgb(this.inputPick.value);
+    this.#setCurrentColor({r: rgbColor[0], g: rgbColor[1], b: rgbColor[2]});
+  }
+
+  /**
+   * Set ``#currentColor`` from the hex-based input field.
+   *
+   * This method is attached as an EventHandler to the input field, see this
+   * class's ``constructor()``.
+   */
+  #setColorFromInputHex() {
+    // Check validity to minimize updates **while** editing the value
+    if (this.inputHex.validity.valid) {
+      let rgbColor = ColorizerUtility.hexToRgb(this.inputHex.value);
+      this.#setCurrentColor({r: rgbColor[0], g: rgbColor[1], b: rgbColor[2]});
+    }
+  }
+
+  /**
+   * Set ``#currentColor`` from the RGB input fields.
+   *
+   * This method is attached as an EventHandler to the RGB-related input
+   * fields, see this class's ``constructor()``.
+   */
+  #setColorFromInputRgb() {
+    this.#setCurrentColor({
+      r: this.#getNormalizedNumberInput(this.inputRgbR, {max: 255}),
+      g: this.#getNormalizedNumberInput(this.inputRgbG, {max: 255}),
+      b: this.#getNormalizedNumberInput(this.inputRgbB, {max: 255}),
+    });
+  }
+
+  /**
+   * Set ``#currentColor`` from the HSL input fields.
+   *
+   * This method is attached as an EventHandler to the HSL-related input
+   * fields, see this class's ``constructor()``.
+   */
+  #setColorFromInputHsl() {
+    let hue = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputHslH, {wrap: 360})
+    );
+    let sat = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputHslS, {max: 100})
+    );
+    let light = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputHslL, {max: 100})
+    );
+
+    let rgb = ColorizerUtility.hslToNormalizedRgb(hue, sat, light);
+
+    this.#setCurrentColor({
+      r: rgb[0],
+      g: rgb[1],
+      b: rgb[2],
+      cause: "hsl"
+    });
+  }
+
+  /**
+   * Set ``#currentColor`` from the HWB input fields.
+   *
+   * This method is attached as an EventHandler to the HWB-related input
+   * fields, see this class's ``constructor()``.
+   */
+  #setColorFromInputHwb() {
+    let hue = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputHwbH, {wrap: 360})
+    );
+    let white = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputHwbW, {max: 100})
+    );
+    let black = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputHwbB, {max: 100})
+    );
+
+    let rgb = ColorizerUtility.hwbToNormalizedRgb(hue, white, black);
+
+    this.#setCurrentColor({
+      r: rgb[0],
+      g: rgb[1],
+      b: rgb[2],
+      cause: "hwb"
+    });
+  }
+
+  /**
+   * Set ``#currentColor`` from the OkLCH input fields.
+   *
+   * This method is attached as an EventHandler to the OkLCH-related input
+   * fields, see this class's ``constructor()``.
+   */
+  #setColorFromInputOklch() {
+    let light = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputOklchL, {max: 100})
+    );
+    let chroma = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputOklchC, {max: 100})
+    );
+    let hue = ColorizerUtility.twoDecimalPlaces(
+      this.#getNormalizedNumberInput(this.inputOklchH, {wrap: 360})
+    );
+
+    let rgb = ColorizerUtility.oklchToRgb(light, chroma, hue);
+
+    this.#setCurrentColor({
+      r: rgb[0],
+      g: rgb[1],
+      b: rgb[2],
+      cause: "oklch"
+    });
+  }
+
+  /**
+   * Update the color picker input field.
+   *
+   * @param newColor The new color as provided by ``#currentColor``.
+   *
+   * This method is attached as an Observer to the class's ``#currentColor``
+   * attribute.
+   */
+  #updateInputPick(newColor) {
+    this.inputPick.value = ColorizerUtility.rgbToHex(newColor.r, newColor.g, newColor.b);
+  }
+
+  /**
+   * Update the hex-based input field.
+   *
+   * @param newColor The new color as provided by ``#currentColor``.
+   *
+   * This method is attached as an Observer to the class's ``#currentColor``
+   * attribute.
+   */
+  #updateInputHex(newColor) {
+    this.inputHex.value = ColorizerUtility.rgbToHex(newColor.r, newColor.g, newColor.b);
+  }
+
+  /**
+   * Update the RGB input fields.
+   *
+   * @param newColor The new color as provided by ``#currentColor``.
+   *
+   * This method is attached as an Observer to the class's ``#currentColor``
+   * attribute.
+   */
+  #updateInputRgb(newColor) {
+    this.inputRgbR.value = newColor.r;
+    this.inputRgbG.value = newColor.g;
+    this.inputRgbB.value = newColor.b;
+  }
+
+  /**
+   * Update the HSL input fields.
+   *
+   * @param newColor The new color as provided by ``#currentColor``.
+   * @param cause Which input did cause this update?
+   *
+   * This method is attached as an Observer to the class's ``#currentColor``
+   * attribute.
+   */
+  #updateInputHsl(newColor, cause) {
+
+    let hue, sat, light;
+
+    if (cause === "hsl") {
+      // While processing inputs from HSL, just keep the input fields in the
+      // accepted range.
+      hue = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputHslH, {wrap: 360})
+      );
+      sat = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputHslS, {max: 100})
+      );
+      light = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputHslL, {max: 100})
+      );
+    } else {
+      // Other causes must be handled by RGB to HSL conversion...
+      let hsl = ColorizerUtility.rgbToHsl(newColor.r, newColor.g, newColor.b);
+
+      if (isNaN(hsl[0])) {
+        hue = ColorizerUtility.twoDecimalPlaces(0);
+      } else {
+        hue = ColorizerUtility.twoDecimalPlaces(hsl[0]);
+      }
+
+      sat = ColorizerUtility.twoDecimalPlaces(hsl[1]);
+      light = ColorizerUtility.twoDecimalPlaces(hsl[2]);
+
+      // ... but if the cause was HWB input, synchronize the ``hue`` component
+      if (cause === "hwb") {
+        hue = ColorizerUtility.twoDecimalPlaces(
+          this.#getNormalizedNumberInput(this.inputHwbH, {wrap: 360})
+        );
+      }
+    }
+
+    this.inputHslH.value = hue;
+    this.inputHslS.value = sat;
+    this.inputHslL.value = light;
+  }
+
+  /**
+   * Update the HWB input fields.
+   *
+   * @param newColor The new color as provided by ``#currentColor``.
+   * @param cause Which input did cause this update?
+   *
+   * This method is attached as an Observer to the class's ``#currentColor``
+   * attribute.
+   */
+  #updateInputHwb(newColor, cause) {
+
+    let hue, white, black;
+
+    if (cause === "hwb") {
+      // While processing inputs from HWB, just keep the input fields in the
+      // accepted range.
+      hue = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputHwbH, {wrap: 360})
+      );
+      white = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputHwbW, {max: 100})
+      );
+      black = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputHwbB, {max: 100})
+      );
+    } else {
+      // Other causes must be handled by RGB to HWB conversion...
+      let hwb = ColorizerUtility.rgbToHwb(newColor.r, newColor.g, newColor.b);
+
+      if (isNaN(hwb[0])) {
+        hue = ColorizerUtility.twoDecimalPlaces(0);
+      } else {
+        hue = ColorizerUtility.twoDecimalPlaces(hwb[0]);
+      }
+
+      white = ColorizerUtility.twoDecimalPlaces(hwb[1]);
+      black = ColorizerUtility.twoDecimalPlaces(hwb[2]);
+
+      // ... but if the cause was HSL input, synchronize the ``hue`` component
+      if (cause === "hsl") {
+        hue = ColorizerUtility.twoDecimalPlaces(
+          this.#getNormalizedNumberInput(this.inputHslH, {wrap: 360})
+        );
+      }
+    }
+
+    this.inputHwbH.value = hue;
+    this.inputHwbW.value = white;
+    this.inputHwbB.value = black;
+  }
+
+  /**
+   * Update the OkLCH input fields.
+   *
+   * @param newColor The new color as provided by ``#currentColor``.
+   * @param cause Which input did cause this update?
+   *
+   * This method is attached as an Observer to the class's ``#currentColor``
+   * attribute.
+   */
+  #updateInputOklch(newColor, cause) {
+    let light, chroma, hue;
+
+    if (cause === "oklch") {
+      light = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputOklchL, {max: 100})
+      );
+      chroma = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputOklchC, {max: 100})
+      );
+      hue = ColorizerUtility.twoDecimalPlaces(
+        this.#getNormalizedNumberInput(this.inputOklchH, {wrap: 360})
+      );
+    } else {
+      let oklch = ColorizerUtility.rgbToOklch(newColor.r, newColor.g, newColor.b);
+
+      light = ColorizerUtility.twoDecimalPlaces(oklch[0]);
+      chroma = ColorizerUtility.twoDecimalPlaces(oklch[1]);
+      hue = ColorizerUtility.twoDecimalPlaces(oklch[2]);
+    }
+
+    this.inputOklchL.value = light;
+    this.inputOklchC.value = chroma;
+    this.inputOklchH.value = hue;
+  }
+
+  /**
+   * Get the value of an input and normalize it for the internal usage.
+   *
+   * @param input The reference to the input field.
+   * @param max The allowed maximum value.
+   * @param wrap The value to wrap the value (this is applying a modulo
+   *             operation).
+   * @returns ``Number``
+   *
+   * Please note: ``max`` and ``wrap`` are wrapped in an object literal, see
+   * https://2ality.com/2011/11/keyword-parameters.html for reference.
+   */
+  #getNormalizedNumberInput(input, {max=undefined, wrap=undefined} = {}) {
+    let val = Number(input.value);
+
+    if (max !== undefined) {
+      if (val > max) {
+        return max;
+      } else {
+        return val;
+      }
+    }
+
+    if (wrap !== undefined) {
+      return val % wrap;
+    }
+
+    return val;
   }
 }
 
@@ -494,7 +1450,7 @@ class PaletteItem {
  *
  * @param engine A reference to the ``ColorizerEngine`` instance.
  *
- * The constructor does all of the heavy lifting: it retrieves the elemens
+ * The constructor does all of the heavy lifting: it retrieves the elements
  * from the DOM and attaches the corresponding event handlers.
  *
  * This follows the idea of progressive enhancement, meaning this class **must**
@@ -503,18 +1459,29 @@ class PaletteItem {
 class ColorizerInterface {
 
   // Private attributes
+  //
+  // This is only the declaration, initialization has to be done elsewhere
+  // (e.g. in the ``constructor()``).
 
   // These attributes are required to make Drag'n'Drop of PaletteItems work
   #draggedItem;
   #dropTarget;
+  // This tracks the state of the control panel
+  #ctrlContainerExpanded;
 
   constructor(engine) {
 
     this.#draggedItem = null;
     this.#dropTarget = null;
+    this.#ctrlContainerExpanded = false;
 
     // Store a reference to the ``ColorizerEngine``
     this.engine = engine;
+
+    // Initialize the color input form
+    this.colorInputForm = new ColorizerColorInputForm(
+      this.addItemToPalette.bind(this)
+    );
 
     // Get DOM elements
     this.ctrl_toggle = document.querySelector("#ctrl-toggle");
@@ -525,16 +1492,6 @@ class ColorizerInterface {
     this.ctrl_container = document.querySelector("#ctrl");
     if (this.ctrl_container === null) {
       console.error("Missing required element with id '#ctrl'");
-    }
-
-    this.color_add_form_hex = document.querySelector("#color-add-hex");
-    if (this.color_add_form_hex === null) {
-      console.error("Missing required element with id '#color-add-hex'");
-    }
-
-    this.color_add_input_hex = document.querySelector("#new-color-hex");
-    if (this.color_add_input_hex === null) {
-      console.error("Missing required element with id '#new-color-hex'");
     }
 
     this.contrast_grid = document.querySelector("#contrast-grid");
@@ -552,14 +1509,11 @@ class ColorizerInterface {
       this.ctrl_toggle_click(e);
     });
 
-    this.color_add_form_hex.addEventListener("submit", (e) => {
-      this.color_add_hex_submit(e);
-    });
-
     // Register Observer callbacks for the engine's palette
     this.engine.registerPaletteObserver(this.buildContrastGrid.bind(this));
     this.engine.registerPaletteObserver(this.updatePaletteDisplay.bind(this));
-    this.engine.registerPaletteObserver(this.clearInputFieldsOnPaletteUpdate.bind(this));
+    // TODO: Currently disabled, see TODO notice in the method's documentation!
+    // this.engine.registerPaletteObserver(this.clearInputFieldsOnPaletteUpdate.bind(this));
   }
 
   /**
@@ -769,9 +1723,37 @@ class ColorizerInterface {
    *
    * This is a quick and dirty solution, but should work without major
    * drawbacks.
+   *
+   * TODO: This method is currently **not attached** to the palette, meaning
+   *       that the form's input fields are not cleared/resetted but will
+   *       provide the last added color for future use.
    */
   clearInputFieldsOnPaletteUpdate() {
-    this.color_add_input_hex.value = "";
+    console.debug("[NOTE] Clearing input fields disabled (see TODO of this method)");
+  }
+
+  /**
+   * Add an item to the palette.
+   *
+   * @param e The DOM event.
+   *
+   * This method is intended to handle the ``colorInputForm``'s ``submit``
+   * event by fetching the form's current color and then calling the
+   * ``engine``'s ``addItemToPalette()`` method, which will take care of the
+   * database persistence.
+   *
+   * The method is supplied to ``ColorizerColorInputForm``'s constructor in
+   * this class's ``constructor()``.
+   */
+  addItemToPalette(e) {
+    // console.debug("addItemToPalette()");
+
+    // don't actually submit the form, intercept with this code
+    e.preventDefault();
+
+    let color = this.colorInputForm.getCurrentColor();
+    // console.debug(`color: (${color.r}, ${color.g}, ${color.b})`);
+    this.engine.addItemToPalette(new PaletteItem(color.r, color.g, color.b));
   }
 
   /**
@@ -793,47 +1775,27 @@ class ColorizerInterface {
    * @param e The DOM's ``click`` event.
    */
   ctrl_toggle_click(e) {
-    if (this.ctrl_toggle.textContent === "<") {
-      this.ctrl_toggle.textContent = ">";
-      this.ctrl_container.style.cssText = "";
+    if (this.#ctrlContainerExpanded === true) {
+      this.#ctrlContainerExpanded = false;
+      this.ctrl_toggle.textContent = "expand";
+      this.ctrl_container.classList.remove("ctrl-expanded");
+      this.ctrl_container.classList.add("ctrl-collapsed");
     } else {
-      this.ctrl_toggle.textContent = "<";
-      this.ctrl_container.style.cssText = "left: 0;";
+      this.#ctrlContainerExpanded = true;
+      this.ctrl_toggle.textContent = "collapse";
+      this.ctrl_container.classList.remove("ctrl-collapsed");
+      this.ctrl_container.classList.add("ctrl-expanded");
     }
-  }
-
-  /**
-   * *Submit* event handler for the form that is meant to add new colors by
-   * hex values.
-   *
-   * @param e The DOM's ``submit`` event.
-   *
-   * The method parses the hex string into actual R, G and B values (using
-   * the ``ColorizerUtility.hexToRGB`` function), creates a temporary instance
-   * of ``PaletteItem`` and asks the engine to add this item to the actual
-   * palette.
-   */
-  color_add_hex_submit(e) {
-    // don't actually submit the form, intercept with this code
-    e.preventDefault();
-
-    console.debug(`Adding color by hex value: ${this.color_add_input_hex.value}`);
-    let color = ColorizerUtility.hexToRGB(this.color_add_input_hex.value);
-    if (color === null)
-      // leave the function if the input can not be parsed as hex color code
-      return;
-
-    let item = new PaletteItem(color[0], color[1], color[2]);
-
-    this.engine.addItemToPalette(item);
   }
 }
 
 
 class ColorizerEngine {
 
-  // Declare **private** variables.
-  // They need initalisation, e.g. in the constructor.
+  // Private Attributes
+  //
+  // This is only the declaration, initialization has to be done elsewhere
+  // (e.g. in the ``constructor()``).
   #palette;
   #paletteObservers;
   #paletteStoreName;
