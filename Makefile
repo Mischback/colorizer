@@ -25,6 +25,13 @@ STAMP_GIT_HOOKS := $(STAMP_DIR)/git-hooks
 # ##### Recipes
 
 # ##### Development Utilities
+
+# Run ``prettier`` against all files in the current directory
+util/lint/prettier : $(STAMP_NODE_READY)
+	npx prettier . --ignore-unknown --write
+.PHONY : util/lint/prettier
+
+# Setup the git hooks
 util/githooks : $(STAMP_GIT_HOOKS)
 .PHONY : util/githooks
 
