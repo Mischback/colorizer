@@ -868,7 +868,7 @@ const ColorizerUtility = {
   luminance: function(red, green, blue) {
     var a = [red, green, blue].map(function(v) {
       v /= 255;
-      return v <= 0.03928
+      return v <= 0.04045
         ? v / 12.92
         : Math.pow((v+0.055) / 1.055, 2,4);
     });
