@@ -14,6 +14,15 @@
 # Ref: https://stackoverflow.com/a/73450593
 REPO_ROOT := $(patsubst %/, %, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
+# Build directory
+BUILD_DIR := $(REPO_ROOT)/dist
+
+BUILD_APP_JS := $(BUILD_DIR)/assets/colorizer.js
+
+# Source directory
+SRC_DIR := $(REPO_ROOT)/src
+SRC_TS := $(shell find $(SRC_DIR)/ts -type f)
+
 # Stamps
 #
 # Track certain things with artificial *stamps*.
@@ -24,10 +33,17 @@ STAMP_GIT_HOOKS := $(STAMP_DIR)/git-hooks
 
 # ##### Recipes
 
+build : $(BUILD_APP_JS)
+.PHONY : build
+
+# Run ``rollup`` to compile TS sources and bundle them
+$(BUILD_APP_JS) : $(SRC_TS) .rollup.config.js | $(STAMP_NODE_READY)
+	npx rollup -c .rollup.config.js --bundleConfigAsCjs
+
 # ##### Development Utilities
 
 # Run ``prettier`` against all files in the current directory
-util/lint/prettier : $(STAMP_NODE_READY)
+util/lint/prettier : | $(STAMP_NODE_READY)
 	npx prettier . --ignore-unknown --write
 .PHONY : util/lint/prettier
 
