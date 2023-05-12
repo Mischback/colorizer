@@ -1,0 +1,7 @@
+# These items should not be treated by prettier.
+#
+# Basically, prettier should only work on the project's own source files,
+# ignoring generated/compiled files as well as 3rd party files.
+
+node_modules
+.npm
