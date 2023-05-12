@@ -4,3 +4,6 @@
 # NodeJS modules
 node_modules/
 .npm/
+
+# The actual release / public / distribution
+dist/
