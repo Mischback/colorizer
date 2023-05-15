@@ -1,9 +1,13 @@
 import typescript from "@rollup/plugin-typescript";
 
 export default {
-  input: "src/script/colorizer.ts",
+  input: "src/script/index.ts",
   output: {
-    dir: "dist/assets",
+    file: "dist/assets/colorizer.js",
+    /* TODO: "es" or "iife"?!
+     *
+     * https://rollupjs.org/configuration-options/#output-format
+     */
     format: "es",
   },
   plugins: [typescript()],
