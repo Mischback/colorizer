@@ -42,6 +42,10 @@ $(BUILD_APP_JS) : $(SRC_SCRIPT) .rollup.config.js tsconfig.json | $(STAMP_NODE_R
 
 # ##### Development Utilities
 
+util/lint/eslint : | $(STAMP_NODE_READY)
+	npx eslint --fix "**/*.ts"
+.PHONY : util/lint/eslint
+
 # Run ``prettier`` against all files in the current directory
 util/lint/prettier : | $(STAMP_NODE_READY)
 	npx prettier . --ignore-unknown --write
