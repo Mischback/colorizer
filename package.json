@@ -18,10 +18,14 @@
   },
   "homepage": "https://mischback.github.io/colorizer/",
   "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.6",
+    "@typescript-eslint/parser": "^5.59.6",
+    "eslint": "^8.40.0",
+    "eslint-config-prettier": "^8.8.0",
     "lint-staged": "^13.2.0",
     "prettier": "^2.8.0",
     "rollup": "^3.21.0",
-    "@rollup/plugin-typescript": "^11.1.0",
     "simple-git-hooks": "^2.8.0",
     "typescript": "^5.0.0"
   }
