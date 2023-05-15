@@ -21,7 +21,7 @@ BUILD_APP_JS := $(BUILD_DIR)/assets/colorizer.js
 
 # Source directory
 SRC_DIR := $(REPO_ROOT)/src
-SRC_TS := $(shell find $(SRC_DIR)/ts -type f)
+SRC_SCRIPT := $(shell find $(SRC_DIR)/script -type f)
 
 # Stamps
 #
@@ -37,7 +37,7 @@ build : $(BUILD_APP_JS)
 .PHONY : build
 
 # Run ``rollup`` to compile TS sources and bundle them
-$(BUILD_APP_JS) : $(SRC_TS) .rollup.config.js | $(STAMP_NODE_READY)
+$(BUILD_APP_JS) : $(SRC_SCRIPT) .rollup.config.js tsconfig.json | $(STAMP_NODE_READY)
 	npx rollup -c .rollup.config.js --bundleConfigAsCjs
 
 # ##### Development Utilities
