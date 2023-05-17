@@ -37,11 +37,15 @@ build : $(BUILD_APP_JS)
 .PHONY : build
 
 # Run ``rollup`` to compile TS sources and bundle them
+#
+# ``rollup`` (or its TypeScript plugin, to be precise) will perform the
+# typechecking, so there is no need to call ``util/lint/typechek`` manually.
 $(BUILD_APP_JS) : $(SRC_SCRIPT) .rollup.config.js tsconfig.json | $(STAMP_NODE_READY)
 	npx rollup -c .rollup.config.js --bundleConfigAsCjs
 
 # ##### Development Utilities
 
+# Run ``eslint`` against script source files
 util/lint/eslint : | $(STAMP_NODE_READY)
 	npx eslint --fix "**/*.ts"
 .PHONY : util/lint/eslint
@@ -50,6 +54,11 @@ util/lint/eslint : | $(STAMP_NODE_READY)
 util/lint/prettier : | $(STAMP_NODE_READY)
 	npx prettier . --ignore-unknown --write
 .PHONY : util/lint/prettier
+
+# Run ``tsc`` to typecheck the script source files
+util/lint/typecheck : tsconfig.json | $(STAMP_NODE_READY)
+	npx tsc --project tsconfig.json
+.PHONY : util/lint/typecheck
 
 # Setup the git hooks
 util/githooks : $(STAMP_GIT_HOOKS)
