@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import { getDomElement } from "./utility";
+import { getColorFormInput } from "./colorizer/interface/color_form/input_methods";
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log(getDomElement(null, "body"));
+  console.log(getColorFormInput("rgb"));
 });
