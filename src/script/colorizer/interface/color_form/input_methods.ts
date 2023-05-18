@@ -31,20 +31,27 @@ class ColorFormInputRgb
 {
   private static fieldsetId = "color-form-rgb";
   private fieldset: HTMLFieldSetElement;
-  private inputTextRed: HTMLInputElement;
-  private inputSliderRed: HTMLInputElement;
-  private inputTextGreen: HTMLInputElement;
-  private inputSliderGreen: HTMLInputElement;
-  private inputTextBlue: HTMLInputElement;
-  private inputSliderBlue: HTMLInputElement;
+  // private inputTextRed: HTMLInputElement;
+  // private inputSliderRed: HTMLInputElement;
+  // private inputTextGreen: HTMLInputElement;
+  // private inputSliderGreen: HTMLInputElement;
+  // private inputTextBlue: HTMLInputElement;
+  // private inputSliderBlue: HTMLInputElement;
 
   constructor() {
     super();
 
     // Get DOM elements
-    this.fieldset = getDomElement(
-      null,
-      `#${(this.constructor as typeof ColorFormInputRgb).fieldsetId}`
+    this.fieldset = <HTMLFieldSetElement>(
+      getDomElement(
+        null,
+        `#${(this.constructor as typeof ColorFormInputRgb).fieldsetId}`
+      )
     );
+    console.debug(this.fieldset);
+  }
+
+  public getColor(): void {
+    console.debug("getColor()...");
   }
 }
