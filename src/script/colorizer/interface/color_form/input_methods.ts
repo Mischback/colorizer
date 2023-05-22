@@ -23,6 +23,41 @@ export function getColorFormInput(
 
 abstract class ColorFormInputMethod implements IColorFormInputMethod {
   public abstract getColor(): void;
+
+  /**
+   * Establish the logical connections between slider, text input and the
+   * containing fieldset.
+   *
+   * Adds event listeners for ``input`` events to the ``<input ...>`` elements
+   * to update the corresponding *other* ``<input ...>`` element.
+   * The ``container`` element's ``style`` attribute is updated with a CSS
+   * custom property, providing the value of the ``<input ...>`` elements for
+   * styling purposes.
+   */
+  protected static linkContainerSliderText(
+    container: HTMLFieldSetElement,
+    slider: HTMLInputElement,
+    text: HTMLInputElement,
+    property: string
+  ): void {
+    // FIXME: Remove debug statements!
+    // console.info("Linking form elements...");
+    // console.debug(`container: ${container}`);
+    // console.debug(`slider: ${slider}`);
+    // console.debug(`text: ${text}`);
+    // console.debug(`property: ${property}`);
+
+    slider.addEventListener("input", () => {
+      const val = Number(slider.value);
+      text.value = val.toString();
+      container.style.setProperty(property, val.toString());
+    });
+    text.addEventListener("input", () => {
+      const val = Number(slider.value);
+      slider.value = val.toString();
+      container.style.setProperty(property, val.toString());
+    });
+  }
 }
 
 class ColorFormInputRgb
@@ -67,13 +102,34 @@ class ColorFormInputRgb
       getDomElement(this.fieldset, ".component-blue > input[type=range]")
     );
 
-    console.debug(this.fieldset);
-    console.debug(this.inputTextRed);
-    console.debug(this.inputSliderRed);
-    console.debug(this.inputTextGreen);
-    console.debug(this.inputSliderGreen);
-    console.debug(this.inputTextBlue);
-    console.debug(this.inputSliderBlue);
+    // Establish connections between related input elements
+    (this.constructor as typeof ColorFormInputRgb).linkContainerSliderText(
+      this.fieldset,
+      this.inputSliderRed,
+      this.inputTextRed,
+      "--this-red"
+    );
+    (this.constructor as typeof ColorFormInputRgb).linkContainerSliderText(
+      this.fieldset,
+      this.inputSliderGreen,
+      this.inputTextGreen,
+      "--this-green"
+    );
+    (this.constructor as typeof ColorFormInputRgb).linkContainerSliderText(
+      this.fieldset,
+      this.inputSliderBlue,
+      this.inputTextBlue,
+      "--this-blue"
+    );
+
+    // FIXME: Remove debug statements!
+    // console.debug(this.fieldset);
+    // console.debug(this.inputTextRed);
+    // console.debug(this.inputSliderRed);
+    // console.debug(this.inputTextGreen);
+    // console.debug(this.inputSliderGreen);
+    // console.debug(this.inputTextBlue);
+    // console.debug(this.inputSliderBlue);
   }
 
   public getColor(): void {
