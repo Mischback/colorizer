@@ -58,6 +58,64 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
       container.style.setProperty(property, val.toString());
     });
   }
+
+  /**
+   * Attach tooltip to a toggle button.
+   *
+   * The implementation is based on
+   * [this guide](https://inclusive-components.design/tooltips-toggletips/).
+   * It makes some **assumptions** about the general structure of the DOM,
+   * meaning this script source is **heavily tied** to the actual
+   * ``index.html`` (tight coupling).
+   *
+   * Please note: The ``<fieldset>`` is setup to be as accessible as possible
+   * on its own, this tooltip adds more context and additional information.
+   *
+   * Implementation detail: While the content of the tooltip is accessible by
+   * an ``id`` attribute, this method uses a *class-based* selector in order to
+   * limit the scope of ``getDomElement()`` / ``querySelector()`` to the
+   * children of the ``container``, which is known to the calling functions.
+   */
+  protected static setupTooltip(container: HTMLFieldSetElement): void {
+    const ttButton = getDomElement(
+      container,
+      "legend > .tooltip-anchor > button"
+    );
+    const ttContent = getDomElement(container, ".tooltip-content");
+    const ttDisplay = getDomElement(
+      container,
+      "legend > .tooltip-anchor > .tooltip-display"
+    );
+
+    ttButton.addEventListener("click", () => {
+      ttDisplay.innerHTML = "";
+      window.setTimeout(() => {
+        ttDisplay.innerHTML = `<div>${ttContent.innerHTML}</div>`;
+      }, 100); // TODO: Should this be adjustable?!
+    });
+
+    ttButton.addEventListener("keydown", (e) => {
+      const keyboardEvent = <KeyboardEvent>e;
+      if ((keyboardEvent.keyCode || keyboardEvent.which) === 27) {
+        ttDisplay.innerHTML = "";
+      }
+    });
+
+    // TODO: This is probably highly inefficient, as this event listener is
+    //       attached multiple times (for every input method). Probably we can
+    //       get away with this, though...
+    document.addEventListener("click", (e) => {
+      if (e.target !== ttButton) {
+        ttDisplay.innerHTML = "";
+      }
+    });
+
+    // Setup is completed, now remove ``ttContent`` from the (visual) DOM.
+    //
+    // TODO: Is this the correct way? Or should it be *removed* from the DOM by
+    //       using ``visibility: hidden``?
+    ttContent.classList.add("hide-visually");
+  }
 }
 
 class ColorFormInputRgb
@@ -121,6 +179,8 @@ class ColorFormInputRgb
       this.inputTextBlue,
       "--this-blue"
     );
+
+    (this.constructor as typeof ColorFormInputRgb).setupTooltip(this.fieldset);
 
     // FIXME: Remove debug statements!
     // console.debug(this.fieldset);
