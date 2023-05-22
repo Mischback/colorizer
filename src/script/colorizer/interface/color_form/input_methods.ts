@@ -3,6 +3,7 @@
 // SPDX-FileType: SOURCE
 
 import { getDomElement } from "../../../utility";
+import { ColorizerColor } from "../../lib/colors";
 
 type TColorFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
 
@@ -193,6 +194,7 @@ class ColorFormInputRgb
   }
 
   public getColor(): void {
-    console.debug("getColor()...");
+    console.debug("getColor()");
+    console.debug(ColorizerColor.fromRgb(0.5, 0.5, 0.5));
   }
 }

@@ -5,5 +5,7 @@
 import { getColorFormInput } from "./colorizer/interface/color_form/input_methods";
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log(getColorFormInput("rgb"));
+  const a = getColorFormInput("rgb");
+  console.log(a);
+  a.getColor();
 });
