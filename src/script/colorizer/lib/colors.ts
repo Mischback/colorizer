@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
+type ColorCoordinates = [number, number, number];
 type TVector = number[];
 type TMatrix = TVector[]; // basically this is ``number[][]``
 
@@ -68,8 +69,8 @@ function multiplyMatrices(
  * https://www.w3.org/TR/css-color-4/#color-conversion-code and complemented
  * with type information.
  */
-function sRgbToLinear(rgb: [number, number, number]): [number, number, number] {
-  return <[number, number, number]>rgb.map((val) => {
+function sRgbToLinear(rgb: ColorCoordinates): ColorCoordinates {
+  return <ColorCoordinates>rgb.map((val) => {
     const sign = val < 0 ? -1 : 1;
     const abs = Math.abs(val);
 
@@ -91,16 +92,14 @@ function sRgbToLinear(rgb: [number, number, number]): [number, number, number] {
  * https://www.w3.org/TR/css-color-4/#color-conversion-code and complemented
  * with type information.
  */
-function linearSRgbToXyz(
-  rgb: [number, number, number]
-): [number, number, number] {
+function linearSRgbToXyz(rgb: ColorCoordinates): ColorCoordinates {
   const M = [
     [506752 / 1228815, 87881 / 245763, 12673 / 70218],
     [87098 / 409605, 175762 / 245763, 12673 / 175545],
     [7918 / 409605, 87881 / 737289, 1001167 / 1053270],
   ];
 
-  return <[number, number, number]>multiplyMatrices(M, rgb);
+  return <ColorCoordinates>multiplyMatrices(M, rgb);
 }
 
 export class ColorizerColor {
