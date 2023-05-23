@@ -3,7 +3,7 @@
 // SPDX-FileType: SOURCE
 
 import { getDomElement } from "../../../utility";
-import { ColorizerColor } from "../../lib/colors";
+import { ColorizerColor } from "../../lib/color";
 
 type TColorFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
 
