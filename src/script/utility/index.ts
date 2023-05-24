@@ -24,3 +24,18 @@ export function getDomElement(
 
   return tmp;
 }
+
+/**
+ * Round a ``Number`` to a given precision.
+ *
+ * @param num The number to be rounded.
+ * @param precision The desired amount of decimal places.
+ * @returns The rounded ``Number``.
+ *
+ * See https://stackoverflow.com/a/11832950 for reference.
+ */
+export function roundToPrecision(num: number, precision = 0): number {
+  const precCalc = Math.pow(10, Math.floor(precision));
+
+  return Math.round((num + Number.EPSILON) * precCalc) / precCalc;
+}
