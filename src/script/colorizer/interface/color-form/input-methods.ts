@@ -15,6 +15,7 @@ type TColorFormInputCallback = (event?: Event, ...args: any[]) => void;
 
 export interface IColorFormInputMethod {
   getColor(): void;
+  setColor(color: ColorizerColor): void;
 }
 
 export function getColorFormInput(
@@ -41,6 +42,7 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
 
   public abstract getColor(): void;
   protected abstract publishColor(): void;
+  public abstract setColor(color: ColorizerColor): void;
 
   /**
    * *Debounce* the ``<input ...>`` elements.
@@ -309,6 +311,7 @@ class ColorFormInputRgb
    *       method enough?
    */
   protected publishColor(): void {
+    // FIXME: Refactor: Get rid of tmp, pass ColorizerColor directly!
     const tmp = ColorizerColor.fromRgb255(
       Number(this.inputTextRed.value),
       Number(this.inputTextGreen.value),
@@ -316,5 +319,15 @@ class ColorFormInputRgb
     );
 
     this.inputReceiver(tmp);
+  }
+
+  /**
+   * Set the color of this input method.
+   *
+   * @param color An instance of ``ColorizerColor``.
+   */
+  public setColor(color: ColorizerColor): void {
+    console.debug(color);
+    console.log(this);
   }
 }

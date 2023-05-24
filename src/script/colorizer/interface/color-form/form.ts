@@ -44,7 +44,11 @@ export class ColorForm {
 
   // TODO: Heavily work in progress here!
   private receiveColor(color: ColorizerColor): void {
-    console.info(color);
     this.color = color;
+
+    // Update the color of all available input methods
+    this.inputMethods.forEach((method) => {
+      method.setColor(color);
+    });
   }
 }
