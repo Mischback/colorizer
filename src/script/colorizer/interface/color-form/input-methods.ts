@@ -30,9 +30,12 @@ export function getColorFormInput(
 }
 
 abstract class ColorFormInputMethod implements IColorFormInputMethod {
+  protected fieldset: HTMLFieldSetElement;
   protected inputReceiver: TColorFormReceiverCallback;
 
-  constructor(receiver: TColorFormReceiverCallback) {
+  constructor(fieldsetId: string, receiver: TColorFormReceiverCallback) {
+    this.fieldset = <HTMLFieldSetElement>getDomElement(null, fieldsetId);
+
     this.inputReceiver = receiver;
   }
 
@@ -169,8 +172,6 @@ class ColorFormInputRgb
   extends ColorFormInputMethod
   implements IColorFormInputMethod
 {
-  private static fieldsetId = "color-form-rgb";
-  private fieldset: HTMLFieldSetElement;
   private inputTextRed: HTMLInputElement;
   private inputSliderRed: HTMLInputElement;
   private inputTextGreen: HTMLInputElement;
@@ -179,15 +180,9 @@ class ColorFormInputRgb
   private inputSliderBlue: HTMLInputElement;
 
   constructor(receiver: TColorFormReceiverCallback) {
-    super(receiver);
+    super("#color-form-rgb", receiver);
 
     // Get DOM elements
-    this.fieldset = <HTMLFieldSetElement>(
-      getDomElement(
-        null,
-        `#${(this.constructor as typeof ColorFormInputRgb).fieldsetId}`
-      )
-    );
     this.inputTextRed = <HTMLInputElement>(
       getDomElement(this.fieldset, ".component-red > input[type=text]")
     );
