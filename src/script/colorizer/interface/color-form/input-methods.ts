@@ -6,6 +6,11 @@ import { getDomElement } from "../../../utility";
 import { ColorizerColor } from "../../lib/color";
 
 type TColorFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
+// The ``args`` array is required, as the functions that are described by this
+// signature are called using ``apply()``.
+//
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type TColorFormInputCallback = (event?: Event, ...args: any[]) => void;
 
 interface IColorFormInputMethod {
   getColor(): void;
@@ -24,6 +29,38 @@ export function getColorFormInput(
 
 abstract class ColorFormInputMethod implements IColorFormInputMethod {
   public abstract getColor(): void;
+
+  /**
+   * *Debounce* the ``<input ...>`` elements.
+   *
+   * This function wraps the actual callback methods for the ``<input ...>``
+   * elements and applies a *configurable delay* (``debounceTime``) before
+   * executing the callback. This is meant to prevent updates of the current
+   * color of the ``<form ...>`` element **while** still editing the values
+   * of the ``<input ...>`` element.
+   *
+   * See https://chiamakaikeanyi.dev/event-debouncing-and-throttling-in-javascript/
+   */
+  protected static debounceInput(
+    context: ColorFormInputMethod,
+    fn: TColorFormInputCallback,
+    debounceTime: number
+  ) {
+    let timer: number;
+
+    // The ``args`` to be applied *should be* an instance of a DOM ``Event``,
+    // see ``TColorFormInputCallback``.
+    // As ``apply()`` does not handle more than two arguments, all arguments
+    // are covered by ``args``.
+    //
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (...args: any[]) => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        fn.apply(context, args);
+      }, debounceTime);
+    };
+  }
 
   /**
    * Establish the logical connections between slider, text input and the
