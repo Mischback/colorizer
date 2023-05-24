@@ -4,6 +4,7 @@
 
 import { getDomElement } from "../../../utility";
 import { ColorizerColor } from "../../lib/color";
+import { TColorFormReceiverCallback } from "./form";
 
 type TColorFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
 // The ``args`` array is required, as the functions that are described by this
@@ -17,17 +18,24 @@ export interface IColorFormInputMethod {
 }
 
 export function getColorFormInput(
-  method: TColorFormInputMethod
+  method: TColorFormInputMethod,
+  receiver: TColorFormReceiverCallback
 ): ColorFormInputMethod {
   switch (method) {
     case "rgb":
-      return new ColorFormInputRgb();
+      return new ColorFormInputRgb(receiver);
     default:
       throw new Error(`Unknown input method '${method}'`);
   }
 }
 
 abstract class ColorFormInputMethod implements IColorFormInputMethod {
+  protected inputReceiver: TColorFormReceiverCallback;
+
+  constructor(receiver: TColorFormReceiverCallback) {
+    this.inputReceiver = receiver;
+  }
+
   public abstract getColor(): void;
   protected abstract publishColor(): void;
 
@@ -170,8 +178,8 @@ class ColorFormInputRgb
   private inputTextBlue: HTMLInputElement;
   private inputSliderBlue: HTMLInputElement;
 
-  constructor() {
-    super();
+  constructor(receiver: TColorFormReceiverCallback) {
+    super(receiver);
 
     // Get DOM elements
     this.fieldset = <HTMLFieldSetElement>(
@@ -316,5 +324,6 @@ class ColorFormInputRgb
     );
 
     console.debug(tmp);
+    this.inputReceiver("bar");
   }
 }
