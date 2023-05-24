@@ -29,6 +29,7 @@ export function getColorFormInput(
 
 abstract class ColorFormInputMethod implements IColorFormInputMethod {
   public abstract getColor(): void;
+  protected abstract publishColor(): void;
 
   /**
    * *Debounce* the ``<input ...>`` elements.
@@ -218,20 +219,77 @@ class ColorFormInputRgb
       "--this-blue"
     );
 
-    (this.constructor as typeof ColorFormInputRgb).setupTooltip(this.fieldset);
+    // Attach event listeners for publishing the RGB color
+    //
+    // The actual method (``publishColor()``) is executed with a (configurable)
+    // delay using ``debounceInput()``.
+    //
+    // eslint complains about the usage of an *unbound method*. This rule is
+    // ignored for this block, as ``debounceInput()`` will take care of the
+    // correct binding of ``publishColor()``.
+    // See https://typescript-eslint.io/rules/unbound-method/
+    /* eslint-disable @typescript-eslint/unbound-method */
+    this.inputTextRed.addEventListener(
+      "input",
+      (this.constructor as typeof ColorFormInputRgb).debounceInput(
+        this,
+        this.publishColor,
+        500
+      )
+    );
+    this.inputSliderRed.addEventListener(
+      "input",
+      (this.constructor as typeof ColorFormInputRgb).debounceInput(
+        this,
+        this.publishColor,
+        500
+      )
+    );
+    this.inputTextGreen.addEventListener(
+      "input",
+      (this.constructor as typeof ColorFormInputRgb).debounceInput(
+        this,
+        this.publishColor,
+        500
+      )
+    );
+    this.inputSliderGreen.addEventListener(
+      "input",
+      (this.constructor as typeof ColorFormInputRgb).debounceInput(
+        this,
+        this.publishColor,
+        500
+      )
+    );
+    this.inputTextBlue.addEventListener(
+      "input",
+      (this.constructor as typeof ColorFormInputRgb).debounceInput(
+        this,
+        this.publishColor,
+        500
+      )
+    );
+    this.inputSliderBlue.addEventListener(
+      "input",
+      (this.constructor as typeof ColorFormInputRgb).debounceInput(
+        this,
+        this.publishColor,
+        500
+      )
+    );
+    /* eslint-enable @typescript-eslint/unbound-method */
 
-    // FIXME: Remove debug statements!
-    // console.debug(this.fieldset);
-    // console.debug(this.inputTextRed);
-    // console.debug(this.inputSliderRed);
-    // console.debug(this.inputTextGreen);
-    // console.debug(this.inputSliderGreen);
-    // console.debug(this.inputTextBlue);
-    // console.debug(this.inputSliderBlue);
+    // Setup the tooltip
+    (this.constructor as typeof ColorFormInputRgb).setupTooltip(this.fieldset);
   }
 
   public getColor(): void {
     console.debug("getColor()");
     console.debug(ColorizerColor.fromRgb(0.5, 0.5, 0.5));
+  }
+
+  protected publishColor(): void {
+    console.debug("publishColor()");
+    console.debug(this.inputTextRed.value);
   }
 }
