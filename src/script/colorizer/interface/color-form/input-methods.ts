@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import { getDomElement } from "../../../utility";
-import { ColorizerColor } from "../../lib/color";
 import { TColorFormReceiverCallback } from "./form";
+import { ColorizerColor } from "../../lib/color";
+import { getDomElement } from "../../../utility";
 
 type TColorFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
 // The ``args`` array is required, as the functions that are described by this
@@ -309,16 +309,12 @@ class ColorFormInputRgb
    *       method enough?
    */
   protected publishColor(): void {
-    // FIXME: Convert ``string`` to ``integer`` (``number`` without decimal places)!
-    console.debug("publishColor()");
-
     const tmp = ColorizerColor.fromRgb255(
       Number(this.inputTextRed.value),
       Number(this.inputTextGreen.value),
       Number(this.inputTextBlue.value)
     );
 
-    console.debug(tmp);
-    this.inputReceiver("bar");
+    this.inputReceiver(tmp);
   }
 }
