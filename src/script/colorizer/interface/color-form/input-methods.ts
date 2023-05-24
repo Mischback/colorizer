@@ -12,7 +12,7 @@ type TColorFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TColorFormInputCallback = (event?: Event, ...args: any[]) => void;
 
-interface IColorFormInputMethod {
+export interface IColorFormInputMethod {
   getColor(): void;
 }
 
