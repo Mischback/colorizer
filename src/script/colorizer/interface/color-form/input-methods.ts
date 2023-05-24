@@ -296,21 +296,23 @@ class ColorFormInputRgb
    * the corresponding sliders!) and publishes it to the parent ``<form ...>``
    * element.
    *
+   * The values of the ``<input type="text" ...>`` elements are converted to
+   * actual numbers by calling ``Number()`` on them. Converting them to the
+   * required integers (numbers without decimal places) is done in
+   * ``ColorizerColor.fromRgb255()``.
+   *
    * TODO: Should this class keep track of the parent ``form`` using a
    *       reference to the (tbd) ``ColorForm`` instance or is a callback
    *       method enough?
-   * TODO: The values **must be converted** to ``Number``. Should the be logic
-   *       to apply rounding (effectively creating *Integers*) be applied here
-   *       or in ``ColorizerColor.fromRgb255()``?
    */
   protected publishColor(): void {
     // FIXME: Convert ``string`` to ``integer`` (``number`` without decimal places)!
     console.debug("publishColor()");
 
-    const tmp = ColorizerColor.fromRgb(
-      Number(this.inputTextRed.value) / 255,
-      Number(this.inputTextGreen.value) / 255,
-      Number(this.inputTextBlue.value) / 255
+    const tmp = ColorizerColor.fromRgb255(
+      Number(this.inputTextRed.value),
+      Number(this.inputTextGreen.value),
+      Number(this.inputTextBlue.value)
     );
 
     console.debug(tmp);
