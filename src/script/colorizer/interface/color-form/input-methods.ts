@@ -288,8 +288,31 @@ class ColorFormInputRgb
     console.debug(ColorizerColor.fromRgb(0.5, 0.5, 0.5));
   }
 
+  /**
+   * Publish the current color to the parent ``<form ...>``.
+   *
+   * This method creates an instance of ``ColorizerColor``, using the values
+   * of the ``<input type="text" ...>`` elements (which are synchronized with
+   * the corresponding sliders!) and publishes it to the parent ``<form ...>``
+   * element.
+   *
+   * TODO: Should this class keep track of the parent ``form`` using a
+   *       reference to the (tbd) ``ColorForm`` instance or is a callback
+   *       method enough?
+   * TODO: The values **must be converted** to ``Number``. Should the be logic
+   *       to apply rounding (effectively creating *Integers*) be applied here
+   *       or in ``ColorizerColor.fromRgb255()``?
+   */
   protected publishColor(): void {
+    // FIXME: Convert ``string`` to ``integer`` (``number`` without decimal places)!
     console.debug("publishColor()");
-    console.debug(this.inputTextRed.value);
+
+    const tmp = ColorizerColor.fromRgb(
+      Number(this.inputTextRed.value) / 255,
+      Number(this.inputTextGreen.value) / 255,
+      Number(this.inputTextBlue.value) / 255
+    );
+
+    console.debug(tmp);
   }
 }
