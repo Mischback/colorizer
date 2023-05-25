@@ -266,17 +266,17 @@ class ColorFormInputRgb
       {
         text: this.inputTextRed,
         slider: this.inputSliderRed,
-        property: "---this-red",
+        property: this.stylePropertyRed,
       },
       {
         text: this.inputTextGreen,
         slider: this.inputSliderGreen,
-        property: "---this-green",
+        property: this.stylePropertyGreen,
       },
       {
         text: this.inputTextBlue,
         slider: this.inputSliderBlue,
-        property: "---this-blue",
+        property: this.stylePropertyBlue,
       }
     );
 
