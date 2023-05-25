@@ -6,18 +6,44 @@ import { TColorFormReceiverCallback } from "./form";
 import { ColorizerColor } from "../../lib/color";
 import { getDomElement } from "../../../utility";
 
+/**
+ * Dedicated typing for the available input methods.
+ *
+ * TODO: Actually implement all of them! ;)
+ */
 type TColorFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
+
+/**
+ * The generic prototype of a function that acts a a callback / event handler
+ * for input events.
+ */
 // The ``args`` array is required, as the functions that are described by this
 // signature are called using ``apply()``.
 //
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TColorFormInputCallback = (evt?: Event, ...args: any[]) => void;
 
+/**
+ * The public interface of the input method classes.
+ */
 export interface IColorFormInputMethod {
   getColor(): ColorizerColor;
   setColor(color: ColorizerColor): void;
 }
 
+/**
+ * Create an instance of an input method class.
+ *
+ * @param method The method / colorspace that should be instantiated.
+ * @param receiver A callback function that will be executed when the color
+ *                 is modified. Intended to *publish* the color of the method
+ *                 to the parent form.
+ *
+ * This is meant to be a very basic implementation of the *Builder* pattern.
+ * Main idea is to keep the actual input method classes in this module
+ * exclusively and only exposing this function to create instances (and the
+ * ``IColorFormInputMethod`` to define the external interface).
+ */
 export function getColorFormInput(
   method: TColorFormInputMethod,
   receiver: TColorFormReceiverCallback
@@ -30,6 +56,47 @@ export function getColorFormInput(
   }
 }
 
+/**
+ * Base class for alle input methods.
+ *
+ * @param fieldsetId The ``id`` attribute of the method's parent
+ *                   ``<fieldset ...>`` element, used to get the DOM element
+ *                   using ``querySelector()``.
+ * @param cASelector The selector for the *A component*. It will be searched
+ *                   as a sibling of the ``<fieldset ...>`` element and used to
+ *                   identify the component's text input and range input.
+ * @param cAProperty The name of a CSS custom property that will be set on the
+ *                   ``<fieldset ...>`` element to trach the *A component's*
+ *                   current value.
+ * @param cBSelector The selector for the *B component*. It will be searched
+ *                   as a sibling of the ``<fieldset ...>`` element and used to
+ *                   identify the component's text input and range input.
+ * @param cBProperty The name of a CSS custom property that will be set on the
+ *                   ``<fieldset ...>`` element to trach the *B component's*
+ *                   current value.
+ * @param cCSelector The selector for the *C component*. It will be searched
+ *                   as a sibling of the ``<fieldset ...>`` element and used to
+ *                   identify the component's text input and range input.
+ * @param cCProperty The name of a CSS custom property that will be set on the
+ *                   ``<fieldset ...>`` element to trach the *C component's*
+ *                   current value.
+ * @param receiver A callback function that is called whenever the input
+ *                 method's current color changes.
+ *
+ * This class provides the implementations for the generic, method-unrelated,
+ * repetitive tasks. It does handle the heavy lifting, like synchronizing the
+ * ``<input ...>`` elements and publishing the color to the parent
+ * ``<form ...>`` element.
+ *
+ * The implementations are as generic as possible, so there are some
+ * assumptions:
+ * - the input method relies on **three** *coordinates* / *components* to
+ *   represent the color;
+ * - each *coordinate* / *component* is represented by a number of a given
+ *   range;
+ * - all required DOM elements are structured as siblings of a ``fieldset``
+ *   element and follow a pre-defined structure;
+ */
 abstract class ColorFormInputMethod implements IColorFormInputMethod {
   private fieldset: HTMLFieldSetElement;
   private inputReceiver: TColorFormReceiverCallback;
@@ -64,8 +131,6 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
 
     // Get DOM elements
     this.fieldset = <HTMLFieldSetElement>getDomElement(null, fieldsetId);
-
-    // TODO: EXPERIMENTAL!
     this.cAText = <HTMLInputElement>(
       getDomElement(this.fieldset, `${cASelector} > input[type=text]`)
     );
@@ -304,6 +369,9 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
   }
 }
 
+/**
+ * Represent sRGB with values in range [0..255].
+ */
 class ColorFormInputRgb
   extends ColorFormInputMethod
   implements IColorFormInputMethod
@@ -329,8 +397,7 @@ class ColorFormInputRgb
    *
    * This method creates an instance of ``ColorizerColor``, using the values
    * of the ``<input type="text" ...>`` elements (which are synchronized with
-   * the corresponding sliders!) and publishes it to the parent ``<form ...>``
-   * element.
+   * the corresponding sliders!).
    *
    * The values of the ``<input type="text" ...>`` elements are converted to
    * actual numbers by calling ``Number()`` on them. Converting them to the
