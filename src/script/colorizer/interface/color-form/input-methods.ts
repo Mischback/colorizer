@@ -102,13 +102,18 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
     /* eslint-disable @typescript-eslint/unbound-method */
     this.fieldset.addEventListener(
       "input",
-      (this.constructor as typeof ColorFormInputRgb).debounceInput(
+      (this.constructor as typeof ColorFormInputMethod).debounceInput(
         this,
         this.publishColor,
         500 // TODO: Should this be configurable?
       )
     );
     /* eslint-enable @typescript-eslint/unbound-method */
+
+    // Setup the tooltip
+    (this.constructor as typeof ColorFormInputMethod).setupTooltip(
+      this.fieldset
+    );
 
     this.inputReceiver = receiver;
   }
@@ -359,9 +364,6 @@ class ColorFormInputRgb
         property: this.stylePropertyBlue,
       }
     );
-
-    // Setup the tooltip
-    (this.constructor as typeof ColorFormInputRgb).setupTooltip(this.fieldset);
   }
 
   /**
