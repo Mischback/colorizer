@@ -40,8 +40,43 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
   protected fieldset: HTMLFieldSetElement;
   protected inputReceiver: TColorFormReceiverCallback;
 
+  // TODO: EXPERIMENTAL!
+  protected cAText: HTMLInputElement;
+  protected cASlider: HTMLInputElement;
+  protected cAProperty: string;
+  protected cBText: HTMLInputElement;
+  protected cBSlider: HTMLInputElement;
+  protected cBProperty: string;
+  protected cCText: HTMLInputElement;
+  protected cCSlider: HTMLInputElement;
+  protected cCProperty: string;
+
   constructor(fieldsetId: string, receiver: TColorFormReceiverCallback) {
+    // Get DOM elements
     this.fieldset = <HTMLFieldSetElement>getDomElement(null, fieldsetId);
+
+    // TODO: EXPERIMENTAL!
+    const cASelector = ".component-red";
+    const cBSelector = ".component-green";
+    const cCSelector = ".component-blue";
+    this.cAText = <HTMLInputElement>(
+      getDomElement(this.fieldset, `${cASelector} > input[type=text]`)
+    );
+    this.cASlider = <HTMLInputElement>(
+      getDomElement(this.fieldset, `${cASelector} > input[type=range]`)
+    );
+    this.cBText = <HTMLInputElement>(
+      getDomElement(this.fieldset, `${cBSelector} > input[type=text]`)
+    );
+    this.cBSlider = <HTMLInputElement>(
+      getDomElement(this.fieldset, `${cBSelector} > input[type=range]`)
+    );
+    this.cCText = <HTMLInputElement>(
+      getDomElement(this.fieldset, `${cCSelector} > input[type=text]`)
+    );
+    this.cCSlider = <HTMLInputElement>(
+      getDomElement(this.fieldset, `${cCSelector} > input[type=range]`)
+    );
 
     this.inputReceiver = receiver;
   }
@@ -258,24 +293,12 @@ class ColorFormInputRgb
     super("#color-form-rgb", receiver);
 
     // Get DOM elements
-    this.inputTextRed = <HTMLInputElement>(
-      getDomElement(this.fieldset, ".component-red > input[type=text]")
-    );
-    this.inputSliderRed = <HTMLInputElement>(
-      getDomElement(this.fieldset, ".component-red > input[type=range]")
-    );
-    this.inputTextGreen = <HTMLInputElement>(
-      getDomElement(this.fieldset, ".component-green > input[type=text]")
-    );
-    this.inputSliderGreen = <HTMLInputElement>(
-      getDomElement(this.fieldset, ".component-green > input[type=range]")
-    );
-    this.inputTextBlue = <HTMLInputElement>(
-      getDomElement(this.fieldset, ".component-blue > input[type=text]")
-    );
-    this.inputSliderBlue = <HTMLInputElement>(
-      getDomElement(this.fieldset, ".component-blue > input[type=range]")
-    );
+    this.inputTextRed = this.cAText;
+    this.inputSliderRed = this.cASlider;
+    this.inputTextGreen = this.cBText;
+    this.inputSliderGreen = this.cBSlider;
+    this.inputTextBlue = this.cCText;
+    this.inputSliderBlue = this.cCSlider;
 
     // Establish connections between related input elements
     this.setupInputSynchronization(
