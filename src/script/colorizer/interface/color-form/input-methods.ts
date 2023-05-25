@@ -45,6 +45,19 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
   public abstract setColor(color: ColorizerColor): void;
 
   /**
+   * Sets a custom CSS property on the ``fieldset`` element.
+   *
+   * @param propertyName The name of the custom CSS property.
+   * @param value The actual value.
+   */
+  protected updateCoordinateInStyleProperty(
+    propertyName: string,
+    value: string
+  ): void {
+    this.fieldset.style.setProperty(propertyName, value);
+  }
+
+  /**
    * *Debounce* the ``<input ...>`` elements.
    *
    * This function wraps the actual callback methods for the ``<input ...>``
@@ -74,41 +87,6 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
         fn.apply(context, args);
       }, debounceTime);
     };
-  }
-
-  /**
-   * Establish the logical connections between slider, text input and the
-   * containing fieldset.
-   *
-   * Adds event listeners for ``input`` events to the ``<input ...>`` elements
-   * to update the corresponding *other* ``<input ...>`` element.
-   * The ``container`` element's ``style`` attribute is updated with a CSS
-   * custom property, providing the value of the ``<input ...>`` elements for
-   * styling purposes.
-   */
-  protected static linkContainerSliderText(
-    container: HTMLFieldSetElement,
-    slider: HTMLInputElement,
-    text: HTMLInputElement,
-    property: string
-  ): void {
-    // FIXME: Remove debug statements!
-    // console.info("Linking form elements...");
-    // console.debug(`container: ${container}`);
-    // console.debug(`slider: ${slider}`);
-    // console.debug(`text: ${text}`);
-    // console.debug(`property: ${property}`);
-
-    slider.addEventListener("input", () => {
-      const val = Number(slider.value);
-      text.value = val.toString();
-      container.style.setProperty(property, val.toString());
-    });
-    text.addEventListener("input", () => {
-      const val = Number(slider.value);
-      slider.value = val.toString();
-      container.style.setProperty(property, val.toString());
-    });
   }
 
   /**
@@ -176,10 +154,13 @@ class ColorFormInputRgb
 {
   private inputTextRed: HTMLInputElement;
   private inputSliderRed: HTMLInputElement;
+  private stylePropertyRed = "--this-red";
   private inputTextGreen: HTMLInputElement;
   private inputSliderGreen: HTMLInputElement;
+  private stylePropertyGreen = "--this-green";
   private inputTextBlue: HTMLInputElement;
   private inputSliderBlue: HTMLInputElement;
+  private stylePropertyBlue = "--this-blue";
 
   constructor(receiver: TColorFormReceiverCallback) {
     super("#color-form-rgb", receiver);
@@ -205,24 +186,7 @@ class ColorFormInputRgb
     );
 
     // Establish connections between related input elements
-    (this.constructor as typeof ColorFormInputRgb).linkContainerSliderText(
-      this.fieldset,
-      this.inputSliderRed,
-      this.inputTextRed,
-      "--this-red"
-    );
-    (this.constructor as typeof ColorFormInputRgb).linkContainerSliderText(
-      this.fieldset,
-      this.inputSliderGreen,
-      this.inputTextGreen,
-      "--this-green"
-    );
-    (this.constructor as typeof ColorFormInputRgb).linkContainerSliderText(
-      this.fieldset,
-      this.inputSliderBlue,
-      this.inputTextBlue,
-      "--this-blue"
-    );
+    this.fieldset.addEventListener("input", this.syncInputElements.bind(this));
 
     // Attach event listeners for publishing the RGB color
     //
@@ -288,6 +252,76 @@ class ColorFormInputRgb
     (this.constructor as typeof ColorFormInputRgb).setupTooltip(this.fieldset);
   }
 
+  // FIXME: Add documentation when this refactoring is finished!
+  private syncInputElements(evt: Event) {
+    console.info("EventHandler on ``this.fieldset``:");
+    // console.info(`currentTarget: ${evt.currentTarget}`);
+    // console.info(`target: ${evt.target}`);
+    console.info(evt);
+
+    let val: number;
+
+    switch (evt.target) {
+      case this.inputTextRed:
+        val = Number(this.inputTextRed.value);
+        this.inputSliderRed.value = val.toString();
+        this.updateCoordinateInStyleProperty(
+          this.stylePropertyRed,
+          val.toString()
+        );
+        break;
+      case this.inputSliderRed:
+        val = Number(this.inputSliderRed.value);
+        this.inputTextRed.value = val.toString();
+        this.updateCoordinateInStyleProperty(
+          this.stylePropertyRed,
+          val.toString()
+        );
+        break;
+      case this.inputTextGreen:
+        val = Number(this.inputTextGreen.value);
+        this.inputSliderGreen.value = val.toString();
+        this.updateCoordinateInStyleProperty(
+          this.stylePropertyGreen,
+          val.toString()
+        );
+        break;
+      case this.inputSliderGreen:
+        val = Number(this.inputSliderGreen.value);
+        this.inputTextGreen.value = val.toString();
+        this.updateCoordinateInStyleProperty(
+          this.stylePropertyGreen,
+          val.toString()
+        );
+        break;
+      case this.inputTextBlue:
+        val = Number(this.inputTextBlue.value);
+        this.inputSliderBlue.value = val.toString();
+        this.updateCoordinateInStyleProperty(
+          this.stylePropertyBlue,
+          val.toString()
+        );
+        break;
+      case this.inputSliderBlue:
+        val = Number(this.inputSliderBlue.value);
+        this.inputTextBlue.value = val.toString();
+        this.updateCoordinateInStyleProperty(
+          this.stylePropertyBlue,
+          val.toString()
+        );
+        break;
+      default:
+        console.warn(
+          // The ``evt.target`` might be ``null``, which is marked by eslint.
+          // However, for debugging it is desired to know the actual value of
+          // ``evt.target``, even if it is ``null``.
+          //
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          `"InputEvent" originated from an unexpected element: ${evt.target}`
+        );
+    }
+  }
+
   public getColor(): void {
     console.debug("getColor()");
     console.debug(ColorizerColor.fromRgb(0.5, 0.5, 0.5));
@@ -327,8 +361,7 @@ class ColorFormInputRgb
    * @param color An instance of ``ColorizerColor``.
    */
   public setColor(color: ColorizerColor): void {
-    console.debug(color);
-    console.debug(color.toRgb());
-    console.debug(color.toRgb255());
+    const tmp = color.toRgb255();
+    console.debug(tmp);
   }
 }
