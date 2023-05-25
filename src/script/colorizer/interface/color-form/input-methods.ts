@@ -83,6 +83,9 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
     c: TColorFormInputSynchronization
   ): void {
     this.fieldset.addEventListener("input", (evt) => {
+      // The ``Event``/``InputEvent`` is handled here!
+      evt.stopPropagation();
+
       // Assuming that all inputs are based on numbers!
       let val: number;
 
