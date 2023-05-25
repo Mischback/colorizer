@@ -346,7 +346,21 @@ class ColorFormInputRgb
    * @param color An instance of ``ColorizerColor``.
    */
   public setColor(color: ColorizerColor): void {
-    const tmp = color.toRgb255();
-    console.debug(tmp);
+    const color255 = color.toRgb255();
+
+    let tmp = color255.r.toString();
+    this.inputTextRed.value = tmp;
+    this.inputSliderRed.value = tmp;
+    this.updateCoordinateInStyleProperty(this.stylePropertyRed, tmp);
+
+    tmp = color255.g.toString();
+    this.inputTextGreen.value = tmp;
+    this.inputSliderGreen.value = tmp;
+    this.updateCoordinateInStyleProperty(this.stylePropertyGreen, tmp);
+
+    tmp = color255.b.toString();
+    this.inputTextBlue.value = tmp;
+    this.inputSliderBlue.value = tmp;
+    this.updateCoordinateInStyleProperty(this.stylePropertyBlue, tmp);
   }
 }
