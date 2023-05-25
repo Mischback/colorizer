@@ -47,8 +47,24 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
   }
 
   public abstract getColor(): ColorizerColor;
-  protected abstract publishColor(evt: Event): void;
   public abstract setColor(color: ColorizerColor): void;
+
+  /**
+   * Publish the current color to the parent ``<form ...>``.
+   *
+   * Internally, this relies on ``getColor()`` to retrieve the current color.
+   *
+   * The parent ``<form ...>`` is notified using the provided callback
+   * function ``this.inputReceiver()``.
+   */
+  protected publishColor(evt?: Event): void {
+    // The ``Event``/``InputEvent`` is handled here!
+    if (evt !== undefined) {
+      evt.stopPropagation();
+    }
+
+    this.inputReceiver(this.getColor());
+  }
 
   /**
    * Sets a custom CSS property on the ``fieldset`` element.
@@ -325,23 +341,6 @@ class ColorFormInputRgb
       Number(this.inputTextGreen.value),
       Number(this.inputTextBlue.value)
     );
-  }
-
-  /**
-   * Publish the current color to the parent ``<form ...>``.
-   *
-   * Internally, this relies on ``getColor()`` to retrieve the current color.
-   *
-   * The parent ``<form ...>`` is notified using the provided callback
-   * function ``this.inputReceiver()``.
-   */
-  protected publishColor(evt?: Event): void {
-    // The ``Event``/``InputEvent`` is handled here!
-    if (evt !== undefined) {
-      evt.stopPropagation();
-    }
-
-    this.inputReceiver(this.getColor());
   }
 
   /**
