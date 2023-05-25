@@ -54,10 +54,17 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
   constructor(
     fieldsetId: string,
     cASelector: string,
+    cAProperty: string,
     cBSelector: string,
+    cBProperty: string,
     cCSelector: string,
+    cCProperty: string,
     receiver: TColorFormReceiverCallback
   ) {
+    this.cAProperty = cAProperty;
+    this.cBProperty = cBProperty;
+    this.cCProperty = cCProperty;
+
     // Get DOM elements
     this.fieldset = <HTMLFieldSetElement>getDomElement(null, fieldsetId);
 
@@ -296,8 +303,11 @@ class ColorFormInputRgb
     super(
       "#color-form-rgb",
       ".component-red",
+      "--this-red",
       ".component-green",
+      "--this-green",
       ".component-blue",
+      "--this-blue",
       receiver
     );
 
