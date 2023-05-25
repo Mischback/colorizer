@@ -11,7 +11,7 @@ type TColorFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
 // signature are called using ``apply()``.
 //
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type TColorFormInputCallback = (event?: Event, ...args: any[]) => void;
+type TColorFormInputCallback = (evt?: Event, ...args: any[]) => void;
 
 type TColorFormInputSynchronization = {
   text: HTMLInputElement;
@@ -47,7 +47,7 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
   }
 
   public abstract getColor(): void;
-  protected abstract publishColor(): void;
+  protected abstract publishColor(evt: Event): void;
   public abstract setColor(color: ColorizerColor): void;
 
   /**
@@ -288,54 +288,16 @@ class ColorFormInputRgb
     // eslint complains about the usage of an *unbound method*. This rule is
     // ignored for this block, as ``debounceInput()`` will take care of the
     // correct binding of ``publishColor()``.
+    //
     // See https://typescript-eslint.io/rules/unbound-method/
+    //
     /* eslint-disable @typescript-eslint/unbound-method */
-    this.inputTextRed.addEventListener(
+    this.fieldset.addEventListener(
       "input",
       (this.constructor as typeof ColorFormInputRgb).debounceInput(
         this,
         this.publishColor,
-        500
-      )
-    );
-    this.inputSliderRed.addEventListener(
-      "input",
-      (this.constructor as typeof ColorFormInputRgb).debounceInput(
-        this,
-        this.publishColor,
-        500
-      )
-    );
-    this.inputTextGreen.addEventListener(
-      "input",
-      (this.constructor as typeof ColorFormInputRgb).debounceInput(
-        this,
-        this.publishColor,
-        500
-      )
-    );
-    this.inputSliderGreen.addEventListener(
-      "input",
-      (this.constructor as typeof ColorFormInputRgb).debounceInput(
-        this,
-        this.publishColor,
-        500
-      )
-    );
-    this.inputTextBlue.addEventListener(
-      "input",
-      (this.constructor as typeof ColorFormInputRgb).debounceInput(
-        this,
-        this.publishColor,
-        500
-      )
-    );
-    this.inputSliderBlue.addEventListener(
-      "input",
-      (this.constructor as typeof ColorFormInputRgb).debounceInput(
-        this,
-        this.publishColor,
-        500
+        500 // TODO: Should this be configurable?
       )
     );
     /* eslint-enable @typescript-eslint/unbound-method */
@@ -361,12 +323,13 @@ class ColorFormInputRgb
    * actual numbers by calling ``Number()`` on them. Converting them to the
    * required integers (numbers without decimal places) is done in
    * ``ColorizerColor.fromRgb255()``.
-   *
-   * TODO: Should this class keep track of the parent ``form`` using a
-   *       reference to the (tbd) ``ColorForm`` instance or is a callback
-   *       method enough?
    */
-  protected publishColor(): void {
+  protected publishColor(evt?: Event): void {
+    // The ``Event``/``InputEvent`` is handled here!
+    if (evt !== undefined) {
+      evt.stopPropagation();
+    }
+
     // FIXME: Refactor: Get rid of tmp, pass ColorizerColor directly!
     const tmp = ColorizerColor.fromRgb255(
       Number(this.inputTextRed.value),
