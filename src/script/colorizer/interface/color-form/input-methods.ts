@@ -20,7 +20,7 @@ type TColorFormInputSynchronization = {
 };
 
 export interface IColorFormInputMethod {
-  getColor(): void;
+  getColor(): ColorizerColor;
   setColor(color: ColorizerColor): void;
 }
 
@@ -46,7 +46,7 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
     this.inputReceiver = receiver;
   }
 
-  public abstract getColor(): void;
+  public abstract getColor(): ColorizerColor;
   protected abstract publishColor(evt: Event): void;
   public abstract setColor(color: ColorizerColor): void;
 
@@ -306,13 +306,8 @@ class ColorFormInputRgb
     (this.constructor as typeof ColorFormInputRgb).setupTooltip(this.fieldset);
   }
 
-  public getColor(): void {
-    console.debug("getColor()");
-    console.debug(ColorizerColor.fromRgb(0.5, 0.5, 0.5));
-  }
-
   /**
-   * Publish the current color to the parent ``<form ...>``.
+   * Return the current color.
    *
    * This method creates an instance of ``ColorizerColor``, using the values
    * of the ``<input type="text" ...>`` elements (which are synchronized with
@@ -324,20 +319,29 @@ class ColorFormInputRgb
    * required integers (numbers without decimal places) is done in
    * ``ColorizerColor.fromRgb255()``.
    */
+  public getColor(): ColorizerColor {
+    return ColorizerColor.fromRgb255(
+      Number(this.inputTextRed.value),
+      Number(this.inputTextGreen.value),
+      Number(this.inputTextBlue.value)
+    );
+  }
+
+  /**
+   * Publish the current color to the parent ``<form ...>``.
+   *
+   * Internally, this relies on ``getColor()`` to retrieve the current color.
+   *
+   * The parent ``<form ...>`` is notified using the provided callback
+   * function ``this.inputReceiver()``.
+   */
   protected publishColor(evt?: Event): void {
     // The ``Event``/``InputEvent`` is handled here!
     if (evt !== undefined) {
       evt.stopPropagation();
     }
 
-    // FIXME: Refactor: Get rid of tmp, pass ColorizerColor directly!
-    const tmp = ColorizerColor.fromRgb255(
-      Number(this.inputTextRed.value),
-      Number(this.inputTextGreen.value),
-      Number(this.inputTextBlue.value)
-    );
-
-    this.inputReceiver(tmp);
+    this.inputReceiver(this.getColor());
   }
 
   /**
