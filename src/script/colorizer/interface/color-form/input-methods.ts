@@ -31,10 +31,8 @@ export function getColorFormInput(
 }
 
 abstract class ColorFormInputMethod implements IColorFormInputMethod {
-  protected fieldset: HTMLFieldSetElement;
-  protected inputReceiver: TColorFormReceiverCallback;
-
-  // TODO: EXPERIMENTAL!
+  private fieldset: HTMLFieldSetElement;
+  private inputReceiver: TColorFormReceiverCallback;
   protected cAText: HTMLInputElement;
   protected cASlider: HTMLInputElement;
   protected cAProperty: string;
@@ -44,6 +42,9 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
   protected cCText: HTMLInputElement;
   protected cCSlider: HTMLInputElement;
   protected cCProperty: string;
+
+  public abstract getColor(): ColorizerColor;
+  public abstract setColor(color: ColorizerColor): void;
 
   constructor(
     fieldsetId: string,
@@ -118,9 +119,6 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
     );
   }
 
-  public abstract getColor(): ColorizerColor;
-  public abstract setColor(color: ColorizerColor): void;
-
   /**
    * Publish the current color to the parent ``<form ...>``.
    *
@@ -129,7 +127,7 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
    * The parent ``<form ...>`` is notified using the provided callback
    * function ``this.inputReceiver()``.
    */
-  protected publishColor(evt?: Event): void {
+  private publishColor(evt?: Event): void {
     // The ``Event``/``InputEvent`` is handled here!
     if (evt !== undefined) {
       evt.stopPropagation();
@@ -152,7 +150,7 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
    * property on the instance's ``fieldset`` element (using
    * ``updateCoordateInStyleProperty()``).
    */
-  protected synchronizeInputElements(evt: Event): void {
+  private synchronizeInputElements(evt: Event): void {
     // The ``Event``/``InputEvent`` is handled here!
     evt.stopPropagation();
 
@@ -226,7 +224,7 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
    *
    * See https://chiamakaikeanyi.dev/event-debouncing-and-throttling-in-javascript/
    */
-  protected static debounceInput(
+  private static debounceInput(
     context: ColorFormInputMethod,
     fn: TColorFormInputCallback,
     debounceTime: number
@@ -264,7 +262,7 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
    * limit the scope of ``getDomElement()`` / ``querySelector()`` to the
    * children of the ``container``, which is known to the calling functions.
    */
-  protected static setupTooltip(container: HTMLFieldSetElement): void {
+  private static setupTooltip(container: HTMLFieldSetElement): void {
     const ttButton = getDomElement(
       container,
       "legend > .tooltip-anchor > button"
