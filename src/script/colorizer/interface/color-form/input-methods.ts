@@ -13,6 +13,12 @@ type TColorFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TColorFormInputCallback = (event?: Event, ...args: any[]) => void;
 
+type TColorFormInputSynchronization = {
+  text: HTMLInputElement;
+  slider: HTMLInputElement;
+  property: string;
+};
+
 export interface IColorFormInputMethod {
   getColor(): void;
   setColor(color: ColorizerColor): void;
@@ -55,6 +61,73 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
     value: string
   ): void {
     this.fieldset.style.setProperty(propertyName, value);
+  }
+
+  /**
+   * Provide synchronization between ``input`` elements.
+   *
+   * The implementation assumes, that the input method uses three distinct
+   * components / color coordinates, each of them represented by a (numerical)
+   * text input and a slider to adjust the value.
+   *
+   * The value is assumed to be a *number*.
+   *
+   * Internally, no sanitization or input validation is performed. The value
+   * is just applied to the corresponding element and set as a custom CSS
+   * property on the instance's ``fieldset`` element (using
+   * ``updateCoordateInStyleProperty()``).
+   */
+  protected setupInputSynchronization(
+    a: TColorFormInputSynchronization,
+    b: TColorFormInputSynchronization,
+    c: TColorFormInputSynchronization
+  ): void {
+    this.fieldset.addEventListener("input", (evt) => {
+      // Assuming that all inputs are based on numbers!
+      let val: number;
+
+      switch (evt.target) {
+        case a.text:
+          val = Number(a.text.value);
+          a.slider.value = val.toString();
+          this.updateCoordinateInStyleProperty(a.property, val.toString());
+          break;
+        case a.slider:
+          val = Number(a.slider.value);
+          a.text.value = val.toString();
+          this.updateCoordinateInStyleProperty(a.property, val.toString());
+          break;
+        case b.text:
+          val = Number(b.text.value);
+          b.slider.value = val.toString();
+          this.updateCoordinateInStyleProperty(b.property, val.toString());
+          break;
+        case b.slider:
+          val = Number(b.slider.value);
+          b.text.value = val.toString();
+          this.updateCoordinateInStyleProperty(b.property, val.toString());
+          break;
+        case c.text:
+          val = Number(c.text.value);
+          c.slider.value = val.toString();
+          this.updateCoordinateInStyleProperty(c.property, val.toString());
+          break;
+        case c.slider:
+          val = Number(c.slider.value);
+          c.text.value = val.toString();
+          this.updateCoordinateInStyleProperty(c.property, val.toString());
+          break;
+        default:
+          console.warn(
+            // The ``evt.target`` might be ``null``, which is marked by eslint.
+            // However, for debugging it is desired to know the actual value of
+            // ``evt.target``, even if it is ``null``.
+            //
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            `"InputEvent" originated from an unexpected element: ${evt.target}`
+          );
+      }
+    });
   }
 
   /**
@@ -186,7 +259,23 @@ class ColorFormInputRgb
     );
 
     // Establish connections between related input elements
-    this.fieldset.addEventListener("input", this.syncInputElements.bind(this));
+    this.setupInputSynchronization(
+      {
+        text: this.inputTextRed,
+        slider: this.inputSliderRed,
+        property: "---this-red",
+      },
+      {
+        text: this.inputTextGreen,
+        slider: this.inputSliderGreen,
+        property: "---this-green",
+      },
+      {
+        text: this.inputTextBlue,
+        slider: this.inputSliderBlue,
+        property: "---this-blue",
+      }
+    );
 
     // Attach event listeners for publishing the RGB color
     //
@@ -250,76 +339,6 @@ class ColorFormInputRgb
 
     // Setup the tooltip
     (this.constructor as typeof ColorFormInputRgb).setupTooltip(this.fieldset);
-  }
-
-  // FIXME: Add documentation when this refactoring is finished!
-  private syncInputElements(evt: Event) {
-    console.info("EventHandler on ``this.fieldset``:");
-    // console.info(`currentTarget: ${evt.currentTarget}`);
-    // console.info(`target: ${evt.target}`);
-    console.info(evt);
-
-    let val: number;
-
-    switch (evt.target) {
-      case this.inputTextRed:
-        val = Number(this.inputTextRed.value);
-        this.inputSliderRed.value = val.toString();
-        this.updateCoordinateInStyleProperty(
-          this.stylePropertyRed,
-          val.toString()
-        );
-        break;
-      case this.inputSliderRed:
-        val = Number(this.inputSliderRed.value);
-        this.inputTextRed.value = val.toString();
-        this.updateCoordinateInStyleProperty(
-          this.stylePropertyRed,
-          val.toString()
-        );
-        break;
-      case this.inputTextGreen:
-        val = Number(this.inputTextGreen.value);
-        this.inputSliderGreen.value = val.toString();
-        this.updateCoordinateInStyleProperty(
-          this.stylePropertyGreen,
-          val.toString()
-        );
-        break;
-      case this.inputSliderGreen:
-        val = Number(this.inputSliderGreen.value);
-        this.inputTextGreen.value = val.toString();
-        this.updateCoordinateInStyleProperty(
-          this.stylePropertyGreen,
-          val.toString()
-        );
-        break;
-      case this.inputTextBlue:
-        val = Number(this.inputTextBlue.value);
-        this.inputSliderBlue.value = val.toString();
-        this.updateCoordinateInStyleProperty(
-          this.stylePropertyBlue,
-          val.toString()
-        );
-        break;
-      case this.inputSliderBlue:
-        val = Number(this.inputSliderBlue.value);
-        this.inputTextBlue.value = val.toString();
-        this.updateCoordinateInStyleProperty(
-          this.stylePropertyBlue,
-          val.toString()
-        );
-        break;
-      default:
-        console.warn(
-          // The ``evt.target`` might be ``null``, which is marked by eslint.
-          // However, for debugging it is desired to know the actual value of
-          // ``evt.target``, even if it is ``null``.
-          //
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          `"InputEvent" originated from an unexpected element: ${evt.target}`
-        );
-    }
   }
 
   public getColor(): void {
