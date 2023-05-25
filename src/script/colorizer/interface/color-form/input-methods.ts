@@ -13,12 +13,6 @@ type TColorFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TColorFormInputCallback = (evt?: Event, ...args: any[]) => void;
 
-type TColorFormInputSynchronization = {
-  text: HTMLInputElement;
-  slider: HTMLInputElement;
-  property: string;
-};
-
 export interface IColorFormInputMethod {
   getColor(): ColorizerColor;
   setColor(color: ColorizerColor): void;
@@ -37,30 +31,109 @@ export function getColorFormInput(
 }
 
 abstract class ColorFormInputMethod implements IColorFormInputMethod {
-  protected fieldset: HTMLFieldSetElement;
-  protected inputReceiver: TColorFormReceiverCallback;
-
-  constructor(fieldsetId: string, receiver: TColorFormReceiverCallback) {
-    this.fieldset = <HTMLFieldSetElement>getDomElement(null, fieldsetId);
-
-    this.inputReceiver = receiver;
-  }
+  private fieldset: HTMLFieldSetElement;
+  private inputReceiver: TColorFormReceiverCallback;
+  protected cAText: HTMLInputElement;
+  protected cASlider: HTMLInputElement;
+  protected cAProperty: string;
+  protected cBText: HTMLInputElement;
+  protected cBSlider: HTMLInputElement;
+  protected cBProperty: string;
+  protected cCText: HTMLInputElement;
+  protected cCSlider: HTMLInputElement;
+  protected cCProperty: string;
 
   public abstract getColor(): ColorizerColor;
-  protected abstract publishColor(evt: Event): void;
   public abstract setColor(color: ColorizerColor): void;
 
+  constructor(
+    fieldsetId: string,
+    cASelector: string,
+    cAProperty: string,
+    cBSelector: string,
+    cBProperty: string,
+    cCSelector: string,
+    cCProperty: string,
+    receiver: TColorFormReceiverCallback
+  ) {
+    // Store elemental values in the instance
+    this.cAProperty = cAProperty;
+    this.cBProperty = cBProperty;
+    this.cCProperty = cCProperty;
+    this.inputReceiver = receiver;
+
+    // Get DOM elements
+    this.fieldset = <HTMLFieldSetElement>getDomElement(null, fieldsetId);
+
+    // TODO: EXPERIMENTAL!
+    this.cAText = <HTMLInputElement>(
+      getDomElement(this.fieldset, `${cASelector} > input[type=text]`)
+    );
+    this.cASlider = <HTMLInputElement>(
+      getDomElement(this.fieldset, `${cASelector} > input[type=range]`)
+    );
+    this.cBText = <HTMLInputElement>(
+      getDomElement(this.fieldset, `${cBSelector} > input[type=text]`)
+    );
+    this.cBSlider = <HTMLInputElement>(
+      getDomElement(this.fieldset, `${cBSelector} > input[type=range]`)
+    );
+    this.cCText = <HTMLInputElement>(
+      getDomElement(this.fieldset, `${cCSelector} > input[type=text]`)
+    );
+    this.cCSlider = <HTMLInputElement>(
+      getDomElement(this.fieldset, `${cCSelector} > input[type=range]`)
+    );
+
+    // Establish connections between related input elements
+    this.fieldset.addEventListener(
+      "input",
+      this.synchronizeInputElements.bind(this)
+    );
+
+    // Attach event listeners for publishing the current color.
+    //
+    // The actual method (``publishColor()``) is executed with a (configurable)
+    // delay using ``debounceInput()``.
+    //
+    // eslint complains about the usage of an *unbound method*. This rule is
+    // ignored for this block, as ``debounceInput()`` will take care of the
+    // correct binding of ``publishColor()``.
+    //
+    // See https://typescript-eslint.io/rules/unbound-method/
+    //
+    /* eslint-disable @typescript-eslint/unbound-method */
+    this.fieldset.addEventListener(
+      "input",
+      (this.constructor as typeof ColorFormInputMethod).debounceInput(
+        this,
+        this.publishColor,
+        500 // TODO: Should this be configurable?
+      )
+    );
+    /* eslint-enable @typescript-eslint/unbound-method */
+
+    // Setup the tooltip
+    (this.constructor as typeof ColorFormInputMethod).setupTooltip(
+      this.fieldset
+    );
+  }
+
   /**
-   * Sets a custom CSS property on the ``fieldset`` element.
+   * Publish the current color to the parent ``<form ...>``.
    *
-   * @param propertyName The name of the custom CSS property.
-   * @param value The actual value.
+   * Internally, this relies on ``getColor()`` to retrieve the current color.
+   *
+   * The parent ``<form ...>`` is notified using the provided callback
+   * function ``this.inputReceiver()``.
    */
-  protected updateCoordinateInStyleProperty(
-    propertyName: string,
-    value: string
-  ): void {
-    this.fieldset.style.setProperty(propertyName, value);
+  private publishColor(evt?: Event): void {
+    // The ``Event``/``InputEvent`` is handled here!
+    if (evt !== undefined) {
+      evt.stopPropagation();
+    }
+
+    this.inputReceiver(this.getColor());
   }
 
   /**
@@ -77,60 +150,67 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
    * property on the instance's ``fieldset`` element (using
    * ``updateCoordateInStyleProperty()``).
    */
-  protected setupInputSynchronization(
-    a: TColorFormInputSynchronization,
-    b: TColorFormInputSynchronization,
-    c: TColorFormInputSynchronization
+  private synchronizeInputElements(evt: Event): void {
+    // The ``Event``/``InputEvent`` is handled here!
+    evt.stopPropagation();
+
+    // Assuming that all inputs are based on numbers!
+    let val: string;
+
+    switch (evt.target) {
+      case this.cAText:
+        val = Number(this.cAText.value).toString();
+        this.cASlider.value = val;
+        this.updateCoordinateInStyleProperty(this.cAProperty, val);
+        break;
+      case this.cASlider:
+        val = Number(this.cASlider.value).toString();
+        this.cAText.value = val;
+        this.updateCoordinateInStyleProperty(this.cAProperty, val);
+        break;
+      case this.cBText:
+        val = Number(this.cBText.value).toString();
+        this.cBSlider.value = val;
+        this.updateCoordinateInStyleProperty(this.cBProperty, val);
+        break;
+      case this.cBSlider:
+        val = Number(this.cBSlider.value).toString();
+        this.cBText.value = val;
+        this.updateCoordinateInStyleProperty(this.cBProperty, val);
+        break;
+      case this.cCText:
+        val = Number(this.cCText.value).toString();
+        this.cCSlider.value = val;
+        this.updateCoordinateInStyleProperty(this.cCProperty, val);
+        break;
+      case this.cCSlider:
+        val = Number(this.cCSlider.value).toString();
+        this.cCText.value = val;
+        this.updateCoordinateInStyleProperty(this.cCProperty, val);
+        break;
+      default:
+        console.warn(
+          // The ``evt.target`` might be ``null``, which is marked by eslint.
+          // However, for debugging it is desired to know the actual value of
+          // ``evt.target``, even if it is ``null``.
+          //
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          `"InputEvent" originated from an unexpected element: ${evt.target}`
+        );
+    }
+  }
+
+  /**
+   * Sets a custom CSS property on the ``fieldset`` element.
+   *
+   * @param propertyName The name of the custom CSS property.
+   * @param value The actual value.
+   */
+  protected updateCoordinateInStyleProperty(
+    propertyName: string,
+    value: string
   ): void {
-    this.fieldset.addEventListener("input", (evt) => {
-      // The ``Event``/``InputEvent`` is handled here!
-      evt.stopPropagation();
-
-      // Assuming that all inputs are based on numbers!
-      let val: number;
-
-      switch (evt.target) {
-        case a.text:
-          val = Number(a.text.value);
-          a.slider.value = val.toString();
-          this.updateCoordinateInStyleProperty(a.property, val.toString());
-          break;
-        case a.slider:
-          val = Number(a.slider.value);
-          a.text.value = val.toString();
-          this.updateCoordinateInStyleProperty(a.property, val.toString());
-          break;
-        case b.text:
-          val = Number(b.text.value);
-          b.slider.value = val.toString();
-          this.updateCoordinateInStyleProperty(b.property, val.toString());
-          break;
-        case b.slider:
-          val = Number(b.slider.value);
-          b.text.value = val.toString();
-          this.updateCoordinateInStyleProperty(b.property, val.toString());
-          break;
-        case c.text:
-          val = Number(c.text.value);
-          c.slider.value = val.toString();
-          this.updateCoordinateInStyleProperty(c.property, val.toString());
-          break;
-        case c.slider:
-          val = Number(c.slider.value);
-          c.text.value = val.toString();
-          this.updateCoordinateInStyleProperty(c.property, val.toString());
-          break;
-        default:
-          console.warn(
-            // The ``evt.target`` might be ``null``, which is marked by eslint.
-            // However, for debugging it is desired to know the actual value of
-            // ``evt.target``, even if it is ``null``.
-            //
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-            `"InputEvent" originated from an unexpected element: ${evt.target}`
-          );
-      }
-    });
+    this.fieldset.style.setProperty(propertyName, value);
   }
 
   /**
@@ -144,7 +224,7 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
    *
    * See https://chiamakaikeanyi.dev/event-debouncing-and-throttling-in-javascript/
    */
-  protected static debounceInput(
+  private static debounceInput(
     context: ColorFormInputMethod,
     fn: TColorFormInputCallback,
     debounceTime: number
@@ -182,7 +262,7 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
    * limit the scope of ``getDomElement()`` / ``querySelector()`` to the
    * children of the ``container``, which is known to the calling functions.
    */
-  protected static setupTooltip(container: HTMLFieldSetElement): void {
+  private static setupTooltip(container: HTMLFieldSetElement): void {
     const ttButton = getDomElement(
       container,
       "legend > .tooltip-anchor > button"
@@ -228,82 +308,20 @@ class ColorFormInputRgb
   extends ColorFormInputMethod
   implements IColorFormInputMethod
 {
-  private inputTextRed: HTMLInputElement;
-  private inputSliderRed: HTMLInputElement;
-  private stylePropertyRed = "--this-red";
-  private inputTextGreen: HTMLInputElement;
-  private inputSliderGreen: HTMLInputElement;
-  private stylePropertyGreen = "--this-green";
-  private inputTextBlue: HTMLInputElement;
-  private inputSliderBlue: HTMLInputElement;
-  private stylePropertyBlue = "--this-blue";
-
   constructor(receiver: TColorFormReceiverCallback) {
-    super("#color-form-rgb", receiver);
-
-    // Get DOM elements
-    this.inputTextRed = <HTMLInputElement>(
-      getDomElement(this.fieldset, ".component-red > input[type=text]")
+    // cA = red component
+    // cB = green component
+    // cC = blue component
+    super(
+      "#color-form-rgb",
+      ".component-red",
+      "--this-red",
+      ".component-green",
+      "--this-green",
+      ".component-blue",
+      "--this-blue",
+      receiver
     );
-    this.inputSliderRed = <HTMLInputElement>(
-      getDomElement(this.fieldset, ".component-red > input[type=range]")
-    );
-    this.inputTextGreen = <HTMLInputElement>(
-      getDomElement(this.fieldset, ".component-green > input[type=text]")
-    );
-    this.inputSliderGreen = <HTMLInputElement>(
-      getDomElement(this.fieldset, ".component-green > input[type=range]")
-    );
-    this.inputTextBlue = <HTMLInputElement>(
-      getDomElement(this.fieldset, ".component-blue > input[type=text]")
-    );
-    this.inputSliderBlue = <HTMLInputElement>(
-      getDomElement(this.fieldset, ".component-blue > input[type=range]")
-    );
-
-    // Establish connections between related input elements
-    this.setupInputSynchronization(
-      {
-        text: this.inputTextRed,
-        slider: this.inputSliderRed,
-        property: this.stylePropertyRed,
-      },
-      {
-        text: this.inputTextGreen,
-        slider: this.inputSliderGreen,
-        property: this.stylePropertyGreen,
-      },
-      {
-        text: this.inputTextBlue,
-        slider: this.inputSliderBlue,
-        property: this.stylePropertyBlue,
-      }
-    );
-
-    // Attach event listeners for publishing the RGB color
-    //
-    // The actual method (``publishColor()``) is executed with a (configurable)
-    // delay using ``debounceInput()``.
-    //
-    // eslint complains about the usage of an *unbound method*. This rule is
-    // ignored for this block, as ``debounceInput()`` will take care of the
-    // correct binding of ``publishColor()``.
-    //
-    // See https://typescript-eslint.io/rules/unbound-method/
-    //
-    /* eslint-disable @typescript-eslint/unbound-method */
-    this.fieldset.addEventListener(
-      "input",
-      (this.constructor as typeof ColorFormInputRgb).debounceInput(
-        this,
-        this.publishColor,
-        500 // TODO: Should this be configurable?
-      )
-    );
-    /* eslint-enable @typescript-eslint/unbound-method */
-
-    // Setup the tooltip
-    (this.constructor as typeof ColorFormInputRgb).setupTooltip(this.fieldset);
   }
 
   /**
@@ -321,27 +339,10 @@ class ColorFormInputRgb
    */
   public getColor(): ColorizerColor {
     return ColorizerColor.fromRgb255(
-      Number(this.inputTextRed.value),
-      Number(this.inputTextGreen.value),
-      Number(this.inputTextBlue.value)
+      Number(this.cAText.value),
+      Number(this.cBText.value),
+      Number(this.cCText.value)
     );
-  }
-
-  /**
-   * Publish the current color to the parent ``<form ...>``.
-   *
-   * Internally, this relies on ``getColor()`` to retrieve the current color.
-   *
-   * The parent ``<form ...>`` is notified using the provided callback
-   * function ``this.inputReceiver()``.
-   */
-  protected publishColor(evt?: Event): void {
-    // The ``Event``/``InputEvent`` is handled here!
-    if (evt !== undefined) {
-      evt.stopPropagation();
-    }
-
-    this.inputReceiver(this.getColor());
   }
 
   /**
@@ -353,18 +354,18 @@ class ColorFormInputRgb
     const color255 = color.toRgb255();
 
     let tmp = color255.r.toString();
-    this.inputTextRed.value = tmp;
-    this.inputSliderRed.value = tmp;
-    this.updateCoordinateInStyleProperty(this.stylePropertyRed, tmp);
+    this.cAText.value = tmp;
+    this.cASlider.value = tmp;
+    this.updateCoordinateInStyleProperty(this.cAProperty, tmp);
 
     tmp = color255.g.toString();
-    this.inputTextGreen.value = tmp;
-    this.inputSliderGreen.value = tmp;
-    this.updateCoordinateInStyleProperty(this.stylePropertyGreen, tmp);
+    this.cBText.value = tmp;
+    this.cBSlider.value = tmp;
+    this.updateCoordinateInStyleProperty(this.cBProperty, tmp);
 
     tmp = color255.b.toString();
-    this.inputTextBlue.value = tmp;
-    this.inputSliderBlue.value = tmp;
-    this.updateCoordinateInStyleProperty(this.stylePropertyBlue, tmp);
+    this.cCText.value = tmp;
+    this.cCSlider.value = tmp;
+    this.updateCoordinateInStyleProperty(this.cCProperty, tmp);
   }
 }
