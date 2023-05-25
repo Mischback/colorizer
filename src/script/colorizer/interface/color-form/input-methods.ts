@@ -310,17 +310,10 @@ class ColorFormInputRgb
   extends ColorFormInputMethod
   implements IColorFormInputMethod
 {
-  private inputTextRed: HTMLInputElement;
-  private inputSliderRed: HTMLInputElement;
-  private stylePropertyRed = "--this-red";
-  private inputTextGreen: HTMLInputElement;
-  private inputSliderGreen: HTMLInputElement;
-  private stylePropertyGreen = "--this-green";
-  private inputTextBlue: HTMLInputElement;
-  private inputSliderBlue: HTMLInputElement;
-  private stylePropertyBlue = "--this-blue";
-
   constructor(receiver: TColorFormReceiverCallback) {
+    // cA = red component
+    // cB = green component
+    // cC = blue component
     super(
       "#color-form-rgb",
       ".component-red",
@@ -331,14 +324,6 @@ class ColorFormInputRgb
       "--this-blue",
       receiver
     );
-
-    // Get DOM elements
-    this.inputTextRed = this.cAText;
-    this.inputSliderRed = this.cASlider;
-    this.inputTextGreen = this.cBText;
-    this.inputSliderGreen = this.cBSlider;
-    this.inputTextBlue = this.cCText;
-    this.inputSliderBlue = this.cCSlider;
   }
 
   /**
@@ -356,9 +341,9 @@ class ColorFormInputRgb
    */
   public getColor(): ColorizerColor {
     return ColorizerColor.fromRgb255(
-      Number(this.inputTextRed.value),
-      Number(this.inputTextGreen.value),
-      Number(this.inputTextBlue.value)
+      Number(this.cAText.value),
+      Number(this.cBText.value),
+      Number(this.cCText.value)
     );
   }
 
@@ -371,18 +356,18 @@ class ColorFormInputRgb
     const color255 = color.toRgb255();
 
     let tmp = color255.r.toString();
-    this.inputTextRed.value = tmp;
-    this.inputSliderRed.value = tmp;
-    this.updateCoordinateInStyleProperty(this.stylePropertyRed, tmp);
+    this.cAText.value = tmp;
+    this.cASlider.value = tmp;
+    this.updateCoordinateInStyleProperty(this.cAProperty, tmp);
 
     tmp = color255.g.toString();
-    this.inputTextGreen.value = tmp;
-    this.inputSliderGreen.value = tmp;
-    this.updateCoordinateInStyleProperty(this.stylePropertyGreen, tmp);
+    this.cBText.value = tmp;
+    this.cBSlider.value = tmp;
+    this.updateCoordinateInStyleProperty(this.cBProperty, tmp);
 
     tmp = color255.b.toString();
-    this.inputTextBlue.value = tmp;
-    this.inputSliderBlue.value = tmp;
-    this.updateCoordinateInStyleProperty(this.stylePropertyBlue, tmp);
+    this.cCText.value = tmp;
+    this.cCSlider.value = tmp;
+    this.updateCoordinateInStyleProperty(this.cCProperty, tmp);
   }
 }
