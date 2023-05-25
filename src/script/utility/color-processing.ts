@@ -5,9 +5,9 @@
 type TVector = number[]; // an Array of numbers
 type TMatrix = TVector[]; // basically this is ``number[][]``, an Array of Arrays of numbers
 type TColorCoordinates = [number, number, number]; // Colors are represented by three coordinates. This is an internal thing to ensure array access
-type TRgb = { r: number; g: number; b: number };
+export type TRgb = { r: number; g: number; b: number };
 type TLinRgb = { r: number; g: number; b: number };
-type TXyz = { x: number; y: number; z: number };
+export type TXyz = { x: number; y: number; z: number };
 
 /**
  * Multiply two matrices.

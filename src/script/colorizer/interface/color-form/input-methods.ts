@@ -328,6 +328,7 @@ class ColorFormInputRgb
    */
   public setColor(color: ColorizerColor): void {
     console.debug(color);
-    console.log(this);
+    console.debug(color.toRgb());
+    console.debug(color.toRgb255());
   }
 }

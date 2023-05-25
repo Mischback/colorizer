@@ -3,7 +3,12 @@
 // SPDX-FileType: SOURCE
 
 import { roundToPrecision } from "../../utility";
-import { convertGammaRgbToXyz } from "../../utility/color-processing";
+import {
+  convertGammaRgbToXyz,
+  convertXyzToGammaRgb,
+  TRgb,
+  TXyz,
+} from "../../utility/color-processing";
 
 export class ColorizerColor {
   private x: number;
@@ -16,11 +21,53 @@ export class ColorizerColor {
     this.z = z;
   }
 
-  public toJSON() {
+  /**
+   * Get the color in CIE XYZ mode.
+   *
+   * @returns An ``object`` literal with ``x``, ``y`` and ``z`` attributes,
+   *          provided in range [0..1].
+   *
+   * This returns the internally stored XYZ coordinates.
+   *
+   * TODO: Verify the range [0..1] for the ``x``, ``y`` and ``z`` attributes!
+   */
+  public toJSON(): TXyz {
     return {
       x: this.x,
       y: this.y,
       z: this.z,
+    };
+  }
+
+  /**
+   * Get the color in gamma-corrected sRGB mode.
+   *
+   * @returns An ``object`` literal with ``r``, ``g`` and ``b`` attributes,
+   *          provided in range [0..1].
+   *
+   * Please note: Internally the color is converted from CIE XYZ to
+   * (gamma-corrected) sRGB **and** the values are **not rounded**.
+   */
+  public toRgb(): TRgb {
+    return convertXyzToGammaRgb(this.toJSON());
+  }
+
+  /**
+   * Get the color in gamma-corrected sRGB mode.
+   *
+   * @returns An ``object`` literal with ``r``, ``g`` and ``b`` attributes,
+   *          provided in range [0..255].
+   *
+   * Please note: Internally the color is converted from CIE XYZ to
+   * (gamma-corrected) sRGB **and** the values are **rounded** to *integers*.
+   */
+  public toRgb255(): TRgb {
+    const tmp = this.toRgb();
+
+    return {
+      r: roundToPrecision(tmp.r * 255, 0),
+      g: roundToPrecision(tmp.g * 255, 0),
+      b: roundToPrecision(tmp.b * 255, 0),
     };
   }
 
