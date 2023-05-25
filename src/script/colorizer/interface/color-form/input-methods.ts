@@ -88,6 +88,28 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
       getDomElement(this.fieldset, `${cCSelector} > input[type=range]`)
     );
 
+    // Attach event listeners for publishing the current color.
+    //
+    // The actual method (``publishColor()``) is executed with a (configurable)
+    // delay using ``debounceInput()``.
+    //
+    // eslint complains about the usage of an *unbound method*. This rule is
+    // ignored for this block, as ``debounceInput()`` will take care of the
+    // correct binding of ``publishColor()``.
+    //
+    // See https://typescript-eslint.io/rules/unbound-method/
+    //
+    /* eslint-disable @typescript-eslint/unbound-method */
+    this.fieldset.addEventListener(
+      "input",
+      (this.constructor as typeof ColorFormInputRgb).debounceInput(
+        this,
+        this.publishColor,
+        500 // TODO: Should this be configurable?
+      )
+    );
+    /* eslint-enable @typescript-eslint/unbound-method */
+
     this.inputReceiver = receiver;
   }
 
@@ -337,28 +359,6 @@ class ColorFormInputRgb
         property: this.stylePropertyBlue,
       }
     );
-
-    // Attach event listeners for publishing the RGB color
-    //
-    // The actual method (``publishColor()``) is executed with a (configurable)
-    // delay using ``debounceInput()``.
-    //
-    // eslint complains about the usage of an *unbound method*. This rule is
-    // ignored for this block, as ``debounceInput()`` will take care of the
-    // correct binding of ``publishColor()``.
-    //
-    // See https://typescript-eslint.io/rules/unbound-method/
-    //
-    /* eslint-disable @typescript-eslint/unbound-method */
-    this.fieldset.addEventListener(
-      "input",
-      (this.constructor as typeof ColorFormInputRgb).debounceInput(
-        this,
-        this.publishColor,
-        500 // TODO: Should this be configurable?
-      )
-    );
-    /* eslint-enable @typescript-eslint/unbound-method */
 
     // Setup the tooltip
     (this.constructor as typeof ColorFormInputRgb).setupTooltip(this.fieldset);
