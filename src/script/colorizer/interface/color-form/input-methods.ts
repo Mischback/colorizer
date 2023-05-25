@@ -157,38 +157,38 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
     evt.stopPropagation();
 
     // Assuming that all inputs are based on numbers!
-    let val: number;
+    let val: string;
 
     switch (evt.target) {
       case this.cAText:
-        val = Number(this.cAText.value);
-        this.cASlider.value = val.toString();
-        this.updateCoordinateInStyleProperty(this.cAProperty, val.toString());
+        val = Number(this.cAText.value).toString();
+        this.cASlider.value = val;
+        this.updateCoordinateInStyleProperty(this.cAProperty, val);
         break;
       case this.cASlider:
-        val = Number(this.cASlider.value);
-        this.cAText.value = val.toString();
-        this.updateCoordinateInStyleProperty(this.cAProperty, val.toString());
+        val = Number(this.cASlider.value).toString();
+        this.cAText.value = val;
+        this.updateCoordinateInStyleProperty(this.cAProperty, val);
         break;
       case this.cBText:
-        val = Number(this.cBText.value);
-        this.cBSlider.value = val.toString();
-        this.updateCoordinateInStyleProperty(this.cBProperty, val.toString());
+        val = Number(this.cBText.value).toString();
+        this.cBSlider.value = val;
+        this.updateCoordinateInStyleProperty(this.cBProperty, val);
         break;
       case this.cBSlider:
-        val = Number(this.cBSlider.value);
-        this.cBText.value = val.toString();
-        this.updateCoordinateInStyleProperty(this.cBProperty, val.toString());
+        val = Number(this.cBSlider.value).toString();
+        this.cBText.value = val;
+        this.updateCoordinateInStyleProperty(this.cBProperty, val);
         break;
       case this.cCText:
-        val = Number(this.cCText.value);
-        this.cCSlider.value = val.toString();
-        this.updateCoordinateInStyleProperty(this.cCProperty, val.toString());
+        val = Number(this.cCText.value).toString();
+        this.cCSlider.value = val;
+        this.updateCoordinateInStyleProperty(this.cCProperty, val);
         break;
       case this.cCSlider:
-        val = Number(this.cCSlider.value);
-        this.cCText.value = val.toString();
-        this.updateCoordinateInStyleProperty(this.cCProperty, val.toString());
+        val = Number(this.cCSlider.value).toString();
+        this.cCText.value = val;
+        this.updateCoordinateInStyleProperty(this.cCProperty, val);
         break;
       default:
         console.warn(
