@@ -51,14 +51,17 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
   protected cCSlider: HTMLInputElement;
   protected cCProperty: string;
 
-  constructor(fieldsetId: string, receiver: TColorFormReceiverCallback) {
+  constructor(
+    fieldsetId: string,
+    cASelector: string,
+    cBSelector: string,
+    cCSelector: string,
+    receiver: TColorFormReceiverCallback
+  ) {
     // Get DOM elements
     this.fieldset = <HTMLFieldSetElement>getDomElement(null, fieldsetId);
 
     // TODO: EXPERIMENTAL!
-    const cASelector = ".component-red";
-    const cBSelector = ".component-green";
-    const cCSelector = ".component-blue";
     this.cAText = <HTMLInputElement>(
       getDomElement(this.fieldset, `${cASelector} > input[type=text]`)
     );
@@ -290,7 +293,13 @@ class ColorFormInputRgb
   private stylePropertyBlue = "--this-blue";
 
   constructor(receiver: TColorFormReceiverCallback) {
-    super("#color-form-rgb", receiver);
+    super(
+      "#color-form-rgb",
+      ".component-red",
+      ".component-green",
+      ".component-blue",
+      receiver
+    );
 
     // Get DOM elements
     this.inputTextRed = this.cAText;
