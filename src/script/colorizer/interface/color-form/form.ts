@@ -11,8 +11,21 @@ import { getDomElement } from "../../../utility";
  * Prototype of the ``ColorForm.receiveColor()`` method.
  *
  * This is used for type safety in the ``input-methods`` module.
+ *
+ * Please note: While this is identical to ``TColorFormSubmitCallback``, these
+ * types are semantically different!
  */
 export type TColorFormReceiverCallback = (color: ColorizerColor) => void;
+
+/**
+ * Prototype of the callback that is to be executed on submitting the form.
+ *
+ * This is used for type safety.
+ *
+ * Please note: While this is identical to ``TColorFormReceiverCallback``,
+ * these types are semantically different!
+ */
+export type TColorFormSubmitCallback = (color: ColorizerColor) => void;
 
 export class ColorForm implements IColorizerSubject {
   private form: HTMLFormElement;
@@ -29,7 +42,23 @@ export class ColorForm implements IColorizerSubject {
   // This is the list of *Observers*.
   private colorObservers: IColorizerObserver[] = [];
 
-  constructor(inputMethods: TColorFormInputMethod[]) {
+  // This function is to be executed, when the ``<form ...>`` is submitted.
+  //
+  // Internally this is wrapped in ``submit()``, allowing additional
+  // sanitization / validation of the values. And yes, I'm aware that
+  // validation in (client) script code does not make sense. Assuming that the
+  // user actually wants to use the application and data is actually only
+  // stored on the user's machine, this is *meh*. (;
+  private submitCallback: TColorFormSubmitCallback;
+
+  constructor(
+    inputMethods: TColorFormInputMethod[],
+    submitCallback: TColorFormSubmitCallback
+  ) {
+    // Store elemental values in the instance
+    this.submitCallback = submitCallback;
+
+    // Get DOM elements
     this.form = <HTMLFormElement>getDomElement(null, "#color-form");
 
     // Setup the available input methods and keep track of them
@@ -40,8 +69,8 @@ export class ColorForm implements IColorizerSubject {
     // Set an initial color for the form and all input methods
     this.receiveColor(ColorizerColor.fromRgb(0, 0, 0));
 
-    // TODO: Remove debug statements
-    console.debug(this.form);
+    // Attach the event handler for submitting the ``<form ...>``
+    this.form.addEventListener("submit", this.submit.bind(this));
   }
 
   public getColor(): ColorizerColor {
@@ -113,5 +142,21 @@ export class ColorForm implements IColorizerSubject {
 
     // Update the color of all available input methods
     this.notifyColorObservers();
+  }
+
+  /**
+   * Handle *Submit Events*.
+   *
+   * As of now, this simply calls the ``submitCallback`` function with the
+   * current ``color``.
+   *
+   * This handler **does** prevent the ``<form ...>``'s default action **and**
+   * stops the bubbling of the event upwards.
+   */
+  private submit(evt: Event): void {
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    this.submitCallback(this.color);
   }
 }
