@@ -83,8 +83,6 @@ export class ColorizerColor {
    * if they exceed the expected range.
    */
   public static fromRgb(red: number, green: number, blue: number) {
-    console.debug(`red: ${red}, green: ${green}, blue: ${blue}`);
-
     // Sanitize user input!
     if (!(0 <= red && red <= 1)) {
       throw new Error(`Value exceeds accepted range [0..1]: ${red}`);
@@ -117,8 +115,6 @@ export class ColorizerColor {
    * instance.
    */
   public static fromRgb255(red: number, green: number, blue: number) {
-    console.debug(`RAW: red: ${red}, green: ${green}, blue: ${blue}`);
-
     // Ensure we have integers
     red = roundToPrecision(red, 0);
     green = roundToPrecision(green, 0);
