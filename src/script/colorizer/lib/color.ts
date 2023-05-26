@@ -6,9 +6,8 @@ import { roundToPrecision } from "../../utility";
 import {
   convertGammaRgbToXyz,
   convertXyzToGammaRgb,
-  TRgb,
-  TXyz,
 } from "../../utility/color-processing";
+import type { TRgb, TXyz } from "../../utility/color-processing";
 
 export class ColorizerColor {
   private x: number;

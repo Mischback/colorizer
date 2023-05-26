@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import { TColorFormReceiverCallback } from "./form";
 import { ColorizerColor } from "../../lib/color";
-import { IColorizerObserver } from "../../lib/types";
 import { getDomElement } from "../../../utility";
+import type { TColorFormReceiverCallback } from "./form";
+import type { IColorizerObserver } from "../../lib/types";
 
 /**
  * Dedicated typing for the available input methods.

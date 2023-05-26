@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import { getColorFormInput, TColorFormInputMethod } from "./input-methods";
+import { getColorFormInput } from "./input-methods";
 import { ColorizerColor } from "../../lib/color";
-import { IColorizerObserver, IColorizerSubject } from "../../lib/types";
 import { getDomElement } from "../../../utility";
+import type { TColorFormInputMethod } from "./input-methods";
+import type { IColorizerObserver, IColorizerSubject } from "../../lib/types";
 
 /**
  * Prototype of the ``ColorForm.receiveColor()`` method.

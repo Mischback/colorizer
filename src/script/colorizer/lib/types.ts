@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import { ColorizerColor } from "./color";
+import type { ColorizerColor } from "./color";
 
 /**
  * Type for an Observer that receives updates of a ``color``.
