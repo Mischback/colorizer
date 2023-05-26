@@ -5,9 +5,11 @@
 import { roundToPrecision } from "../../utility";
 import {
   convertGammaRgbToXyz,
+  convertOklchToXyz,
   convertXyzToGammaRgb,
+  convertXyzToOklch,
 } from "../../utility/color-processing";
-import type { TRgb, TXyz } from "../../utility/color-processing";
+import type { TOklch, TRgb, TXyz } from "../../utility/color-processing";
 
 export class ColorizerColor {
   private x: number;
@@ -70,6 +72,10 @@ export class ColorizerColor {
     };
   }
 
+  public toOklch(): TOklch {
+    return convertXyzToOklch(this.toJSON());
+  }
+
   /**
    * Create a ``ColorizerColor`` instance from RGB values in range [0..1].
    *
@@ -128,5 +134,11 @@ export class ColorizerColor {
     if (blue > 255) blue = 255;
 
     return ColorizerColor.fromRgb(red / 255, green / 255, blue / 255);
+  }
+
+  public static fromOklch(lightness: number, chroma: number, hue: number) {
+    // FIXME: Sanitize user input!
+    const xyz = convertOklchToXyz({ l: lightness, c: chroma, h: hue });
+    return new ColorizerColor(xyz.x, xyz.y, xyz.z);
   }
 }

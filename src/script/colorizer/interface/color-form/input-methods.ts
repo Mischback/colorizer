@@ -56,6 +56,8 @@ export function getColorizerFormInput(
   switch (method) {
     case "rgb":
       return new ColorizerFormInputRgb(receiver);
+    case "oklch":
+      return new ColorizerFormInputOklch(receiver);
     default:
       throw new Error(`Unknown input method '${method}'`);
   }
@@ -467,6 +469,86 @@ class ColorizerFormInputRgb
     this.updateCoordinateInStyleProperty(this.cBProperty, tmp);
 
     tmp = color255.b.toString();
+    this.cCText.value = tmp;
+    this.cCSlider.value = tmp;
+    this.updateCoordinateInStyleProperty(this.cCProperty, tmp);
+  }
+}
+
+/**
+ * Represent Oklch color input.
+ *
+ * @param receiver A callback function that is called whenever the input
+ *                 method's current color changes.
+ * @param inputDebounceDelay The delay to be applied to the method's input
+ *                           event handlers, given in **ms** and passed to
+ *                           ``setTimeout()``. **Optional**, will get a default
+ *                           value of ``500`` in ``ColorizerFormInputMethod``.
+ */
+class ColorizerFormInputOklch
+  extends ColorizerFormInputMethod
+  implements IColorizerFormInputMethod
+{
+  constructor(
+    receiver: TColorizerFormReceiverCallback,
+    inputDebounceDelay?: number
+  ) {
+    // cA = lightness component
+    // cB = chroma component
+    // cC = hue component
+    super(
+      "#color-form-oklch",
+      ".component-lightness",
+      "--this-lightness",
+      ".component-chroma",
+      "--this-chroma",
+      ".component-hue",
+      "--this-hue",
+      receiver,
+      inputDebounceDelay
+    );
+  }
+
+  /**
+   * Return the current color.
+   *
+   * This method creates an instance of ``ColorizerColor``, using the values
+   * of the ``<input type="text" ...>`` elements (which are synchronized with
+   * the corresponding sliders!).
+   *
+   * The values of the ``<input type="text" ...>`` elements are converted to
+   * actual numbers by calling ``Number()`` on them. Converting them to the
+   * required integers (numbers without decimal places) is done in
+   * ``ColorizerColor.fromOklch()``.
+   */
+  public getColor(): ColorizerColor {
+    return ColorizerColor.fromOklch(
+      Number(this.cAText.value),
+      Number(this.cBText.value),
+      Number(this.cCText.value)
+    );
+  }
+
+  /**
+   * Set the color of this input method.
+   *
+   * @param color An instance of ``ColorizerColor``.
+   */
+  public setColor(color: ColorizerColor): void {
+    // FIXME: Rounding has to be applied in order to keep the interface clean!
+    const colorOklch = color.toOklch();
+
+    let tmp = colorOklch.l.toString();
+    this.cAText.value = tmp;
+    this.cASlider.value = tmp;
+    this.updateCoordinateInStyleProperty(this.cAProperty, tmp);
+
+    tmp = colorOklch.c.toString();
+    this.cBText.value = tmp;
+    this.cBSlider.value = tmp;
+    this.updateCoordinateInStyleProperty(this.cBProperty, tmp);
+
+    tmp = colorOklch.h.toString();
     this.cCText.value = tmp;
     this.cCSlider.value = tmp;
     this.updateCoordinateInStyleProperty(this.cCProperty, tmp);

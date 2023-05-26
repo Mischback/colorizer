@@ -5,7 +5,7 @@
 import { ColorizerForm } from "./colorizer/interface/color-form";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const form = new ColorizerForm(["rgb"], (color) => {
+  const form = new ColorizerForm(["rgb", "oklch"], (color) => {
     console.log("ColorizerForm submitted!");
 
     const raw = color.toJSON();
