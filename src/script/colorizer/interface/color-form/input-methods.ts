@@ -380,9 +380,6 @@ abstract class ColorizerFormInputMethod
       }
     });
 
-    // TODO: This is probably highly inefficient, as this event listener is
-    //       attached multiple times (for every input method). Probably we can
-    //       get away with this, though...
     document.addEventListener("click", (e) => {
       if (e.target !== ttButton) {
         ttDisplay.innerHTML = "";
@@ -391,8 +388,8 @@ abstract class ColorizerFormInputMethod
 
     // Setup is completed, now remove ``ttContent`` from the (visual) DOM.
     //
-    // TODO: Is this the correct way? Or should it be *removed* from the DOM by
-    //       using ``visibility: hidden``?
+    // TODO: [#22] Is this the correct way? Or should it be *removed* from the
+    //       DOM by using ``visibility: hidden``?
     ttContent.classList.add("hide-visually");
   }
 }
