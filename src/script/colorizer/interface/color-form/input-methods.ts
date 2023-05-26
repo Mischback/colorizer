@@ -325,7 +325,7 @@ abstract class ColorizerFormInputMethod
     let timer: number;
 
     // The ``args`` to be applied *should be* an instance of a DOM ``Event``,
-    // see ``TColorFormInputCallback``.
+    // see ``TColorizerFormInputCallback``.
     // As ``apply()`` does not handle more than two arguments, all arguments
     // are covered by ``args``.
     //
@@ -373,15 +373,15 @@ abstract class ColorizerFormInputMethod
       }, 100);
     });
 
-    ttButton.addEventListener("keydown", (e) => {
-      const keyboardEvent = <KeyboardEvent>e;
+    ttButton.addEventListener("keydown", (evt) => {
+      const keyboardEvent = <KeyboardEvent>evt;
       if ((keyboardEvent.keyCode || keyboardEvent.which) === 27) {
         ttDisplay.innerHTML = "";
       }
     });
 
-    document.addEventListener("click", (e) => {
-      if (e.target !== ttButton) {
+    document.addEventListener("click", (evt) => {
+      if (evt.target !== ttButton) {
         ttDisplay.innerHTML = "";
       }
     });
