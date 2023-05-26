@@ -10,7 +10,9 @@ import type { IColorizerObserver } from "../../lib/types";
 /**
  * Dedicated typing for the available input methods.
  *
- * TODO: Actually implement all of them! ;)
+ * TODO: [#20] Implement "oklch"
+ * TODO: [#24] Implement "hsl"
+ * TODO: [#24] Implement "hwb"
  */
 export type TColorizerFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
 
