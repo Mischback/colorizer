@@ -11,7 +11,7 @@ import { getDomElement } from "../../../utility";
  *
  * TODO: Actually implement all of them! ;)
  */
-type TColorFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
+export type TColorFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
 
 /**
  * The generic prototype of a function that acts a a callback / event handler

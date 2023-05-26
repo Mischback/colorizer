@@ -2,7 +2,11 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import { getColorFormInput, IColorFormInputMethod } from "./input-methods";
+import {
+  getColorFormInput,
+  IColorFormInputMethod,
+  TColorFormInputMethod,
+} from "./input-methods";
 import { ColorizerColor } from "../../lib/color";
 import { getDomElement } from "../../../utility";
 
@@ -10,7 +14,6 @@ import { getDomElement } from "../../../utility";
 export type TColorFormReceiverCallback = (color: ColorizerColor) => void;
 
 export class ColorForm {
-  private static formId = "color-form";
   private form: HTMLFormElement;
   private inputMethods: IColorFormInputMethod[] = [];
   // Initialization of color **is done** in the ``constructor()`` by calling
@@ -20,15 +23,15 @@ export class ColorForm {
   // @ts-ignore: strictPropertyInitialization
   private color: ColorizerColor;
 
-  constructor() {
-    this.form = <HTMLFormElement>(
-      getDomElement(null, `#${(this.constructor as typeof ColorForm).formId}`)
-    );
+  constructor(inputMethods: TColorFormInputMethod[]) {
+    this.form = <HTMLFormElement>getDomElement(null, "#color-form");
 
     // Setup the available input methods and keep track of them
-    this.inputMethods.push(
-      getColorFormInput("rgb", this.receiveColor.bind(this))
-    );
+    inputMethods.forEach((m) => {
+      this.inputMethods.push(
+        getColorFormInput(m, this.receiveColor.bind(this))
+      );
+    });
 
     // Set an initial color for the form and all input methods
     this.receiveColor(ColorizerColor.fromRgb(0, 0, 0));

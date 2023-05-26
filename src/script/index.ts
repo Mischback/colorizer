@@ -5,6 +5,6 @@
 import { ColorForm } from "./colorizer/interface/color-form/form";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const tmp = new ColorForm();
+  const tmp = new ColorForm(["rgb"]);
   console.debug(tmp);
 });
