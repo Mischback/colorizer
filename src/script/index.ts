@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import { ColorForm } from "./colorizer/interface/color-form/form";
+import { ColorForm } from "./colorizer/interface/color-form";
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = new ColorForm(["rgb"], (color) => {
