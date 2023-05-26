@@ -3,3 +3,5 @@
 // SPDX-FileType: SOURCE
 
 export { ColorizerForm } from "./form";
+export type { TColorizerFormSubmitCallback } from "./form";
+export type { TColorizerFormInputMethod } from "./input-methods";

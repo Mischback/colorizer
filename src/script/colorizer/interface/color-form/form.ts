@@ -28,6 +28,21 @@ export type TColorizerFormReceiverCallback = (color: ColorizerColor) => void;
  */
 export type TColorizerFormSubmitCallback = (color: ColorizerColor) => void;
 
+/**
+ * Application-specific representation of the ``<form ...>`` to add new colors.
+ *
+ * This class takes care of adding new colors through various *input methods*,
+ * representing different color spaces / notations (e.g. sRGB, OkLCH, ...).
+ * Instances will take care of managing the various input methods by setting
+ * up the corresponding classes (children of ``ColorizerFormInputMethod``) and
+ * keeping them in sync.
+ *
+ * Submitting the form will trigger the execution of a callback function that
+ * must be provided during instantiation of the class (``submitCallback``).
+ *
+ * Instances of this class are acting as the *Subject* in the Observer pattern
+ * implementation (implementing ``IColorizerSubject``).
+ */
 export class ColorizerForm implements IColorizerSubject {
   private form: HTMLFormElement;
 
@@ -76,6 +91,12 @@ export class ColorizerForm implements IColorizerSubject {
     this.form.addEventListener("submit", this.submit.bind(this));
   }
 
+  /**
+   * Return the current color.
+   *
+   * This method allows external code to *pull* the current color of the
+   * ``<form ...>``.
+   */
   public getColor(): ColorizerColor {
     return this.color;
   }
@@ -139,7 +160,18 @@ export class ColorizerForm implements IColorizerSubject {
     });
   }
 
-  // TODO: Heavily work in progress here!
+  /**
+   * Receive a ``color`` from one of the input methods.
+   *
+   * While setting up the different input methods using
+   * ``getColorizerFormInput()``, this method is provided as callback function.
+   * It is then used by concrete children of ``ColorizerFormInputMethod`` to
+   * update the parent form, which is the *Subject* in an Observer pattern
+   * implementation, notifying all *Observers* (including the input methods to
+   * keep them in sync).
+   *
+   * Internally, this relies on ``notifyColorObservers()``.
+   */
   private receiveColor(color: ColorizerColor): void {
     this.color = color;
 
