@@ -5,6 +5,8 @@
 type TVector = number[]; // an Array of numbers
 type TMatrix = TVector[]; // basically this is ``number[][]``, an Array of Arrays of numbers
 type TColorCoordinates = [number, number, number]; // Colors are represented by three coordinates. This is an internal thing to ensure array access
+export type TOklab = { l: number; a: number; b: number };
+export type TOklch = { l: number; c: number; h: number };
 export type TRgb = { r: number; g: number; b: number };
 type TLinRgb = { r: number; g: number; b: number };
 export type TXyz = { x: number; y: number; z: number };
@@ -201,9 +203,94 @@ export function convertXyzToGammaRgb(xyz: TXyz): TRgb {
  * @returns An object literal with ``x``, ``y`` and ``z`` attributes,
  *          representing coordinates in CIE XYZ.
  *
- * This is a shortcut function. See ``convertGammeRgbToLinearRgb()`` and
+ * This is a shortcut function. See ``convertGammaRgbToLinearRgb()`` and
  * ``convertLinearRgbToXyz()`` for implementation details.
  */
 export function convertGammaRgbToXyz(rgb: TRgb): TXyz {
   return convertLinearRgbToXyz(convertGammaRgbToLinearRgb(rgb));
+}
+
+// FIXME: NEEDS IMPLEMENTATION!
+export function convertOklchToXyz(oklch: TOklch): TXyz {
+  console.debug(oklch);
+  return {
+    x: 0.25,
+    y: 0.25,
+    z: 0.25,
+  };
+}
+
+/**
+ * Convert CIE XYZ (D65) to Oklab.
+ *
+ * @param xyz An object literal with ``x``, ``y`` and ``z`` attributes,
+ *            representing coordinates in CIE XYZ.
+ * @returns An object literal with ``l``, ``a`` and ``b`` attributes in
+ *          range [0..1], representing Oklab color coordinates.
+ *
+ * The implementation is adapted from
+ * https://www.w3.org/TR/css-color-4/#color-conversion-code and complemented
+ * with type information.
+ *
+ * For more reference see https://bottosson.github.io/posts/oklab/.
+ */
+export function convertXyzToOklab(xyz: TXyz): TOklab {
+  const M1 = [
+    [0.8190224432164319, 0.3619062562801221, -0.12887378261216414],
+    [0.0329836671980271, 0.9292868468965546, 0.03614466816999844],
+    [0.048177199566046255, 0.26423952494422764, 0.6335478258136937],
+  ];
+
+  const M2 = [
+    [0.2104542553, 0.793617785, -0.0040720468],
+    [1.9779984951, -2.428592205, 0.4505937099],
+    [0.0259040371, 0.7827717662, -0.808675766],
+  ];
+  const LMS = <TColorCoordinates>multiplyMatrices(M1, [xyz.x, xyz.y, xyz.z]);
+  const oklab = <TColorCoordinates>multiplyMatrices(
+    M2,
+    LMS.map((c) => Math.cbrt(c))
+  );
+
+  return {
+    l: oklab[0],
+    a: oklab[1],
+    b: oklab[2],
+  };
+}
+
+/**
+ * Convert Oklab to Oklch.
+ *
+ * @param oklab An object literal with ``l``, ``a`` and ``b`` attributes,
+ *              representing coordinates in CIE XYZ.
+ * @returns An object literal with ``l``, ``c`` and ``h`` attributes in
+ *          range [0..1], representing Oklch color coordinates.
+ *
+ * The implementation is adapted from
+ * https://www.w3.org/TR/css-color-4/#color-conversion-code and complemented
+ * with type information.
+ */
+export function convertOklabToOklch(oklab: TOklab): TOklch {
+  const hue = (Math.atan2(oklab.b, oklab.a) * 180) / Math.PI;
+  return {
+    l: oklab.l,
+    c: Math.sqrt(oklab.a ** 2 + oklab.b ** 2),
+    h: hue >= 0 ? hue : hue + 360,
+  };
+}
+
+/**
+ * Convert CIE XYZ (D65) to Oklab.
+ *
+ * @param xyz An object literal with ``x``, ``y`` and ``z`` attributes,
+ *            representing coordinates in CIE XYZ.
+ * @returns An object literal with ``l``, ``c`` and ``h`` attributes in
+ *          range [0..1], representing Oklch color coordinates.
+ *
+ * This is a shortcut function. See ``convertXyzToOklab()`` and
+ * ``convertOklabToOklch()`` for implementation details.
+ */
+export function convertXyzToOklch(xyz: TXyz): TOklch {
+  return convertOklabToOklch(convertXyzToOklab(xyz));
 }
