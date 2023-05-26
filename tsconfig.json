@@ -4,13 +4,10 @@
      *
      * https://www.typescriptlang.org/tsconfig#target
      *
-     * "ES2020" is from ``ViteJS``'s reference configuration and rather modern,
-     * so this may the tuned down. "ES6" should be well supported by all major
-     * browsers.
-     *
-     * TODO: Start with "ES6"/"ES2015" and just go up when required!
+     * Keep this as *low* as possible:
+     * - started with "es6" / "es2015";
      */
-    "target": "es6",
+    "target": "es2015",
 
     /* https://www.typescriptlang.org/tsconfig#useDefineForClassFields
      *
@@ -35,7 +32,7 @@
      * This included "ES2020" (from ``ViteJS``'s reference configuration). As "target"
      * and "module" are tuned down, this is adjusted, too.
      */
-    "lib": ["es6", "DOM", "DOM.Iterable"],
+    "lib": ["es2015", "DOM", "DOM.Iterable"],
 
     /* https://www.typescriptlang.org/tsconfig#skipLibCheck
      *

@@ -4,6 +4,7 @@
 
 import { TColorFormReceiverCallback } from "./form";
 import { ColorizerColor } from "../../lib/color";
+import { IColorizerObserver } from "../../lib/types";
 import { getDomElement } from "../../../utility";
 
 /**
@@ -102,7 +103,9 @@ export function getColorFormInput(
  * - all required DOM elements are structured as siblings of a ``fieldset``
  *   element and follow a pre-defined structure;
  */
-abstract class ColorFormInputMethod implements IColorFormInputMethod {
+abstract class ColorFormInputMethod
+  implements IColorFormInputMethod, IColorizerObserver
+{
   private fieldset: HTMLFieldSetElement;
   private inputReceiver: TColorFormReceiverCallback;
   private inputDebounceDelay: number;
@@ -284,6 +287,18 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
     value: string
   ): void {
     this.fieldset.style.setProperty(propertyName, value);
+  }
+
+  /**
+   * Receive updates of the overall current color.
+   *
+   * @param color The new color.
+   *
+   * This is part of the implementation of the Observer pattern, required by
+   * ``IColorizerObserver``.
+   */
+  public update(color: ColorizerColor): void {
+    console.log(color);
   }
 
   /**
