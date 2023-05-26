@@ -2,4 +2,4 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-export { ColorForm } from "./form";
+export { ColorizerForm } from "./form";

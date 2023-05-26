@@ -2,33 +2,33 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import { getColorFormInput } from "./input-methods";
+import { getColorizerFormInput } from "./input-methods";
 import { ColorizerColor } from "../../lib/color";
 import { getDomElement } from "../../../utility";
-import type { TColorFormInputMethod } from "./input-methods";
+import type { TColorizerFormInputMethod } from "./input-methods";
 import type { IColorizerObserver, IColorizerSubject } from "../../lib/types";
 
 /**
- * Prototype of the ``ColorForm.receiveColor()`` method.
+ * Prototype of the ``ColorizerForm.receiveColor()`` method.
  *
  * This is used for type safety in the ``input-methods`` module.
  *
- * Please note: While this is identical to ``TColorFormSubmitCallback``, these
- * types are semantically different!
+ * Please note: While this is identical to ``TColorizerFormSubmitCallback``,
+ * these types are semantically different!
  */
-export type TColorFormReceiverCallback = (color: ColorizerColor) => void;
+export type TColorizerFormReceiverCallback = (color: ColorizerColor) => void;
 
 /**
  * Prototype of the callback that is to be executed on submitting the form.
  *
  * This is used for type safety.
  *
- * Please note: While this is identical to ``TColorFormReceiverCallback``,
+ * Please note: While this is identical to ``TColorizerFormReceiverCallback``,
  * these types are semantically different!
  */
-export type TColorFormSubmitCallback = (color: ColorizerColor) => void;
+export type TColorizerFormSubmitCallback = (color: ColorizerColor) => void;
 
-export class ColorForm implements IColorizerSubject {
+export class ColorizerForm implements IColorizerSubject {
   private form: HTMLFormElement;
 
   // Initialization of color **is done** in the ``constructor()`` by calling
@@ -50,11 +50,11 @@ export class ColorForm implements IColorizerSubject {
   // validation in (client) script code does not make sense. Assuming that the
   // user actually wants to use the application and data is actually only
   // stored on the user's machine, this is *meh*. (;
-  private submitCallback: TColorFormSubmitCallback;
+  private submitCallback: TColorizerFormSubmitCallback;
 
   constructor(
-    inputMethods: TColorFormInputMethod[],
-    submitCallback: TColorFormSubmitCallback
+    inputMethods: TColorizerFormInputMethod[],
+    submitCallback: TColorizerFormSubmitCallback
   ) {
     // Store elemental values in the instance
     this.submitCallback = submitCallback;
@@ -64,7 +64,9 @@ export class ColorForm implements IColorizerSubject {
 
     // Setup the available input methods and keep track of them
     inputMethods.forEach((m) => {
-      this.addColorObserver(getColorFormInput(m, this.receiveColor.bind(this)));
+      this.addColorObserver(
+        getColorizerFormInput(m, this.receiveColor.bind(this))
+      );
     });
 
     // Set an initial color for the form and all input methods

@@ -4,7 +4,7 @@
 
 import { ColorizerColor } from "../../lib/color";
 import { getDomElement } from "../../../utility";
-import type { TColorFormReceiverCallback } from "./form";
+import type { TColorizerFormReceiverCallback } from "./form";
 import type { IColorizerObserver } from "../../lib/types";
 
 /**
@@ -12,7 +12,7 @@ import type { IColorizerObserver } from "../../lib/types";
  *
  * TODO: Actually implement all of them! ;)
  */
-export type TColorFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
+export type TColorizerFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
 
 /**
  * The generic prototype of a function that acts a a callback / event handler
@@ -22,12 +22,12 @@ export type TColorFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
 // signature are called using ``apply()``.
 //
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type TColorFormInputCallback = (evt?: Event, ...args: any[]) => void;
+type TColorizerFormInputCallback = (evt?: Event, ...args: any[]) => void;
 
 /**
  * The public interface of the input method classes.
  */
-export interface IColorFormInputMethod {
+export interface IColorizerFormInputMethod {
   getColor(): ColorizerColor;
   setColor(color: ColorizerColor): void;
 }
@@ -43,17 +43,17 @@ export interface IColorFormInputMethod {
  * This is meant to be a very basic implementation of the *Builder* pattern.
  * Main idea is to keep the actual input method classes in this module
  * exclusively and only exposing this function to create instances (and the
- * ``IColorFormInputMethod`` to define the external interface).
+ * ``IColorizerFormInputMethod`` to define the external interface).
  *
  * TODO: [#23] Expose ``inputDebounceDelay`` argument!
  */
-export function getColorFormInput(
-  method: TColorFormInputMethod,
-  receiver: TColorFormReceiverCallback
-): ColorFormInputMethod {
+export function getColorizerFormInput(
+  method: TColorizerFormInputMethod,
+  receiver: TColorizerFormReceiverCallback
+): ColorizerFormInputMethod {
   switch (method) {
     case "rgb":
-      return new ColorFormInputRgb(receiver);
+      return new ColorizerFormInputRgb(receiver);
     default:
       throw new Error(`Unknown input method '${method}'`);
   }
@@ -103,11 +103,11 @@ export function getColorFormInput(
  * - all required DOM elements are structured as siblings of a ``fieldset``
  *   element and follow a pre-defined structure;
  */
-abstract class ColorFormInputMethod
-  implements IColorFormInputMethod, IColorizerObserver
+abstract class ColorizerFormInputMethod
+  implements IColorizerFormInputMethod, IColorizerObserver
 {
   private fieldset: HTMLFieldSetElement;
-  private inputReceiver: TColorFormReceiverCallback;
+  private inputReceiver: TColorizerFormReceiverCallback;
   private inputDebounceDelay: number;
   protected cAText: HTMLInputElement;
   protected cASlider: HTMLInputElement;
@@ -130,7 +130,7 @@ abstract class ColorFormInputMethod
     cBProperty: string,
     cCSelector: string,
     cCProperty: string,
-    receiver: TColorFormReceiverCallback,
+    receiver: TColorizerFormReceiverCallback,
     inputDebounceDelay = 500
   ) {
     // Store elemental values in the instance
@@ -181,7 +181,7 @@ abstract class ColorFormInputMethod
     /* eslint-disable @typescript-eslint/unbound-method */
     this.fieldset.addEventListener(
       "input",
-      (this.constructor as typeof ColorFormInputMethod).debounceInput(
+      (this.constructor as typeof ColorizerFormInputMethod).debounceInput(
         this,
         this.publishColor,
         this.inputDebounceDelay
@@ -190,7 +190,7 @@ abstract class ColorFormInputMethod
     /* eslint-enable @typescript-eslint/unbound-method */
 
     // Setup the tooltip
-    (this.constructor as typeof ColorFormInputMethod).setupTooltip(
+    (this.constructor as typeof ColorizerFormInputMethod).setupTooltip(
       this.fieldset
     );
   }
@@ -316,8 +316,8 @@ abstract class ColorFormInputMethod
    * See https://chiamakaikeanyi.dev/event-debouncing-and-throttling-in-javascript/
    */
   private static debounceInput(
-    context: ColorFormInputMethod,
-    fn: TColorFormInputCallback,
+    context: ColorizerFormInputMethod,
+    fn: TColorizerFormInputCallback,
     debounceTime: number
   ) {
     let timer: number;
@@ -403,14 +403,14 @@ abstract class ColorFormInputMethod
  * @param inputDebounceDelay The delay to be applied to the method's input
  *                           event handlers, given in **ms** and passed to
  *                           ``setTimeout()``. **Optional**, will get a default
- *                           value of ``500`` in ``ColorFormInputMethod``.
+ *                           value of ``500`` in ``ColorizerFormInputMethod``.
  */
-class ColorFormInputRgb
-  extends ColorFormInputMethod
-  implements IColorFormInputMethod
+class ColorizerFormInputRgb
+  extends ColorizerFormInputMethod
+  implements IColorizerFormInputMethod
 {
   constructor(
-    receiver: TColorFormReceiverCallback,
+    receiver: TColorizerFormReceiverCallback,
     inputDebounceDelay?: number
   ) {
     // cA = red component
