@@ -43,6 +43,8 @@ export interface IColorFormInputMethod {
  * Main idea is to keep the actual input method classes in this module
  * exclusively and only exposing this function to create instances (and the
  * ``IColorFormInputMethod`` to define the external interface).
+ *
+ * TODO: [#23] Expose ``inputDebounceDelay`` argument!
  */
 export function getColorFormInput(
   method: TColorFormInputMethod,
@@ -82,6 +84,9 @@ export function getColorFormInput(
  *                   current value.
  * @param receiver A callback function that is called whenever the input
  *                 method's current color changes.
+ * @param inputDebounceDelay The delay to be applied to the method's input
+ *                           event handlers, given in **ms** and passed to
+ *                           ``setTimeout()``. Default: ``500``.
  *
  * This class provides the implementations for the generic, method-unrelated,
  * repetitive tasks. It does handle the heavy lifting, like synchronizing the
@@ -100,6 +105,7 @@ export function getColorFormInput(
 abstract class ColorFormInputMethod implements IColorFormInputMethod {
   private fieldset: HTMLFieldSetElement;
   private inputReceiver: TColorFormReceiverCallback;
+  private inputDebounceDelay: number;
   protected cAText: HTMLInputElement;
   protected cASlider: HTMLInputElement;
   protected cAProperty: string;
@@ -121,13 +127,15 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
     cBProperty: string,
     cCSelector: string,
     cCProperty: string,
-    receiver: TColorFormReceiverCallback
+    receiver: TColorFormReceiverCallback,
+    inputDebounceDelay = 500
   ) {
     // Store elemental values in the instance
     this.cAProperty = cAProperty;
     this.cBProperty = cBProperty;
     this.cCProperty = cCProperty;
     this.inputReceiver = receiver;
+    this.inputDebounceDelay = inputDebounceDelay;
 
     // Get DOM elements
     this.fieldset = <HTMLFieldSetElement>getDomElement(null, fieldsetId);
@@ -173,7 +181,7 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
       (this.constructor as typeof ColorFormInputMethod).debounceInput(
         this,
         this.publishColor,
-        500 // TODO: Should this be configurable?
+        this.inputDebounceDelay
       )
     );
     /* eslint-enable @typescript-eslint/unbound-method */
@@ -342,7 +350,7 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
       ttDisplay.innerHTML = "";
       window.setTimeout(() => {
         ttDisplay.innerHTML = `<div>${ttContent.innerHTML}</div>`;
-      }, 100); // TODO: Should this be adjustable?!
+      }, 100);
     });
 
     ttButton.addEventListener("keydown", (e) => {
@@ -371,12 +379,22 @@ abstract class ColorFormInputMethod implements IColorFormInputMethod {
 
 /**
  * Represent sRGB with values in range [0..255].
+ *
+ * @param receiver A callback function that is called whenever the input
+ *                 method's current color changes.
+ * @param inputDebounceDelay The delay to be applied to the method's input
+ *                           event handlers, given in **ms** and passed to
+ *                           ``setTimeout()``. **Optional**, will get a default
+ *                           value of ``500`` in ``ColorFormInputMethod``.
  */
 class ColorFormInputRgb
   extends ColorFormInputMethod
   implements IColorFormInputMethod
 {
-  constructor(receiver: TColorFormReceiverCallback) {
+  constructor(
+    receiver: TColorFormReceiverCallback,
+    inputDebounceDelay?: number
+  ) {
     // cA = red component
     // cB = green component
     // cC = blue component
@@ -388,7 +406,8 @@ class ColorFormInputRgb
       "--this-green",
       ".component-blue",
       "--this-blue",
-      receiver
+      receiver,
+      inputDebounceDelay
     );
   }
 
