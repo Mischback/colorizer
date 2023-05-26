@@ -10,7 +10,7 @@ import { ColorizerColor } from "./color";
  * This is part of the implementation of the Observer pattern.
  */
 export interface IColorizerObserver {
-  update(color: ColorizerColor): void;
+  updateColor(color: ColorizerColor): void;
 }
 
 /**

@@ -2,21 +2,20 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import {
-  getColorFormInput,
-  IColorFormInputMethod,
-  TColorFormInputMethod,
-} from "./input-methods";
+import { getColorFormInput, TColorFormInputMethod } from "./input-methods";
 import { ColorizerColor } from "../../lib/color";
 import { IColorizerObserver, IColorizerSubject } from "../../lib/types";
 import { getDomElement } from "../../../utility";
 
-// This type describes the ``ColorForm.receiveColor()`` method.
+/**
+ * Prototype of the ``ColorForm.receiveColor()`` method.
+ *
+ * This is used for type safety in the ``input-methods`` module.
+ */
 export type TColorFormReceiverCallback = (color: ColorizerColor) => void;
 
 export class ColorForm implements IColorizerSubject {
   private form: HTMLFormElement;
-  private inputMethods: IColorFormInputMethod[] = [];
 
   // Initialization of color **is done** in the ``constructor()`` by calling
   // ``receiveColor()``.
@@ -35,9 +34,7 @@ export class ColorForm implements IColorizerSubject {
 
     // Setup the available input methods and keep track of them
     inputMethods.forEach((m) => {
-      this.inputMethods.push(
-        getColorFormInput(m, this.receiveColor.bind(this))
-      );
+      this.addColorObserver(getColorFormInput(m, this.receiveColor.bind(this)));
     });
 
     // Set an initial color for the form and all input methods
@@ -45,7 +42,6 @@ export class ColorForm implements IColorizerSubject {
 
     // TODO: Remove debug statements
     console.debug(this.form);
-    console.debug(this.inputMethods);
   }
 
   public getColor(): ColorizerColor {
@@ -74,7 +70,7 @@ export class ColorForm implements IColorizerSubject {
   /**
    * Remove an *Observer* from the form.
    *
-   * @param obs The *Observer* to attach. Must implement the
+   * @param obs The *Observer* to remove. Must implement the
    *            ``IColorizerObserver`` interface!
    *
    * This is part of the implementation of the Observer pattern, required by
@@ -106,7 +102,9 @@ export class ColorForm implements IColorizerSubject {
    * dedicated method for clarity.
    */
   private notifyColorObservers(): void {
-    console.debug("Notifying ColorObservers");
+    this.colorObservers.forEach((obs) => {
+      obs.updateColor(this.color);
+    });
   }
 
   // TODO: Heavily work in progress here!
@@ -115,9 +113,5 @@ export class ColorForm implements IColorizerSubject {
 
     // Update the color of all available input methods
     this.notifyColorObservers();
-
-    this.inputMethods.forEach((method) => {
-      method.setColor(color);
-    });
   }
 }

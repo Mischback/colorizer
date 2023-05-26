@@ -198,7 +198,8 @@ abstract class ColorFormInputMethod
   /**
    * Publish the current color to the parent ``<form ...>``.
    *
-   * Internally, this relies on ``getColor()`` to retrieve the current color.
+   * Internally, this relies on ``getColor()`` of the concrete (child) class to
+   * retrieve the current color.
    *
    * The parent ``<form ...>`` is notified using the provided callback
    * function ``this.inputReceiver()``.
@@ -296,9 +297,11 @@ abstract class ColorFormInputMethod
    *
    * This is part of the implementation of the Observer pattern, required by
    * ``IColorizerObserver``.
+   *
+   * Internally, it calls ``setColor()`` of the concrete (child) class.
    */
-  public update(color: ColorizerColor): void {
-    console.log(color);
+  public updateColor(color: ColorizerColor): void {
+    this.setColor(color);
   }
 
   /**
