@@ -128,19 +128,18 @@ export class ColorizerForm implements IColorizerSubject {
    *
    * This is part of the implementation of the Observer pattern, required by
    * ``IColorizerSubject``.
-   *
-   * TODO: Is this really required? As of now, the application's flow does not
-   *       require *removing of Observers*.
    */
   public removeColorObserver(obs: IColorizerObserver): void {
-    const obsIndex = this.colorObservers.indexOf(obs);
-    if (obsIndex === -1) {
-      console.warn("That observer does not exist!");
-      return;
-    }
+    // const obsIndex = this.colorObservers.indexOf(obs);
+    // if (obsIndex === -1) {
+    //   console.warn("That observer does not exist!");
+    //   return;
+    // }
 
-    this.colorObservers.splice(obsIndex, 1);
-    console.info("Observer removed successfully");
+    // this.colorObservers.splice(obsIndex, 1);
+    // console.info("Observer removed successfully");
+    console.debug(obs);
+    throw new Error(`[BAM] Now go implement this!`);
   }
 
   /**
