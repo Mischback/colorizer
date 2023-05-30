@@ -30,6 +30,17 @@ function forceValueIntoRange(
   return val;
 }
 
+/**
+ * The internal representation of colors in the application.
+ *
+ * Internally, the class uses the **CIE XYZ** colorspace with **D65** as
+ * reference white to manage colors.
+ *
+ * Instances may be created by different (``static``) functions from different
+ * color spaces, following their respective semantic mechanics. They are
+ * converted to *CIE XYZ D65* by functions of the ``utility/color-processing``
+ * module.
+ */
 export class ColorizerColor {
   private x: number;
   private y: number;
@@ -91,6 +102,16 @@ export class ColorizerColor {
     };
   }
 
+  /**
+   * Get the color in Oklch mode.
+   *
+   * @returns An ``object`` literal with ``l``, ``c`` and ``h`` attributes,
+   *          where ``l`` and ``c`` are in range [0..1] and ``h`` in range
+   *          [0..360].
+   *
+   * Please note: Internally the color is converted from CIE XYZ to Oklch
+   * **and** the values are **not rounded**.
+   */
   public toOklch(): TOklch {
     return convertXyzToOklch(this.toJSON());
   }
