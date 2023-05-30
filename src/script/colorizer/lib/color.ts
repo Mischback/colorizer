@@ -126,10 +126,13 @@ export class ColorizerColor {
     blue = roundToPrecision(blue, 0);
 
     // Sanitize user input!
+    if (Number.isNaN(red)) red = 0;
     if (red < 0) red = 0;
     if (red > 255) red = 255;
+    if (Number.isNaN(green)) green = 0;
     if (green < 0) green = 0;
     if (green > 255) green = 255;
+    if (Number.isNaN(blue)) blue = 0;
     if (blue < 0) blue = 0;
     if (blue > 255) blue = 255;
 
