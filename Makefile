@@ -82,10 +82,13 @@ $(BUILD_DIR)/assets/%.css : $(SRC_DIR)/style/%.scss $(SRC_STYLE) | $(STAMP_NODE_
 	$(create_dir)
 ifeq ($(BUILD_MODE), $(DEV_FLAG))
 	echo "[development] building stylesheet..."
-	npx sass --verbose --embed-sources --stop-on-error $< $@
+	npx sass --verbose --embed-sources --embed-source-map --stop-on-error $< | \
+	npx postcss -o $@
 else
 # FIXME: Use ``postcss`` here!
-	npx sass --verbose --embed-sources --stop-on-error $< $@
+	DEV_FLAG=$(DEV_FLAG) \
+	npx sass --verbose --stop-on-error $< | \
+	npx postcss -o $@
 endif
 
 # ##### Development Utilities
