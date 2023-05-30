@@ -5,7 +5,7 @@
     <title>Colorizer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="assets/style.css">
-    <script src="assets/colorizer.js" defer></script>
+    <script src="dist/assets/colorizer.js" defer></script>
   </head>
 
   <body>
@@ -14,95 +14,81 @@
       <p>A tool to build color palettes while considering contrast values.</p>
     </header>
 
-    <section id="ctrl" class="ctrl-collapsed">
-      <button id="ctrl-toggle">expand</button>
+<form id="color-form">
+  <fieldset id="color-form-rgb" class="color-form-input-method">
+    <legend>
+      <strong>RGB input</strong>
+      <span class="tooltip-anchor">
+        <button type="button" aria-label="Description of the RGB input">?</button>
+        <div class="tooltip-display" role="status"></div>
+      </span>
+    </legend>
+    <fieldset class="component-red">
+      <legend>Red component</legend>
+      <label for="color-form-rgb-r-slider" class="hide-visually">Slider to adjust red component</label>
+      <input id="color-form-rgb-r-slider" type="range" min="0" max="255" step="1" aria-describedby="color-form-rgb-tooltip">
+      <label for="color-form-rgb-r" class="hide-visually">Decimal input for red component</label>
+      <input id="color-form-rgb-r" type="text" pattern="^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$" inputmode="numeric" aria-describedby="color-form-rgb-tooltip">
+    </fieldset>
+    <fieldset class="component-green">
+      <legend>Green component</legend>
+      <label for="color-form-rgb-g-slider" class="hide-visually">Slider to adjust green component</label>
+      <input id="color-form-rgb-g-slider" type="range" min="0" max="255" step="1" aria-describedby="color-form-rgb-tooltip">
+      <label for="color-form-rgb-g" class="hide-visually">Decimal input for green component</label>
+      <input id="color-form-rgb-g" type="text" pattern="^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$" inputmode="numeric" aria-describedby="color-form-rgb-tooltip">
+    </fieldset>
+    <fieldset class="component-blue">
+      <legend>Blue component</legend>
+      <label for="color-form-rgb-b-slider" class="hide-visually">Slider to adjust blue component</label>
+      <input id="color-form-rgb-b-slider" type="range" min="0" max="255" step="1" aria-describedby="color-form-rgb-tooltip">
+      <label for="color-form-rgb-b" class="hide-visually">Decimal input for blue component</label>
+      <input id="color-form-rgb-b" type="text" pattern="^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$" inputmode="numeric" aria-describedby="color-form-rgb-tooltip">
+    </fieldset>
+    <div role="tooltip" id="color-form-rgb-tooltip" class="tooltip-content">
+      <p>The RGB input lets you specify the values for R, G and B components of the color directly.</p>
+      <p>Each of the components may be specified in a range between 0 and 255.</p>
+      <p>The values may be entered directly or using the corresponding sliders.</p>
+    </div>
+  </fieldset>
 
-      <section id="color-add">
-        <h3>Add new Color</h3>
-        <form id="color-add-form">
-          <fieldset class="color-input">
-            <legend>Hex / Color Picker input</legend>
-            <div>
-              <label for="new-color-pick">New Color:</label>
-              <div id="new-color-pick-wrapper">
-                <input id="new-color-pick" type="color">
-              </div>
-            </div>
-            <div>
-              <label for="new-color-hex">Hex Input:</label>
-              <input id="new-color-hex" type="text">
-            </div>
-          </fieldset>
-          <fieldset class="rgb-input">
-            <legend>RGB input</legend>
-            <div class="component-input">
-              <label for="new-color-rgb-r">R:</label>
-              <input id="new-color-rgb-r" type="text" inputmode="numberic">
-            </div>
-            <div class="component-input">
-              <label for="new-color-rgb-g">G:</label>
-              <input id="new-color-rgb-g" type="text" inputmode="numberic">
-            </div>
-            <div class="component-input">
-              <label for="new-color-rgb-b">B:</label>
-              <input id="new-color-rgb-b" type="text" inputmode="numberic">
-            </div>
-          </fieldset>
-          <fieldset class="hsl-input">
-            <legend>HSL input</legend>
-            <div class="component-input">
-              <label for="new-color-hsl-h">H:</label>
-              <input id="new-color-hsl-h" type="text" inputmode="numberic">
-            </div>
-            <div class="component-input">
-              <label for="new-color-hsl-s">S:</label>
-              <input id="new-color-hsl-s" type="text" inputmode="numberic">
-            </div>
-            <div class="component-input">
-              <label for="new-color-hsl-l">L:</label>
-              <input id="new-color-hsl-l" type="text" inputmode="numberic">
-            </div>
-          </fieldset>
-          <fieldset class="hwb-input">
-            <legend>HWB input</legend>
-            <div class="component-input">
-              <label for="new-color-hwb-h">H:</label>
-              <input id="new-color-hwb-h" type="text" inputmode="numberic">
-            </div>
-            <div class="component-input">
-              <label for="new-color-hwb-w">W:</label>
-              <input id="new-color-hwb-w" type="text" inputmode="numberic">
-            </div>
-            <div class="component-input">
-              <label for="new-color-hwb-b">B:</label>
-              <input id="new-color-hwb-b" type="text" inputmode="numberic">
-            </div>
-          </fieldset>
-          <fieldset class="oklch-input">
-            <legend>OkLCH input</legend>
-            <div class="component-input">
-              <label for="new-color-oklch-l">L:</label>
-              <input id="new-color-oklch-l" type="text" inputmode="numberic">
-            </div>
-            <div class="component-input">
-              <label for="new-color-oklch-c">C:</label>
-              <input id="new-color-oklch-c" type="text" inputmode="numberic">
-            </div>
-            <div class="component-input">
-              <label for="new-color-oklch-h">H:</label>
-              <input id="new-color-oklch-h" type="text" inputmode="numberic">
-            </div>
-          </fieldset>
-          <button type="submit">Add</button>
-        </form>
-      </section>
+  <fieldset id="color-form-oklch" class="color-form-input-method">
+    <legend>
+      <strong>Oklch input</strong>
+      <span class="tooltip-anchor">
+        <button type="button" aria-label="Description of the Oklch input">?</button>
+        <div class="tooltip-display" role="status"></div>
+      </span>
+    </legend>
+    <fieldset class="component-lightness">
+      <legend>Lightness component</legend>
+      <label for="color-form-oklch-l-slider" class="hide-visually">Slider to adjust lightness component</label>
+      <input id="color-form-oklch-l-slider" type="range" min="0" max="100" step="0.01" aria-describedby="color-form-oklch-tooltip">
+      <label for="color-form-oklch-l" class="hide-visually">Decimal input for lightness component</label>
+      <input id="color-form-oklch-l" type="text" pattern="^(100|[1-9]?[0-9](\.[0-9]+)?)$" inputmode="numeric" aria-describedby="color-form-oklch-tooltip">
+    </fieldset>
+    <fieldset class="component-chroma">
+      <legend>Chroma component</legend>
+      <label for="color-form-oklch-c-slider" class="hide-visually">Slider to adjust chroma component</label>
+      <input id="color-form-oklch-c-slider" type="range" min="0" max="100" step="0.01" aria-describedby="color-form-oklch-tooltip">
+      <label for="color-form-oklch-c" class="hide-visually">Decimal input for chroma component</label>
+      <input id="color-form-oklch-c" type="text" pattern="^(100|[1-9]?[0-9](\.[0-9]+)?)$" inputmode="numeric" aria-describedby="color-form-oklch-tooltip">
+    </fieldset>
+    <fieldset class="component-hue">
+      <legend>Hue component</legend> <label for="color-form-oklch-h-slider" class="hide-visually">Slider to adjust hue component</label>
+      <input id="color-form-oklch-h-slider" type="range" min="0" max="360" step="1" aria-describedby="color-form-oklch-tooltip">
+      <label for="color-form-oklch-h" class="hide-visually">Decimal input for hue component</label>
+      <input id="color-form-oklch-h" type="text" pattern="^(360|((3[0-5][0-9]|[12][0-9]{2}|([1-9]?[0-9]{1}))(\.[0-9]+)?))$" inputmode="numeric" aria-describedby="color-form-oklch-tooltip">
+    </fieldset>
+    <div role="tooltip" id="color-form-oklch-tooltip" class="tooltip-content">
+      <p>Oklch is the polar form of the <strong>Oklab</strong> colorspace.</p>
+      <p>It lets you specify the (perceived) <strong>Lightness</strong> (L), <strong>Chroma</strong> (C) and <strong>Hue</strong> (H).</p>
+      <p>While Lightness and Chroma are specified in percent-based values in range [0..100], the Hue is an angle in range [0..360].</p>
+      <p>The values may be entered directly or using the corresponding sliders.</p>
+    </div>
+  </fieldset>
 
-      <section id="color-palette">
-        <h3>Color Palette</h3>
-        <ul></ul>
-      </section>
-    </section>
+  <button type="submit">Add Color</button>
+</form>
 
-    <section id="contrast-grid"></section>
   </body>
 </html>
