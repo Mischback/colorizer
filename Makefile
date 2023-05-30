@@ -18,10 +18,12 @@ REPO_ROOT := $(patsubst %/, %, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 BUILD_DIR := $(REPO_ROOT)/dist
 
 BUILD_APP_JS := $(BUILD_DIR)/assets/colorizer.js
+BUILD_APP_STYLE := $(BUILD_DIR)/assets/style.css
 
 # Source directory
 SRC_DIR := $(REPO_ROOT)/src
 SRC_SCRIPT := $(shell find $(SRC_DIR)/script -type f)
+SRC_STYLE := $(shell find $(SRC_DIR)/style -type f)
 
 # Stamps
 #
@@ -33,15 +35,21 @@ STAMP_GIT_HOOKS := $(STAMP_DIR)/git-hooks
 
 # ##### Recipes
 
-build : $(BUILD_APP_JS)
+build : $(BUILD_APP_JS) $(BUILD_APP_STYLE)
 .PHONY : build
 
 # Run ``rollup`` to compile TS sources and bundle them
 #
 # ``rollup`` (or its TypeScript plugin, to be precise) will perform the
-# typechecking, so there is no need to call ``util/lint/typechek`` manually.
+# typechecking, so there is no need to call ``util/lint/typecheck`` manually.
 $(BUILD_APP_JS) : $(SRC_SCRIPT) .rollup.config.js tsconfig.json | $(STAMP_NODE_READY)
+	$(create_dir)
 	npx rollup -c .rollup.config.js --bundleConfigAsCjs
+
+# Run ``sass`` to compile SASS/SCSS sources to CSS
+$(BUILD_DIR)/assets/%.css : $(SRC_DIR)/style/%.scss $(SRC_STYLE) | $(STAMP_NODE_READY)
+	$(create_dir)
+	npx sass --verbose --embed-sources --stop-on-error $< $@
 
 # ##### Development Utilities
 
