@@ -55,6 +55,11 @@ util/lint/prettier : | $(STAMP_NODE_READY)
 	npx prettier . --ignore-unknown --write
 .PHONY : util/lint/prettier
 
+# Run ``stylelint`` on SCSS sources
+util/lint/stylelint : | $(STAMP_NODE_READY)
+	npx stylelint . --fix
+.PHONY : util/lint/stylelint
+
 # Run ``tsc`` to typecheck the script source files
 util/lint/typecheck : tsconfig.json | $(STAMP_NODE_READY)
 	npx tsc --project tsconfig.json
