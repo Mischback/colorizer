@@ -23,7 +23,9 @@ BUILD_APP_STYLE := $(BUILD_DIR)/assets/style.css
 # Source directory
 SRC_DIR := $(REPO_ROOT)/src
 SRC_SCRIPT := $(shell find $(SRC_DIR)/script -type f)
+SRC_SCRIPT_ENTRYPOINT := $(SRC_DIR)/script/index.ts
 SRC_STYLE := $(shell find $(SRC_DIR)/style -type f)
+SRC_STYLE_ENTRYPOINT := $(SRC_DIR)/style/style.scss
 
 # Stamps
 #
@@ -32,11 +34,35 @@ STAMP_DIR := $(REPO_ROOT)/.make-stamps
 STAMP_NODE_READY := $(STAMP_DIR)/node-ready
 STAMP_GIT_HOOKS := $(STAMP_DIR)/git-hooks
 
+# INTERNAL FLAGS
+DEV_FLAG := dev
+
+# ``make``-specific settings
+.SILENT :
+.DELETE_ON_ERROR :
+MAKEFLAGS += --no-print-directory
+MAKEFLAGS += --warn-undefined-variables
+MAKEFLAGS += --no-builtin-rules
 
 # ##### Recipes
 
+# Build the application
+#
+# This builds the JS from TypeScript sources and the stylesheet from SCSS
+# sources.
 build : $(BUILD_APP_JS) $(BUILD_APP_STYLE)
 .PHONY : build
+
+# Build in development mode
+#
+# Build for development, providing source maps etc...
+# This forces a rebuild every time!
+build/development :
+	touch $(SRC_SCRIPT_ENTRYPOINT) && \
+	touch $(SRC_STYLE_ENTRYPOINT) && \
+	BUILD_MODE=$(DEV_FLAG) \
+	$(MAKE) build
+.PHONY : build/development
 
 # Run ``rollup`` to compile TS sources and bundle them
 #
@@ -44,12 +70,23 @@ build : $(BUILD_APP_JS) $(BUILD_APP_STYLE)
 # typechecking, so there is no need to call ``util/lint/typecheck`` manually.
 $(BUILD_APP_JS) : $(SRC_SCRIPT) .rollup.config.js tsconfig.json | $(STAMP_NODE_READY)
 	$(create_dir)
+ifeq ($(BUILD_MODE), $(DEV_FLAG))
+	DEV_FLAG=$(DEV_FLAG) \
 	npx rollup -c .rollup.config.js --bundleConfigAsCjs
+else
+	npx rollup -c .rollup.config.js --bundleConfigAsCjs
+endif
 
 # Run ``sass`` to compile SASS/SCSS sources to CSS
 $(BUILD_DIR)/assets/%.css : $(SRC_DIR)/style/%.scss $(SRC_STYLE) | $(STAMP_NODE_READY)
 	$(create_dir)
+ifeq ($(BUILD_MODE), $(DEV_FLAG))
+	echo "[development] building stylesheet..."
 	npx sass --verbose --embed-sources --stop-on-error $< $@
+else
+# FIXME: Use ``postcss`` here!
+	npx sass --verbose --embed-sources --stop-on-error $< $@
+endif
 
 # ##### Development Utilities
 
