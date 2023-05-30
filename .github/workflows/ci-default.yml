@@ -34,3 +34,5 @@ jobs:
         run: make util/lint/eslint
       - name: Run typechecking (using tsc)
         run: make util/lint/typecheck
+      - name: Run stylelint
+        run: make util/lint/stylelint
