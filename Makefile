@@ -71,6 +71,7 @@ build/development :
 $(BUILD_APP_JS) : $(SRC_SCRIPT) .rollup.config.js tsconfig.json | $(STAMP_NODE_READY)
 	$(create_dir)
 ifeq ($(BUILD_MODE), $(DEV_FLAG))
+	echo "[development] building script bundle..."
 	DEV_FLAG=$(DEV_FLAG) \
 	npx rollup -c .rollup.config.js --bundleConfigAsCjs
 else
