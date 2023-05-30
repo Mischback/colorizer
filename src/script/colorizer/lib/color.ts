@@ -11,6 +11,25 @@ import {
 } from "../../utility/color-processing";
 import type { TOklch, TRgb, TXyz } from "../../utility/color-processing";
 
+/**
+ * Force a ``value`` into a range specified by ``lower`` and ``upper``.
+ *
+ * @param val The input value.
+ * @param lower The lower bound of the accepted range.
+ * @param upper The upper bound of the accepted range.
+ *
+ * If ``val`` is ``NaN``, ``lower`` is returned.
+ */
+function forceValueIntoRange(
+  val: number,
+  lower: number,
+  upper: number
+): number {
+  if (Number.isNaN(val) || val < lower) return lower;
+  if (val > upper) return upper;
+  return val;
+}
+
 export class ColorizerColor {
   private x: number;
   private y: number;
@@ -84,22 +103,17 @@ export class ColorizerColor {
    * @param blue The blue component in range [0..1].
    * @returns ``ColorizerColor`` instance.
    *
-   * The method does check the input values and throws ``Error`` instances
-   * if they exceed the expected range.
+   * The function sanitizes the arguments by forcing red, green and blue into
+   * the accepted range of [0..1]. If ``NaN`` is provided for any of the
+   * arguments, it is set to ``0``. No rounding is applied while creating the
+   * instance. The interface may apply rounding when the values are displayed.
    */
   public static fromRgb(red: number, green: number, blue: number) {
-    // Sanitize user input!
-    if (!(0 <= red && red <= 1)) {
-      throw new Error(`Value exceeds accepted range [0..1]: ${red}`);
-    }
-    if (!(0 <= green && green <= 1)) {
-      throw new Error(`Value exceeds accepted range [0..1]: ${green}`);
-    }
-    if (!(0 <= blue && blue <= 1)) {
-      throw new Error(`Value exceeds accepted range [0..1]: ${blue}`);
-    }
-
-    const xyz = convertGammaRgbToXyz({ r: red, g: green, b: blue });
+    const xyz = convertGammaRgbToXyz({
+      r: forceValueIntoRange(red, 0, 1),
+      g: forceValueIntoRange(green, 0, 1),
+      b: forceValueIntoRange(blue, 0, 1),
+    });
     return new ColorizerColor(xyz.x, xyz.y, xyz.z);
   }
 
@@ -112,12 +126,9 @@ export class ColorizerColor {
    * @returns ``ColorizerColor`` instance.
    *
    * The function sanitizes the arguments by converting them to integers
-   * (meaning: numbers without decimal places) and keeps them in the
-   * required range of [0..255] (values below 0 are set to 0, values above
-   * 255 are set to 255).
-   *
-   * Internally it uses ``ColorizerColor.fromRgb()`` to create the class
-   * instance.
+   * (meaning: numbers without decimal places). If the value exceeds the
+   * accepted range of [0..255], this is sanitized by
+   * ``ColorizerColor.fromRgb()``, which handles the instantiation internally.
    */
   public static fromRgb255(red: number, green: number, blue: number) {
     // Ensure we have integers
@@ -125,23 +136,34 @@ export class ColorizerColor {
     green = roundToPrecision(green, 0);
     blue = roundToPrecision(blue, 0);
 
-    // Sanitize user input!
-    if (Number.isNaN(red)) red = 0;
-    if (red < 0) red = 0;
-    if (red > 255) red = 255;
-    if (Number.isNaN(green)) green = 0;
-    if (green < 0) green = 0;
-    if (green > 255) green = 255;
-    if (Number.isNaN(blue)) blue = 0;
-    if (blue < 0) blue = 0;
-    if (blue > 255) blue = 255;
-
     return ColorizerColor.fromRgb(red / 255, green / 255, blue / 255);
   }
 
+  /**
+   * Create a ``ColorizerColor`` instance from Oklch input.
+   *
+   * @param lightness The (perceived) lightness in range [0..1].
+   * @param chroma The chroma in range [0..1].
+   * @param hue The hue (in range [0..360]; this is not enforced, but
+   *            effectively ensured by the internal conversion functions in
+   *            ``utility/color-processing.ts``).
+   * @returns ``ColorizerColor`` instance.
+   *
+   * The function sanitizes the arguments by forcing lightness and chroma into
+   * the accepted range of [0..1]. If ``NaN`` is provided for any of the
+   * arguments, it is set to ``0``. No rounding is applied while creating the
+   * instance. The interface may apply rounding when the values are displayed.
+   */
   public static fromOklch(lightness: number, chroma: number, hue: number) {
-    // FIXME: Sanitize user input!
-    const xyz = convertOklchToXyz({ l: lightness, c: chroma, h: hue });
+    // Note: The conversion functions will handle ``hue`` and make sure to keep
+    //       it in range [0..360].
+    if (Number.isNaN(hue)) hue = 0;
+
+    const xyz = convertOklchToXyz({
+      l: forceValueIntoRange(lightness, 0, 1),
+      c: forceValueIntoRange(chroma, 0, 1),
+      h: hue,
+    });
     return new ColorizerColor(xyz.x, xyz.y, xyz.z);
   }
 }
