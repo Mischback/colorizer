@@ -299,13 +299,27 @@ export function convertXyzToLinearRgb(xyz: TXyz): TLinRgb {
     [705 / 12673, -2585 / 12673, 705 / 667],
   ];
 
+  function clipToGamut(val: number): number {
+    // TODO: [#25] Should this be done here or - as late as possible - in
+    //       ``convertLinearRgbToGammaRgb()``?
+    if (val < 0) {
+      return 0;
+    }
+
+    if (val > 1) {
+      return 1;
+    }
+
+    return val;
+  }
+
   // This is a ``TVector`` because the second multiplier is a vector
   const tmp = <TColorCoordinates>multiplyMatrices(M, [xyz.x, xyz.y, xyz.z]);
 
   return {
-    r: tmp[0],
-    g: tmp[1],
-    b: tmp[2],
+    r: clipToGamut(tmp[0]),
+    g: clipToGamut(tmp[1]),
+    b: clipToGamut(tmp[2]),
   };
 }
 
