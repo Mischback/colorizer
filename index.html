@@ -28,21 +28,21 @@
       <label for="color-form-rgb-r-slider" class="hide-visually">Slider to adjust red component</label>
       <input id="color-form-rgb-r-slider" type="range" min="0" max="255" step="1" aria-describedby="color-form-rgb-tooltip">
       <label for="color-form-rgb-r" class="hide-visually">Decimal input for red component</label>
-      <input id="color-form-rgb-r" type="text" inputmode="numeric" aria-describedby="color-form-rgb-tooltip">
+      <input id="color-form-rgb-r" type="text" pattern="^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$" inputmode="numeric" aria-describedby="color-form-rgb-tooltip">
     </fieldset>
     <fieldset class="component-green">
       <legend>Green component</legend>
       <label for="color-form-rgb-g-slider" class="hide-visually">Slider to adjust green component</label>
       <input id="color-form-rgb-g-slider" type="range" min="0" max="255" step="1" aria-describedby="color-form-rgb-tooltip">
       <label for="color-form-rgb-g" class="hide-visually">Decimal input for green component</label>
-      <input id="color-form-rgb-g" type="text" inputmode="numeric" aria-describedby="color-form-rgb-tooltip">
+      <input id="color-form-rgb-g" type="text" pattern="^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$" inputmode="numeric" aria-describedby="color-form-rgb-tooltip">
     </fieldset>
     <fieldset class="component-blue">
       <legend>Blue component</legend>
       <label for="color-form-rgb-b-slider" class="hide-visually">Slider to adjust blue component</label>
       <input id="color-form-rgb-b-slider" type="range" min="0" max="255" step="1" aria-describedby="color-form-rgb-tooltip">
       <label for="color-form-rgb-b" class="hide-visually">Decimal input for blue component</label>
-      <input id="color-form-rgb-b" type="text" inputmode="numeric" aria-describedby="color-form-rgb-tooltip">
+      <input id="color-form-rgb-b" type="text" pattern="^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$" inputmode="numeric" aria-describedby="color-form-rgb-tooltip">
     </fieldset>
     <div role="tooltip" id="color-form-rgb-tooltip" class="tooltip-content">
       <p>The RGB input lets you specify the values for R, G and B components of the color directly.</p>
