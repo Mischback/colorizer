@@ -1,0 +1,20 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+/**
+ * Some elements should not be visible, but **must** still be part of the DOM,
+ * e.g. for accessibility.
+ *
+ * Ref: https://www.w3.org/WAI/tutorials/forms/labels/#note-on-hiding-elements
+ */
+.hide-visually {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
