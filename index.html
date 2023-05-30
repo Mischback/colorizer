@@ -64,21 +64,20 @@
       <label for="color-form-oklch-l-slider" class="hide-visually">Slider to adjust lightness component</label>
       <input id="color-form-oklch-l-slider" type="range" min="0" max="100" step="0.01" aria-describedby="color-form-oklch-tooltip">
       <label for="color-form-oklch-l" class="hide-visually">Decimal input for lightness component</label>
-      <input id="color-form-oklch-l" type="text" inputmode="numeric" aria-describedby="color-form-oklch-tooltip">
+      <input id="color-form-oklch-l" type="text" pattern="^(100|[1-9]?[0-9](\.[0-9]+)?)$" inputmode="numeric" aria-describedby="color-form-oklch-tooltip">
     </fieldset>
     <fieldset class="component-chroma">
       <legend>Chroma component</legend>
       <label for="color-form-oklch-c-slider" class="hide-visually">Slider to adjust chroma component</label>
       <input id="color-form-oklch-c-slider" type="range" min="0" max="100" step="0.01" aria-describedby="color-form-oklch-tooltip">
       <label for="color-form-oklch-c" class="hide-visually">Decimal input for chroma component</label>
-      <input id="color-form-oklch-c" type="text" inputmode="numeric" aria-describedby="color-form-oklch-tooltip">
+      <input id="color-form-oklch-c" type="text" pattern="^(100|[1-9]?[0-9](\.[0-9]+)?)$" inputmode="numeric" aria-describedby="color-form-oklch-tooltip">
     </fieldset>
     <fieldset class="component-hue">
-      <legend>Hue component</legend>
-      <label for="color-form-oklch-h-slider" class="hide-visually">Slider to adjust hue component</label>
+      <legend>Hue component</legend> <label for="color-form-oklch-h-slider" class="hide-visually">Slider to adjust hue component</label>
       <input id="color-form-oklch-h-slider" type="range" min="0" max="360" step="1" aria-describedby="color-form-oklch-tooltip">
       <label for="color-form-oklch-h" class="hide-visually">Decimal input for hue component</label>
-      <input id="color-form-oklch-h" type="text" inputmode="numeric" aria-describedby="color-form-oklch-tooltip">
+      <input id="color-form-oklch-h" type="text" pattern="^(360|((3[0-5][0-9]|[12][0-9]{2}|([1-9]?[0-9]{1}))(\.[0-9]+)?))$" inputmode="numeric" aria-describedby="color-form-oklch-tooltip">
     </fieldset>
     <div role="tooltip" id="color-form-oklch-tooltip" class="tooltip-content">
       <p>Oklch is the polar form of the <strong>Oklab</strong> colorspace.</p>
