@@ -55,12 +55,19 @@ export class ColorizerColor {
   /**
    * Get the color in CIE XYZ mode.
    *
-   * @returns An ``object`` literal with ``x``, ``y`` and ``z`` attributes,
-   *          provided in range [0..1].
+   * @returns An ``object`` literal with ``x``, ``y`` and ``z`` attributes.
+   *          The ranges of the ``x``, ``y`` and ``z`` attributes are not
+   *          restrained, but should be *roughly* in the following ranges:
+   *          - ``x``: [0..0.96]
+   *          - ``y``: [0..1]
+   *          - ``z``: [0..1.09]
    *
    * This returns the internally stored XYZ coordinates.
    *
-   * TODO: Verify the range [0..1] for the ``x``, ``y`` and ``z`` attributes!
+   * References:
+   * - https://en.wikipedia.org/wiki/CIE_1931_color_space
+   * - https://medium.com/hipster-color-science/a-beginners-guide-to-colorimetry-401f1830b65a
+   * - https://www.sttmedia.com/colormodel-xyz
    */
   public toJSON(): TXyz {
     return {
