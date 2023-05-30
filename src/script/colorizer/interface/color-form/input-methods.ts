@@ -3,7 +3,7 @@
 // SPDX-FileType: SOURCE
 
 import { ColorizerColor } from "../../lib/color";
-import { getDomElement } from "../../../utility";
+import { getDomElement, roundToPrecision } from "../../../utility";
 import type { TColorizerFormReceiverCallback } from "./form";
 import type { IColorizerObserver } from "../../lib/types";
 
@@ -539,8 +539,8 @@ class ColorizerFormInputOklch
    */
   public getColor(): ColorizerColor {
     return ColorizerColor.fromOklch(
-      Number(this.cAText.value),
-      Number(this.cBText.value),
+      Number(this.cAText.value) / 100,
+      Number(this.cBText.value) / 100,
       Number(this.cCText.value)
     );
   }
@@ -551,20 +551,22 @@ class ColorizerFormInputOklch
    * @param color An instance of ``ColorizerColor``.
    */
   public setColor(color: ColorizerColor): void {
-    // FIXME: Rounding has to be applied in order to keep the interface clean!
     const colorOklch = color.toOklch();
 
-    let tmp = colorOklch.l.toString();
+    // TODO: [#23] Expose precision!
+    let tmp = roundToPrecision(colorOklch.l * 100, 2).toString();
     this.cAText.value = tmp;
     this.cASlider.value = tmp;
     this.updateCoordinateInStyleProperty(this.cAProperty, tmp);
 
-    tmp = colorOklch.c.toString();
+    // TODO: [#23] Expose precision!
+    tmp = roundToPrecision(colorOklch.c * 100, 2).toString();
     this.cBText.value = tmp;
     this.cBSlider.value = tmp;
     this.updateCoordinateInStyleProperty(this.cBProperty, tmp);
 
-    tmp = colorOklch.h.toString();
+    // TODO: [#23] Expose precision!
+    tmp = roundToPrecision(colorOklch.h, 2).toString();
     this.cCText.value = tmp;
     this.cCSlider.value = tmp;
     this.updateCoordinateInStyleProperty(this.cCProperty, tmp);
