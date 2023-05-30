@@ -65,6 +65,11 @@ export class ColorizerForm implements IColorizerSubject {
   // validation in (client) script code does not make sense. Assuming that the
   // user actually wants to use the application and data is actually only
   // stored on the user's machine, this is *meh*. (;
+  //
+  // There is another place for input validation in
+  // ``ColorizerFormInputMethod.publishColor()``.
+  //
+  // Ref: https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation#validating_forms_using_javascript
   private submitCallback: TColorizerFormSubmitCallback;
 
   constructor(

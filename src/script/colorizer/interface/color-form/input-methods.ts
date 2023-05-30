@@ -212,6 +212,22 @@ abstract class ColorizerFormInputMethod
     // The ``Event``/``InputEvent`` is handled here!
     if (evt !== undefined) {
       evt.stopPropagation();
+
+      // Internal input validation
+      //
+      // The aim is to handle invalid input *gracefully*, meaning that errors
+      // are silently ignored and values are forced into the acceptable range.
+      //
+      // The validation is based on the HTML ``pattern`` attribute of the
+      // ``<input type="text" ...>`` elements.
+      //
+      // Ref: https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation#validating_forms_using_javascript
+      if ((evt.target as HTMLInputElement).validity.valid === false) {
+        console.warn("Input invalid!");
+        console.debug(evt.target);
+        console.debug((evt.target as HTMLInputElement).validity);
+        // return;  // uncomment to actually stop processing the ``InputEvent``
+      }
     }
 
     this.inputReceiver(this.getColor());
