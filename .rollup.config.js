@@ -2,7 +2,27 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import nodeResolve from "@rollup/plugin-node-resolve";
+/**
+ * Configuration for ``Rollup``.
+ *
+ * ``Rollup`` is only used to *bundle* the script files. It does not create
+ * *the whole bundle*, including other static assets (e.g. stylesheets, ...).
+ *
+ * The overall build process is driven by ``make`` and there are dedicated
+ * recipes to transpile / post-process the other assets.
+ *
+ * This configuration deliberately omits specifying the ``input`` file(s) and
+ * the desired output location. These parameters should be provided by command
+ * line arguments (``--input``/``-i`` and ``--file``/``-o`` or
+ * ``--dir``/``-d``).
+ *
+ * References:
+ * - https://rollupjs.org/configuration-options/#input
+ * - https://rollupjs.org/configuration-options/#output-dir
+ * - https://rollupjs.org/configuration-options/#output-file
+ */
+
+// import nodeResolve from "@rollup/plugin-node-resolve";  // Not in use as of now!
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
 
@@ -12,48 +32,28 @@ import typescript from "@rollup/plugin-typescript";
  */
 const devMode = process.env.DEV_FLAG === "dev";
 
-/* The default output filename.
- *
- * This will be the minimized script file, meaning the ``terser`` plugin is
- * applied to the file.
- */
-const outputMainFile = "dist/assets/colorizer.js";
-
 /* TODO: "es" or "iife"?!
  *
  * https://rollupjs.org/configuration-options/#output-format
  */
 const outputFormat = "es";
 
-/* The default output format.
- *
- * This is the minimized script file, meaning the ``terser`` plugin is applied
- * to the file.
- */
-const outputDefault = {
-  file: outputMainFile,
-  format: outputFormat,
-  plugins: [terser()],
+const config = {
+  output: {
+    assetFileNames: "[name][extname]",
+    format: outputFormat,
+  },
+  plugins: [typescript()],
 };
 
-/* In *development mode* a **maximized** version is generated, where the
- * ``terser`` plugin is not applied to the file.
- */
-let outputConfig = {};
 if (devMode === true) {
-  outputConfig = [
-    outputDefault,
-    {
-      file: "dist/assets/colorizer.max.js",
-      format: outputFormat,
-    },
-  ];
+  // FIXME: Make sourcemaps actually work
+  //        Desired: Show references to the actual TS sources!
+  //        Ref: https://stackoverflow.com/questions/63218218/rollup-is-not-generating-typescript-sourcemap
+  config.output.sourcemap = true;
+  config.output.validate = true; // highly experimental
 } else {
-  outputConfig = outputDefault;
+  config.output.plugins = [terser()];
 }
 
-export default {
-  input: "src/script/index.ts",
-  output: outputConfig,
-  plugins: [typescript(), nodeResolve()],
-};
+export default config;
