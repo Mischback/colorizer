@@ -97,9 +97,23 @@ build/development :
     $(MAKE) build
 .PHONY : build/development
 
-$(BUILD_HTML_DIR)/index.html : $(SRC_DIR)/index.html $(BUILD_ASSETS)
+# Run ``PostHTML`` to apply cache-busting for the static assets.
+#
+# Please note: In *development mode*, the ``index.html`` is simply copied to
+# the build directory.
+#
+# Please note: ``PostHTML`` / ``posthtml-hash`` do only work with relative
+# file paths. The whole setup of ``Makefile``, ``posthtml.config.js`` and
+# the build artifacts is fragile!
+$(BUILD_HTML_DIR)/index.html : $(SRC_DIR)/index.html $(BUILD_ASSETS) posthtml.config.js | $(STAMP_NODE_READY)
 	$(create_dir)
+ifeq ($(BUILD_MODE), $(DEV_FLAG))
+	echo "[development] building script bundle..."
 	cp $< $@
+else
+	cp $< $@ && \
+    npx posthtml $(subst $(REPO_ROOT)/, "", $@) -o $(subst $(REPO_ROOT)/, "", $@) -c posthtml.config.js
+endif
 
 # Run ``rollup`` to compile TS sources and bundle them
 #
