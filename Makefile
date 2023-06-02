@@ -14,18 +14,50 @@
 # Ref: https://stackoverflow.com/a/73450593
 REPO_ROOT := $(patsubst %/, %, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
+# This ``string`` is automatically appended to the ``basename`` of static
+# assets (as specified in ``BUILD_ASSETS_RAW).
+#
+# It has to be synchronized with the ``posthtml`` configuration and with the
+# ``*.html`` source files.
+BUSTING_PATTERN := "[BUSTING]"
+
 # Build directory
 BUILD_DIR := $(REPO_ROOT)/dist
 
-BUILD_APP_JS := $(BUILD_DIR)/assets/colorizer.js
-BUILD_APP_STYLE := $(BUILD_DIR)/assets/style.css
+# Where to put *.html files?
+BUILD_HTML_DIR := $(BUILD_DIR)
+
+# Where to put static assets, like stylesheets / scripts?
+BUILD_ASSETS_DIR := $(BUILD_DIR)/assets
+
+# The actual filenames of assets to be built.
+BUILD_ASSETS_RAW := style.css colorizer.js
+
+# These are the actual assets to be built.
+#
+# Starting with the ``BUILD_ASSETS_RAW``, the ``BUSTING_PATTERN`` is appended
+# to the ``basename`` and then the file ``suffix`` is re-appended. Finally,
+# all files are prefixed with ``BUILD_ASSETS_DIR`` to apply the actual build
+# path.
+BUILD_ASSETS := $(addprefix \
+                  $(BUILD_ASSETS_DIR)/, \
+                  $(join \
+                    $(addsuffix \
+                      .$(BUSTING_PATTERN), \
+                      $(basename $(BUILD_ASSETS_RAW)) \
+                    ), \
+                    $(suffix $(BUILD_ASSETS_RAW)) \
+                  ) \
+                )
 
 # Source directory
 SRC_DIR := $(REPO_ROOT)/src
+
+# All script source files, meant to be used as a dependency/prerequisite
 SRC_SCRIPT := $(shell find $(SRC_DIR)/script -type f)
-SRC_SCRIPT_ENTRYPOINT := $(SRC_DIR)/script/index.ts
+
+# All style source files, meant to be used as a dependency/prerequisite
 SRC_STYLE := $(shell find $(SRC_DIR)/style -type f)
-SRC_STYLE_ENTRYPOINT := $(SRC_DIR)/style/style.scss
 
 # Stamps
 #
@@ -44,13 +76,13 @@ MAKEFLAGS += --no-print-directory
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
-# ##### Recipes
+# ### RECIPES
 
 # Build the application
 #
 # This builds the JS from TypeScript sources and the stylesheet from SCSS
 # sources.
-build : $(BUILD_APP_JS) $(BUILD_APP_STYLE)
+build : $(BUILD_HTML_DIR)/index.html
 .PHONY : build
 
 # Build in development mode
@@ -58,37 +90,42 @@ build : $(BUILD_APP_JS) $(BUILD_APP_STYLE)
 # Build for development, providing source maps etc...
 # This forces a rebuild every time!
 build/development :
-	touch $(SRC_SCRIPT_ENTRYPOINT) && \
-	touch $(SRC_STYLE_ENTRYPOINT) && \
-	BUILD_MODE=$(DEV_FLAG) \
-	$(MAKE) build
+	touch $(SRC_DIR)/index.html && \
+    touch $(firstword $(SRC_SCRIPT)) && \
+    touch $(firstword $(SRC_STYLE)) && \
+    BUILD_MODE=$(DEV_FLAG) \
+    $(MAKE) build
 .PHONY : build/development
+
+$(BUILD_HTML_DIR)/index.html : $(SRC_DIR)/index.html $(BUILD_ASSETS)
+	$(create_dir)
+	cp $< $@
 
 # Run ``rollup`` to compile TS sources and bundle them
 #
 # ``rollup`` (or its TypeScript plugin, to be precise) will perform the
 # typechecking, so there is no need to call ``util/lint/typecheck`` manually.
-$(BUILD_APP_JS) : $(SRC_SCRIPT) .rollup.config.js tsconfig.json | $(STAMP_NODE_READY)
+$(BUILD_ASSETS_DIR)/%.$(BUSTING_PATTERN).js : $(SRC_DIR)/script/%.ts $(SRC_SCRIPT) .rollup.config.js tsconfig.json | $(STAMP_NODE_READY)
 	$(create_dir)
 ifeq ($(BUILD_MODE), $(DEV_FLAG))
+	echo "[development] building script bundle..."
 	DEV_FLAG=$(DEV_FLAG) \
-	npx rollup -c .rollup.config.js --bundleConfigAsCjs
+    npx rollup -c .rollup.config.js --bundleConfigAsCjs -i $< -o $@
 else
-	npx rollup -c .rollup.config.js --bundleConfigAsCjs
+	npx rollup -c .rollup.config.js --bundleConfigAsCjs -i $< -o $@
 endif
 
 # Run ``sass`` to compile SASS/SCSS sources to CSS
-$(BUILD_DIR)/assets/%.css : $(SRC_DIR)/style/%.scss $(SRC_STYLE) | $(STAMP_NODE_READY)
+$(BUILD_ASSETS_DIR)/%.$(BUSTING_PATTERN).css : $(SRC_DIR)/style/%.scss $(SRC_STYLE) postcss.config.js | $(STAMP_NODE_READY)
 	$(create_dir)
 ifeq ($(BUILD_MODE), $(DEV_FLAG))
 	echo "[development] building stylesheet..."
-	npx sass --verbose --embed-sources --embed-source-map --stop-on-error $< | \
-	npx postcss -o $@
-else
-# FIXME: Use ``postcss`` here!
 	DEV_FLAG=$(DEV_FLAG) \
+    npx sass --verbose --embed-sources --embed-source-map --stop-on-error $< | \
+    npx postcss -o $@
+else
 	npx sass --verbose --stop-on-error $< | \
-	npx postcss -o $@
+    npx postcss -o $@
 endif
 
 # ##### Development Utilities
