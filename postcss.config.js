@@ -1,16 +1,23 @@
 // SPDX-FileCopyrightText: 2023 Mischback
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
+//
 
-const purgecss = require("@fullhuman/postcss-purgecss");
-const purgecssConfig = {
+/**
+ * Configuration for ``PostCSS``.
+ *
+ * The SCSS sources are transpiled using ``sass`` and the result is then
+ * post-processed with PostCSS.
+ */
+
+const purgecss = require("@fullhuman/postcss-purgecss")({
   content: ["./**/*.html"],
   fontFace: true,
   keyFrames: true,
   variables: true,
   // safelist: [],
   blocklist: [],
-};
+});
 
 /* Determine if we're running in *development mode*.
  *
@@ -22,16 +29,12 @@ const devMode = process.env.DEV_FLAG === "dev";
  *
  * *development mode* will skip all optimisation plugins.
  */
-const outputConfig = {
-  plugins: [
-    purgecss(purgecssConfig),
-    require("autoprefixer")(),
-    require("cssnano")(),
-  ],
+const config = {
+  plugins: [purgecss, require("autoprefixer")(), require("cssnano")()],
 };
 
 if (devMode === true) {
-  outputConfig.plugins = [purgecss(purgecssConfig)];
+  config.plugins = [purgecss];
 }
 
-module.exports = outputConfig;
+module.exports = config;
