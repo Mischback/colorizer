@@ -97,6 +97,11 @@ build/development :
     $(MAKE) build
 .PHONY : build/development
 
+# Just remove the build directory.
+clean :
+	rm -rf $(BUILD_DIR)
+.PHONY : clean
+
 # Run ``PostHTML`` to apply cache-busting for the static assets.
 #
 # Please note: In *development mode*, the ``index.html`` is simply copied to
