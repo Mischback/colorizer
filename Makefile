@@ -124,14 +124,14 @@ endif
 #
 # ``rollup`` (or its TypeScript plugin, to be precise) will perform the
 # typechecking, so there is no need to call ``util/lint/typecheck`` manually.
-$(BUILD_ASSETS_DIR)/%.$(BUSTING_PATTERN).js : $(SRC_DIR)/script/%.ts $(SRC_SCRIPT) .rollup.config.js tsconfig.json | $(STAMP_NODE_READY)
+$(BUILD_ASSETS_DIR)/%.$(BUSTING_PATTERN).js : $(SRC_DIR)/script/%.ts $(SRC_SCRIPT) rollup.config.js tsconfig.json | $(STAMP_NODE_READY)
 	$(create_dir)
 ifeq ($(BUILD_MODE), $(DEV_FLAG))
 	echo "[development] building script bundle..."
 	DEV_FLAG=$(DEV_FLAG) \
-    npx rollup -c .rollup.config.js --bundleConfigAsCjs -i $< -o $@
+    npx rollup -c rollup.config.js --bundleConfigAsCjs -i $< -o $@
 else
-	npx rollup -c .rollup.config.js --bundleConfigAsCjs -i $< -o $@
+	npx rollup -c rollup.config.js --bundleConfigAsCjs -i $< -o $@
 endif
 
 # Run ``sass`` to compile SASS/SCSS sources to CSS

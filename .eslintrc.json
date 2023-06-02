@@ -13,7 +13,8 @@
     "dist",
     "node_modules",
     "postcss.config.js",
-    "posthtml.config.js"
+    "posthtml.config.js",
+    "rollup.config.js"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
