@@ -9,7 +9,12 @@
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "prettier"
   ],
-  "ignorePatterns": ["dist", "node_modules", "postcss.config.js"],
+  "ignorePatterns": [
+    "dist",
+    "node_modules",
+    "postcss.config.js",
+    "posthtml.config.js"
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": ["./tsconfig.json"]
