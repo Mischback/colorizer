@@ -1,0 +1,41 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+/* Place and style the tooltips, which are provided as part of an input
+ * method's ``<legend>``.
+ */
+
+/* stylelint-disable selector-max-compound-selectors */
+.color-form-input-method > legend > .tooltip-anchor {
+  display: inline-block;
+  position: relative;
+
+  button {
+    // FIXME: [#32] Build an overall colorscheme
+    border: 1px solid rgb(0 0 0);
+    border-radius: 5em;
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+
+  > .tooltip-display > div {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 20em;
+    padding: 0.25em 0.5em;
+
+    // FIXME: [#32] Build an overall colorscheme
+    border: 1px solid rgb(0 0 0);
+
+    // FIXME: [#32] Build an overall colorscheme
+    background: rgb(200 200 200);
+
+    // FIXME: [#32] Build an overall colorscheme
+    color: rgb(0 0 0);
+    font-size: 1rem;
+  }
+}
+/* stylelint-enable selector-max-compound-selectors */
