@@ -5,6 +5,7 @@
 type TVector = number[]; // an Array of numbers
 type TMatrix = TVector[]; // basically this is ``number[][]``, an Array of Arrays of numbers
 type TColorCoordinates = [number, number, number]; // Colors are represented by three coordinates. This is an internal thing to ensure array access
+export type THsl = { h: number; s: number; l: number };
 export type TOklab = { l: number; a: number; b: number };
 export type TOklch = { l: number; c: number; h: number };
 export type TRgb = { r: number; g: number; b: number };
@@ -106,6 +107,21 @@ export function convertGammaRgbToLinearRgb(rgb: TRgb): TLinRgb {
  */
 export function convertGammaRgbToXyz(rgb: TRgb): TXyz {
   return convertLinearRgbToXyz(convertGammaRgbToLinearRgb(rgb));
+}
+
+/**
+ * Convert HSL notation sRGB to CIE XYZ (D65).
+ *
+ * @param hsl An object literal with ``h`` attribute in range [0..360] and ``s``
+ *            and ``l`` in range [0..1].
+ * @returns An object literal with ``x``, ``y`` and ``z`` attributes,
+ *          representing coordinates in CIE XYZ.
+ *
+ * This is a shortcut function. See ``translateHslNotationToGammaRgb()`` and
+ * ``convertGammaRgbToXyz()`` for implementation details.
+ */
+export function convertHslToXyz(hsl: THsl): TXyz {
+  return convertGammaRgbToXyz(translateHslNotationToGammaRgb(hsl));
 }
 
 /**
@@ -281,6 +297,21 @@ export function convertXyzToGammaRgb(xyz: TXyz): TRgb {
 }
 
 /**
+ * Convert CIE XYZ (D65) to HSL notation sRGB.
+ *
+ * @param xyz An object literal with ``x``, ``y`` and ``z`` attributes,
+ *            representing coordinates in CIE XYZ.
+ * @returns An object literal with ``h`` attribute in range [0..360] and ``s``
+ *          and ``l`` in range [0..1].
+ *
+ * This is a shortcut function. See ``convertXyzToGammaRgb()`` and
+ * ``translateGammaRgbToHslNotation()`` for implementation details.
+ */
+export function convertXyzToHsl(xyz: TXyz): THsl {
+  return translateGammaRgbToHslNotation(convertXyzToGammaRgb(xyz));
+}
+
+/**
  * Convert CIE XYZ (D65) to linear-light sRGB.
  *
  * @param xyz An object literal with ``x``, ``y`` and ``z`` attributes,
@@ -378,4 +409,87 @@ export function convertXyzToOklab(xyz: TXyz): TOklab {
  */
 export function convertXyzToOklch(xyz: TXyz): TOklch {
   return convertOklabToOklch(convertXyzToOklab(xyz));
+}
+
+/**
+ * Translate gamma-corrected sRGB value to HSL notation.
+ *
+ * @param rgb An object literal with ``r``, ``g`` and ``b`` attributes in
+ *            range [0..1], representing gamma-corrected sRGB values.
+ * @returns An object literal with ``h`` attribute in range [0..360] and ``s``
+ *          and ``l`` in range [0..1].
+ *
+ * The implementation is taken from
+ * https://www.w3.org/TR/css-color-4/#rgb-to-hsl and complemented with type
+ * information.
+ *
+ * HSL is no dedicated color space but more of a different notation for sRGB.
+ */
+export function translateGammaRgbToHslNotation(rgb: TRgb): THsl {
+  const max = Math.max(rgb.r, rgb.g, rgb.b);
+  const min = Math.min(rgb.r, rgb.g, rgb.b);
+  const d = max - min;
+  const light = (min + max) / 2;
+  let hue = Number.NaN;
+  let sat = 0;
+
+  if (d !== 0) {
+    sat =
+      light === 0 || light === 1
+        ? 0
+        : (max - light) / Math.min(light, 1 - light);
+
+    switch (max) {
+      case rgb.r:
+        hue = (rgb.g - rgb.b) / d + (rgb.g < rgb.b ? 6 : 0);
+        break;
+      case rgb.g:
+        hue = (rgb.b - rgb.r) / d + 2;
+        break;
+      case rgb.b:
+        hue = (rgb.r - rgb.g) / d + 4;
+    }
+
+    hue = hue * 60;
+  }
+
+  return {
+    h: hue,
+    s: sat,
+    l: light,
+  };
+}
+
+/**
+ * Translate HSL notation sRGB to gamma-corrected sRGB.
+ *
+ * @param hsl An object literal with ``h`` attribute in range [0..360] and ``s``
+ *            and ``l`` in range [0..1].
+ * @returns An object literal with ``r``, ``g`` and ``b`` attributes in
+ *          range [0..1], representing gamma-corrected sRGB values.
+ *
+ * The implementation is taken from
+ * https://www.w3.org/TR/css-color-4/#hsl-to-rgb and complemented with type
+ * information.
+ *
+ * HSL is no dedicated color space but more of a different notation for sRGB.
+ */
+export function translateHslNotationToGammaRgb(hsl: THsl): TRgb {
+  hsl.h = hsl.h % 360;
+
+  if (hsl.h < 0) {
+    hsl.h += 360;
+  }
+
+  function f(n: number) {
+    const k = (n + hsl.h / 30) % 12;
+    const a = hsl.s * Math.min(hsl.l, 1 - hsl.l);
+    return hsl.l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+  }
+
+  return {
+    r: f(0),
+    g: f(8),
+    b: f(4),
+  };
 }
