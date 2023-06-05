@@ -1,0 +1,37 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+button {
+  padding: 0.25em 0.5em;
+  border: 0;
+  border-radius: 5px;
+
+  // FIXME: [#32] Build an overall colorscheme
+  background: linear-gradient(
+    to bottom,
+    #e2e2e2 5%,
+    #c3c3c3 15% 40%,
+    #a0a0a0 50% 90%,
+    #666 95%
+  );
+
+  // FIXME: [#32] Build an overall colorscheme
+  box-shadow: 0 0 2px 2px rgb(0 0 0 / 60%);
+
+  // FIXME: [#32] Build an overall colorscheme
+  color: #444;
+  font-weight: bold;
+
+  &:hover,
+  &:focus {
+    // FIXME: [#32] Build an overall colorscheme
+    background: linear-gradient(
+      to bottom,
+      #ed9 5%,
+      #fc0 15% 40%,
+      #ea0 50% 90%,
+      #666 95%
+    );
+  }
+}

@@ -113,7 +113,7 @@ clean :
 $(BUILD_HTML_DIR)/index.html : $(SRC_DIR)/index.html $(BUILD_ASSETS) posthtml.config.js | $(STAMP_NODE_READY)
 	$(create_dir)
 ifeq ($(BUILD_MODE), $(DEV_FLAG))
-	echo "[development] building script bundle..."
+	echo "[development] building index.html..."
 	cp $< $@
 else
 	cp $< $@ && \

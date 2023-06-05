@@ -3,5 +3,15 @@
     "stylelint-config-standard-scss",
     "stylelint-config-sass-guidelines",
     "stylelint-config-property-sort-order-smacss"
-  ]
+  ],
+  "rules": {
+    "max-nesting-depth": 3,
+    "selector-max-id": 1,
+    "selector-no-qualifying-type": [
+      true,
+      {
+        "ignore": ["attribute"]
+      }
+    ]
+  }
 }

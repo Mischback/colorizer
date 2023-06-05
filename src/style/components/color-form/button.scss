@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-@import "min-reset";
-@import "hide-visually";
-@import "button";
+#color-form {
+  button[type="submit"] {
+    margin: 0.5em 0;
+    font-size: 1.25em;
+  }
+}
