@@ -6,12 +6,20 @@ import { roundToPrecision } from "../../utility";
 import {
   convertGammaRgbToXyz,
   convertHslToXyz,
+  convertHwbToXyz,
   convertOklchToXyz,
   convertXyzToGammaRgb,
   convertXyzToHsl,
+  convertXyzToHwb,
   convertXyzToOklch,
 } from "../../utility/color-processing";
-import type { THsl, TOklch, TRgb, TXyz } from "../../utility/color-processing";
+import type {
+  THsl,
+  THwb,
+  TOklch,
+  TRgb,
+  TXyz,
+} from "../../utility/color-processing";
 
 /**
  * Force a ``value`` into a range specified by ``lower`` and ``upper``.
@@ -125,8 +133,30 @@ export class ColorizerColor {
     return convertXyzToOklch(this.toJSON());
   }
 
+  /**
+   * Get the color in HSL notation of sRGB.
+   *
+   * @returns An ``object`` literal with ``h`` attribute in range [0..360] and
+   *          ``s`` and ``l`` attributes in range [0..1].
+   *
+   * Please note: Internally the color is converted from CIE XYZ to HSL sRGB
+   * notation **and** the values are **not rounded**.
+   */
   public toHsl(): THsl {
     return convertXyzToHsl(this.toJSON());
+  }
+
+  /**
+   * Get the color in HWB notation of sRGB.
+   *
+   * @returns An ``object`` literal with ``h`` attribute in range [0..360] and
+   *          ``w`` and ``b`` attributes in range [0..1].
+   *
+   * Please note: Internally the color is converted from CIE XYZ to HWB sRGB
+   * notation **and** the values are **not rounded**.
+   */
+  public toHwb(): THwb {
+    return convertXyzToHwb(this.toJSON());
   }
 
   /**
@@ -201,6 +231,21 @@ export class ColorizerColor {
     return new ColorizerColor(xyz.x, xyz.y, xyz.z);
   }
 
+  /**
+   * Create a ``ColorizerColor`` instance from HSL input.
+   *
+   * @param hue The hue (in range [0..360]; this is not enforced, but
+   *            effectively ensured by the internal conversion functions in
+   *            ``utility/color-processing.ts``).
+   * @param saturation The saturarion in range [0..1].
+   * @param light The light in range [0..1].
+   * @returns ``ColorizerColor`` instance.
+   *
+   * The function sanitizes the arguments by forcing light and saturation into
+   * the accepted range of [0..1]. If ``NaN`` is provided for any of the
+   * arguments, it is set to ``0``. No rounding is applied while creating the
+   * instance. The interface may apply rounding when the values are displayed.
+   */
   public static fromHsl(hue: number, saturation: number, light: number) {
     // Note: The conversion functions will handle ``hue`` and make sure to keep
     //       it in range [0..360].
@@ -210,6 +255,34 @@ export class ColorizerColor {
       h: hue,
       s: forceValueIntoRange(saturation, 0, 1),
       l: forceValueIntoRange(light, 0, 1),
+    });
+    return new ColorizerColor(xyz.x, xyz.y, xyz.z);
+  }
+
+  /**
+   * Create a ``ColorizerColor`` instance from HWB input.
+   *
+   * @param hue The hue (in range [0..360]; this is not enforced, but
+   *            effectively ensured by the internal conversion functions in
+   *            ``utility/color-processing.ts``).
+   * @param white The white component in range [0..1].
+   * @param black The black component in range [0..1].
+   * @returns ``ColorizerColor`` instance.
+   *
+   * The function sanitizes the arguments by forcing white and black into
+   * the accepted range of [0..1]. If ``NaN`` is provided for any of the
+   * arguments, it is set to ``0``. No rounding is applied while creating the
+   * instance. The interface may apply rounding when the values are displayed.
+   */
+  public static fromHwb(hue: number, white: number, black: number) {
+    // Note: The conversion functions will handle ``hue`` and make sure to keep
+    //       it in range [0..360].
+    if (Number.isNaN(hue)) hue = 0;
+
+    const xyz = convertHwbToXyz({
+      h: hue,
+      w: forceValueIntoRange(white, 0, 1),
+      b: forceValueIntoRange(black, 0, 1),
     });
     return new ColorizerColor(xyz.x, xyz.y, xyz.z);
   }
