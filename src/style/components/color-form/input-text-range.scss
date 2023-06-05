@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
+@use "sass:math";
+
 /**
  * Common styling of ``<input type="range"> elements (the slider track).
  *
@@ -13,11 +15,11 @@
 @mixin input-method-range-track {
   /* transition: all .2s ease; */
   width: 100%;
-  height: 1em;
+  height: $color-form-input-range-track-height;
 
   // FIXME: [#32] Build an overall colorscheme
   border: 1px solid rgb(0 0 0);
-  border-radius: 5px;
+  border-radius: 5em;
 
   // FIXME: [#32] Build an overall colorscheme
   //        The track's ``background`` is actually styled in the input method's
@@ -36,8 +38,8 @@
  * https://github.com/darlanrod/input-range-scss (MIT licensed).
  */
 @mixin input-method-range-thumb {
-  width: var(--slider-thumb-width);
-  height: var(--slider-thumb-height);
+  width: $color-form-input-range-thumb-size;
+  height: $color-form-input-range-thumb-size;
 
   // FIXME: [#32] Build an overall colorscheme
   border: 1px solid rgb(0 0 0);
@@ -51,20 +53,6 @@
 }
 
 /**
- * The overall ``<form>`` element is the common ancestor of all instances of
- * ``.color-form-input-method``.
- *
- * TODO: Determine if these CSS custom properties are actually required/desired
- *       or if they can be replaced by SASS/SCSS variables, which are evaluated
- *       and applied during the *build*.
- */
-#color-form {
-  --input-text-size: 1.25em;
-  --input-text-vertical-spacing: 0.25em;
-  --input-text-border-width: 1px;
-}
-
-/**
  * The common styling of all input methods.
  *
  * The *input methods* are grouped in one parent ``<fieldset>`` element.
@@ -73,22 +61,21 @@
  */
 .color-form-input-method > fieldset {
   > input {
+    display: inline-block;
+    height: $color-form-input-height;
     margin: 0;
-    padding: var(--input-text-vertical-padding) 0.5em;
+    padding: $color-form-input-vertical-padding 0.5em;
 
     // FIXME: [#32] Build an overall colorscheme
-    border: var(--input-text-border-width) solid rgb(0 0 0);
+    border: 1px solid rgb(0 0 0);
 
     // FIXME: Create and use font-stacks!
     font-family: monospace;
-    font-size: var(--input-text-size);
+    font-size: $color-form-input-text-size;
+    vertical-align: middle;
   }
 
   > input[type="range"] {
-    --slider-track-height: 1em;
-    --slider-thumb-height: calc(var(--slider-track-height) * 1.5);
-    --slider-thumb-width: var(--slider-thumb-height);
-
     appearance: none;
     width: 10em;
     border: 0;
@@ -106,9 +93,14 @@
       @include input-method-range-thumb;
 
       appearance: none;
-      margin-top: calc(
-        (var(--slider-thumb-height) - var(slider-track-height)) / 2
-      );
+      /* stylelint-disable scss/operator-no-newline-after */
+      margin-top: -1 *
+        math.div(
+          $color-form-input-range-thumb-size -
+            $color-form-input-range-track-height,
+          2
+        );
+      /* stylelint-enable scss/operator-no-newline-after */
     }
 
     &::-moz-range-thumb {
