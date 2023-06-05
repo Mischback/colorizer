@@ -3,6 +3,54 @@
 // SPDX-FileType: SOURCE
 
 /**
+ * Common styling of ``<input type="range"> elements (the slider track).
+ *
+ * These styles have to be applied multiple times, as the vendor-specific
+ * selectors (``-webkit-slider-runnable-track``/``-moz-range-track``) may not
+ * be combined. The implementation is based on
+ * https://github.com/darlanrod/input-range-scss (MIT licensed).
+ */
+@mixin input-method-range-track {
+  /* transition: all .2s ease; */
+  width: 100%;
+  height: 1em;
+
+  // FIXME: [#32] Build an overall colorscheme
+  border: 1px solid rgb(0 0 0);
+  border-radius: 5px;
+
+  // FIXME: [#32] Build an overall colorscheme
+  //        The track's ``background`` is actually styled in the input method's
+  //        specific block, visualizing the component's impact on the current
+  //        color.
+  background: rgb(200 200 200);
+  cursor: pointer;
+}
+
+/**
+ * Common styling of ``<input type="range"> elements (the slider thumb).
+ *
+ * These styles have to be applied multiple times, as the vendor-specific
+ * selectors (``-webkit-slider-runnable-track``/``-moz-range-track``) may not
+ * be combined. The implementation is based on
+ * https://github.com/darlanrod/input-range-scss (MIT licensed).
+ */
+@mixin input-method-range-thumb {
+  width: var(--slider-thumb-width);
+  height: var(--slider-thumb-height);
+
+  // FIXME: [#32] Build an overall colorscheme
+  border: 1px solid rgb(0 0 0);
+  border-radius: 999px;
+
+  // FIXME: [#32] Build an overall colorscheme
+  //        The thumb's ``background`` is actually styled in the input method's
+  //        specific block, visualizing the current color.
+  background: rgb(255 0 255);
+  cursor: pointer;
+}
+
+/**
  * The overall ``<form>`` element is the common ancestor of all instances of
  * ``.color-form-input-method``.
  *
@@ -45,30 +93,27 @@
     width: 10em;
     border: 0;
     background: transparent;
-  }
 
-  > input[type="range"]::-webkit-slider-runnable-track,
-  > input[type="range"]::-moz-range-track {
-    width: 100%;
-    height: 1em;
-    border: 1px solid rgb(0 0 0);
-    border-radius: 5px;
-    background: rgb(200 200 200);
-    cursor: pointer;
-  }
+    &::-webkit-slider-runnable-track {
+      @include input-method-range-track;
+    }
 
-  > input[type="range"]::-webkit-slider-thumb,
-  > input[type="range"]::-moz-range-thumb {
-    width: var(--slider-thumb-width);
-    height: var(--slider-thumb-height);
-    margin-top: calc(
-      (var(--slider-thumb-height) - var(slider-track-height)) / 2
-    );
-    border: 1px solid rgb(0 0 0);
-    border-radius: 999px;
-    background: rgb(255 0 255);
-    cursor: pointer;
-    appearance: none;
+    &::-moz-range-track {
+      @include input-method-range-track;
+    }
+
+    &::-webkit-slider-thumb {
+      @include input-method-range-thumb;
+
+      appearance: none;
+      margin-top: calc(
+        (var(--slider-thumb-height) - var(slider-track-height)) / 2
+      );
+    }
+
+    &::-moz-range-thumb {
+      @include input-method-range-thumb;
+    }
   }
 }
 
@@ -89,43 +134,75 @@
  * The slider's thumb visualizes the current color.
  */
 #color-form-rgb {
+  > fieldset {
+    > input[type="range"] {
+      &::-webkit-slider-thumb {
+        background: rgb(var(--this-red) var(--this-green) var(--this-blue));
+      }
+
+      &::-moz-range-thumb {
+        background: rgb(var(--this-red) var(--this-green) var(--this-blue));
+      }
+    }
+  }
+
   > .component-red {
-    > input[type="range"]::-webkit-slider-runnable-track,
-    > input[type="range"]::-moz-range-track {
-      background: linear-gradient(
-        90deg,
-        rgb(0 var(--this-green) var(--this-blue)) 0%,
-        rgb(255 var(--this-green) var(--this-blue)) 100%
-      );
+    > input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        background: linear-gradient(
+          90deg,
+          rgb(0 var(--this-green) var(--this-blue)) 0%,
+          rgb(255 var(--this-green) var(--this-blue)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        background: linear-gradient(
+          90deg,
+          rgb(0 var(--this-green) var(--this-blue)) 0%,
+          rgb(255 var(--this-green) var(--this-blue)) 100%
+        );
+      }
     }
   }
 
   > .component-green {
-    > input[type="range"]::-webkit-slider-runnable-track,
-    > input[type="range"]::-moz-range-track {
-      background: linear-gradient(
-        90deg,
-        rgb(var(--this-red) 0 var(--this-blue)) 0%,
-        rgb(var(--this-red) 255 var(--this-blue)) 100%
-      );
+    > input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        background: linear-gradient(
+          90deg,
+          rgb(var(--this-red) 0 var(--this-blue)) 0%,
+          rgb(var(--this-red) 255 var(--this-blue)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        background: linear-gradient(
+          90deg,
+          rgb(var(--this-red) 0 var(--this-blue)) 0%,
+          rgb(var(--this-red) 255 var(--this-blue)) 100%
+        );
+      }
     }
   }
 
   > .component-blue {
-    > input[type="range"]::-webkit-slider-runnable-track,
-    > input[type="range"]::-moz-range-track {
-      background: linear-gradient(
-        90deg,
-        rgb(var(--this-red) var(--this-green) 0) 0%,
-        rgb(var(--this-red) var(--this-green) 255) 100%
-      );
-    }
-  }
+    > input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        background: linear-gradient(
+          90deg,
+          rgb(var(--this-red) var(--this-green) 0) 0%,
+          rgb(var(--this-red) var(--this-green) 255) 100%
+        );
+      }
 
-  > fieldset {
-    > input[type="range"]::-webkit-slider-thumb,
-    > input[type="range"]::-moz-range-thumb {
-      background: rgb(var(--this-red) var(--this-green) var(--this-blue));
+      &::-moz-range-track {
+        background: linear-gradient(
+          90deg,
+          rgb(var(--this-red) var(--this-green) 0) 0%,
+          rgb(var(--this-red) var(--this-green) 255) 100%
+        );
+      }
     }
   }
 }
@@ -136,140 +213,140 @@
  * The overall idea is identical to RGB inputs, but the sliders' gradients have
  * some *more resolution*, because the components do not work strictly linear.
  */
+/* stylelint-disable no-descending-specificity */
 #color-form-oklch {
+  > fieldset {
+    > input[type="range"] {
+      &::-webkit-slider-thumb {
+        /* prettier-ignore */
+        background: oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg));
+      }
+
+      &::-moz-range-thumb {
+        /* prettier-ignore */
+        background: oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg));
+      }
+    }
+  }
+
   > .component-lightness {
-    > input[type="range"]::-webkit-slider-runnable-track,
-    > input[type="range"]::-moz-range-track {
-      background: linear-gradient(
-        90deg,
-        oklch(0% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 0%,
-        oklch(10% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg))
-          10%,
-        oklch(20% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg))
-          20%,
-        oklch(30% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg))
-          30%,
-        oklch(40% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg))
-          40%,
-        oklch(50% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg))
-          50%,
-        oklch(60% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg))
-          60%,
-        oklch(70% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg))
-          70%,
-        oklch(80% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg))
-          80%,
-        oklch(90% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg))
-          90%,
-        oklch(100% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg))
-          100%
-      );
+    > input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          oklch(0% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 0%,
+          oklch(10% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 10%,
+          oklch(20% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 20%,
+          oklch(30% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 30%,
+          oklch(40% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 40%,
+          oklch(50% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 50%,
+          oklch(60% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 60%,
+          oklch(70% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 70%,
+          oklch(80% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 80%,
+          oklch(90% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 90%,
+          oklch(100% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          oklch(0% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 0%,
+          oklch(10% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 10%,
+          oklch(20% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 20%,
+          oklch(30% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 30%,
+          oklch(40% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 40%,
+          oklch(50% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 50%,
+          oklch(60% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 60%,
+          oklch(70% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 70%,
+          oklch(80% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 80%,
+          oklch(90% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 90%,
+          oklch(100% calc(var(--this-chroma) * 1%) calc(var(--this-hue) * 1deg)) 100%
+        );
+      }
     }
   }
 
   > .component-chroma {
-    > input[type="range"]::-webkit-slider-runnable-track,
-    > input[type="range"]::-moz-range-track {
-      background: linear-gradient(
-        90deg,
-        oklch(calc(var(--this-lightness) * 1%) 0% calc(var(--this-hue) * 1deg))
-          0%,
-        oklch(calc(var(--this-lightness) * 1%) 10% calc(var(--this-hue) * 1deg))
-          10%,
-        oklch(calc(var(--this-lightness) * 1%) 20% calc(var(--this-hue) * 1deg))
-          20%,
-        oklch(calc(var(--this-lightness) * 1%) 30% calc(var(--this-hue) * 1deg))
-          30%,
-        oklch(calc(var(--this-lightness) * 1%) 40% calc(var(--this-hue) * 1deg))
-          40%,
-        oklch(calc(var(--this-lightness) * 1%) 50% calc(var(--this-hue) * 1deg))
-          50%,
-        oklch(calc(var(--this-lightness) * 1%) 60% calc(var(--this-hue) * 1deg))
-          60%,
-        oklch(calc(var(--this-lightness) * 1%) 70% calc(var(--this-hue) * 1deg))
-          70%,
-        oklch(calc(var(--this-lightness) * 1%) 80% calc(var(--this-hue) * 1deg))
-          80%,
-        oklch(calc(var(--this-lightness) * 1%) 90% calc(var(--this-hue) * 1deg))
-          90%,
-        oklch(
-            calc(var(--this-lightness) * 1%) 100% calc(var(--this-hue) * 1deg)
-          )
-          100%
-      );
+    > input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          oklch(calc(var(--this-lightness) * 1%) 0% calc(var(--this-hue) * 1deg)) 0%,
+          oklch(calc(var(--this-lightness) * 1%) 10% calc(var(--this-hue) * 1deg)) 10%,
+          oklch(calc(var(--this-lightness) * 1%) 20% calc(var(--this-hue) * 1deg)) 20%,
+          oklch(calc(var(--this-lightness) * 1%) 30% calc(var(--this-hue) * 1deg)) 30%,
+          oklch(calc(var(--this-lightness) * 1%) 40% calc(var(--this-hue) * 1deg)) 40%,
+          oklch(calc(var(--this-lightness) * 1%) 50% calc(var(--this-hue) * 1deg)) 50%,
+          oklch(calc(var(--this-lightness) * 1%) 60% calc(var(--this-hue) * 1deg)) 60%,
+          oklch(calc(var(--this-lightness) * 1%) 70% calc(var(--this-hue) * 1deg)) 70%,
+          oklch(calc(var(--this-lightness) * 1%) 80% calc(var(--this-hue) * 1deg)) 80%,
+          oklch(calc(var(--this-lightness) * 1%) 90% calc(var(--this-hue) * 1deg)) 90%,
+          oklch(calc(var(--this-lightness) * 1%) 100% calc(var(--this-hue) * 1deg)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          oklch(calc(var(--this-lightness) * 1%) 0% calc(var(--this-hue) * 1deg)) 0%,
+          oklch(calc(var(--this-lightness) * 1%) 10% calc(var(--this-hue) * 1deg)) 10%,
+          oklch(calc(var(--this-lightness) * 1%) 20% calc(var(--this-hue) * 1deg)) 20%,
+          oklch(calc(var(--this-lightness) * 1%) 30% calc(var(--this-hue) * 1deg)) 30%,
+          oklch(calc(var(--this-lightness) * 1%) 40% calc(var(--this-hue) * 1deg)) 40%,
+          oklch(calc(var(--this-lightness) * 1%) 50% calc(var(--this-hue) * 1deg)) 50%,
+          oklch(calc(var(--this-lightness) * 1%) 60% calc(var(--this-hue) * 1deg)) 60%,
+          oklch(calc(var(--this-lightness) * 1%) 70% calc(var(--this-hue) * 1deg)) 70%,
+          oklch(calc(var(--this-lightness) * 1%) 80% calc(var(--this-hue) * 1deg)) 80%,
+          oklch(calc(var(--this-lightness) * 1%) 90% calc(var(--this-hue) * 1deg)) 90%,
+          oklch(calc(var(--this-lightness) * 1%) 100% calc(var(--this-hue) * 1deg)) 100%
+        );
+      }
     }
   }
 
   > .component-hue {
-    > input[type="range"]::-webkit-slider-runnable-track,
-    > input[type="range"]::-moz-range-track {
-      background: linear-gradient(
-        90deg,
-        oklch(
-            calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) 0deg
-          )
-          0%,
-        oklch(
-            calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%)
-              calc(0.1 * 360deg)
-          )
-          10%,
-        oklch(
-            calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%)
-              calc(0.2 * 360deg)
-          )
-          20%,
-        oklch(
-            calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%)
-              calc(0.3 * 360deg)
-          )
-          30%,
-        oklch(
-            calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%)
-              calc(0.4 * 360deg)
-          )
-          40%,
-        oklch(
-            calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%)
-              calc(0.5 * 360deg)
-          )
-          50%,
-        oklch(
-            calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%)
-              calc(0.6 * 360deg)
-          )
-          60%,
-        oklch(
-            calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%)
-              calc(0.7 * 360deg)
-          )
-          70%,
-        oklch(
-            calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%)
-              calc(0.8 * 360deg)
-          )
-          80%,
-        oklch(
-            calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%)
-              calc(0.9 * 360deg)
-          )
-          90%,
-        oklch(
-            calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%)
-              360deg
-          )
-          100%
-      );
-    }
-  }
+    > input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) 0deg) 0%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.1 * 360deg)) 10%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.2 * 360deg)) 20%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.3 * 360deg)) 30%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.4 * 360deg)) 40%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.5 * 360deg)) 50%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.6 * 360deg)) 60%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.7 * 360deg)) 70%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.8 * 360deg)) 80%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.9 * 360deg)) 90%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) 360deg) 100%
+        );
+      }
 
-  > fieldset {
-    > input[type="range"]::-webkit-slider-thumb,
-    > input[type="range"]::-moz-range-thumb {
-      background: oklch(
-        calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%)
-          calc(var(--this-hue) * 1deg)
-      );
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) 0deg) 0%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.1 * 360deg)) 10%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.2 * 360deg)) 20%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.3 * 360deg)) 30%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.4 * 360deg)) 40%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.5 * 360deg)) 50%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.6 * 360deg)) 60%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.7 * 360deg)) 70%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.8 * 360deg)) 80%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) calc(0.9 * 360deg)) 90%,
+          oklch(calc(var(--this-lightness) * 1%) calc(var(--this-chroma) * 1%) 360deg) 100%
+        );
+      }
     }
   }
 }
+/* stylelint-enable no-descending-specificity */
