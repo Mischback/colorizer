@@ -127,6 +127,13 @@
  */
 #color-form-rgb {
   > fieldset {
+    > input[type="text"] {
+      // TODO: Works on Ubuntu with Firefox and Chromium. Dependent on the
+      //       font-stack for monospace fonts.
+      //       Required width: Three digits (``ddd``).
+      width: 4em;
+    }
+
     > input[type="range"] {
       &::-webkit-slider-thumb {
         background: rgb(var(--this-red) var(--this-green) var(--this-blue));
@@ -208,6 +215,13 @@
 /* stylelint-disable no-descending-specificity */
 #color-form-oklch {
   > fieldset {
+    > input[type="text"] {
+      // TODO: Works on Ubuntu with Firefox and Chromium. Dependent on the
+      //       font-stack for monospace fonts.
+      //       Required width: three digits with two decimal places (``ddd.dd``).
+      width: 5em;
+    }
+
     > input[type="range"] {
       &::-webkit-slider-thumb {
         /* prettier-ignore */
