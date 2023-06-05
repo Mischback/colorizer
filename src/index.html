@@ -87,6 +87,42 @@
     </div>
   </fieldset>
 
+  <fieldset id="color-form-hwb" class="color-form-input-method">
+    <legend>
+      <strong>HWB input</strong>
+      <span class="tooltip-anchor">
+        <button type="button" aria-label="Description of the HWB input">?</button>
+        <div class="tooltip-display" role="status"></div>
+      </span>
+    </legend>
+    <fieldset class="component-hue">
+      <legend>Hue component</legend> <label for="color-form-hwb-h-slider" class="hide-visually">Slider to adjust hue component</label>
+      <input id="color-form-hwb-h-slider" type="range" min="0" max="360" step="1" aria-describedby="color-form-hwb-tooltip">
+      <label for="color-form-hwb-h" class="hide-visually">Decimal input for hue component</label>
+      <input id="color-form-hwb-h" type="text" pattern="^(360|((3[0-5][0-9]|[12][0-9]{2}|([1-9]?[0-9]{1}))(\.[0-9]+)?))$" inputmode="numeric" aria-describedby="color-form-hwb-tooltip">
+    </fieldset>
+    <fieldset class="component-white">
+      <legend>White component</legend>
+      <label for="color-form-hwb-w-slider" class="hide-visually">Slider to adjust white component</label>
+      <input id="color-form-hwb-w-slider" type="range" min="0" max="100" step="0.01" aria-describedby="color-form-hwb-tooltip">
+      <label for="color-form-hwb-w" class="hide-visually">Decimal input for white component</label>
+      <input id="color-form-hwb-w" type="text" pattern="^(100|[1-9]?[0-9](\.[0-9]+)?)$" inputmode="numeric" aria-describedby="color-form-hwb-tooltip">
+    </fieldset>
+    <fieldset class="component-black">
+      <legend>Black component</legend>
+      <label for="color-form-hwb-b-slider" class="hide-visually">Slider to adjust black component</label>
+      <input id="color-form-hwb-b-slider" type="range" min="0" max="100" step="0.01" aria-describedby="color-form-hwb-tooltip">
+      <label for="color-form-hwb-b" class="hide-visually">Decimal input for black component</label>
+      <input id="color-form-hwb-b" type="text" pattern="^(100|[1-9]?[0-9](\.[0-9]+)?)$" inputmode="numeric" aria-describedby="color-form-hwb-tooltip">
+    </fieldset>
+    <div role="tooltip" id="color-form-hwb-tooltip" class="tooltip-content">
+      <p><strong>HWB</strong> is a different notation for the <em>sRGB</em> colorspace.</p>
+      <p>It lets you specify the <strong>Hue</strong> (H), <strong>Whiteness</strong> (W) and <strong>Blackness</strong> (B).</p>
+      <p>While Whiteness and Blackness are specified in percent-based values in range [0..100], the Hue is an angle in range [0..360].</p>
+      <p>The values may be entered directly or using the corresponding sliders.</p>
+    </div>
+  </fieldset>
+
   <fieldset id="color-form-oklch" class="color-form-input-method">
     <legend>
       <strong>Oklch input</strong>

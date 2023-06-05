@@ -9,9 +9,6 @@ import type { IColorizerObserver } from "../../lib/types";
 
 /**
  * Dedicated typing for the available input methods.
- *
- * TODO: [#24] Implement "hsl"
- * TODO: [#24] Implement "hwb"
  */
 export type TColorizerFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
 
@@ -57,9 +54,12 @@ export function getColorizerFormInput(
       return new ColorizerFormInputRgb(receiver);
     case "hsl":
       return new ColorizerFormInputHsl(receiver);
+    case "hwb":
+      return new ColorizerFormInputHwb(receiver);
     case "oklch":
       return new ColorizerFormInputOklch(receiver);
     default:
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       throw new Error(`Unknown input method '${method}'`);
   }
 }
@@ -650,6 +650,88 @@ class ColorizerFormInputHsl
 
     // TODO: [#23] Expose precision!
     tmp = roundToPrecision(colorHsl.l * 100, 2).toString();
+    this.cCText.value = tmp;
+    this.cCSlider.value = tmp;
+    this.updateCoordinateInStyleProperty(this.cCProperty, tmp);
+  }
+}
+
+/**
+ * Represent HWB color input.
+ *
+ * @param receiver A callback function that is called whenever the input
+ *                 method's current color changes.
+ * @param inputDebounceDelay The delay to be applied to the method's input
+ *                           event handlers, given in **ms** and passed to
+ *                           ``setTimeout()``. **Optional**, will get a default
+ *                           value of ``500`` in ``ColorizerFormInputMethod``.
+ */
+class ColorizerFormInputHwb
+  extends ColorizerFormInputMethod
+  implements IColorizerFormInputMethod
+{
+  constructor(
+    receiver: TColorizerFormReceiverCallback,
+    inputDebounceDelay?: number
+  ) {
+    // cA = hue component
+    // cB = white component
+    // cC = black component
+    super(
+      "#color-form-hwb",
+      ".component-hue",
+      "--this-hue",
+      ".component-white",
+      "--this-white",
+      ".component-black",
+      "--this-black",
+      receiver,
+      inputDebounceDelay
+    );
+  }
+
+  /**
+   * Return the current color.
+   *
+   * This method creates an instance of ``ColorizerColor``, using the values
+   * of the ``<input type="text" ...>`` elements (which are synchronized with
+   * the corresponding sliders!).
+   *
+   * The values of the ``<input type="text" ...>`` elements are converted to
+   * actual numbers by calling ``Number()`` on them. Forcing them into the
+   * required ranges (e.g. into range [0..1]) is done in
+   * ``ColorizerColor.fromHwb()``.
+   */
+  public getColor(): ColorizerColor {
+    return ColorizerColor.fromHwb(
+      Number(this.cAText.value),
+      Number(this.cBText.value) / 100,
+      Number(this.cCText.value) / 100
+    );
+  }
+
+  /**
+   * Set the color of this input method.
+   *
+   * @param color An instance of ``ColorizerColor``.
+   */
+  public setColor(color: ColorizerColor): void {
+    const colorHwb = color.toHwb();
+
+    // TODO: [#23] Expose precision!
+    let tmp = roundToPrecision(colorHwb.h, 2).toString();
+    this.cAText.value = tmp;
+    this.cASlider.value = tmp;
+    this.updateCoordinateInStyleProperty(this.cAProperty, tmp);
+
+    // TODO: [#23] Expose precision!
+    tmp = roundToPrecision(colorHwb.w * 100, 2).toString();
+    this.cBText.value = tmp;
+    this.cBSlider.value = tmp;
+    this.updateCoordinateInStyleProperty(this.cBProperty, tmp);
+
+    // TODO: [#23] Expose precision!
+    tmp = roundToPrecision(colorHwb.b * 100, 2).toString();
     this.cCText.value = tmp;
     this.cCSlider.value = tmp;
     this.updateCoordinateInStyleProperty(this.cCProperty, tmp);
