@@ -5,11 +5,13 @@
 import { roundToPrecision } from "../../utility";
 import {
   convertGammaRgbToXyz,
+  convertHslToXyz,
   convertOklchToXyz,
   convertXyzToGammaRgb,
+  convertXyzToHsl,
   convertXyzToOklch,
 } from "../../utility/color-processing";
-import type { TOklch, TRgb, TXyz } from "../../utility/color-processing";
+import type { THsl, TOklch, TRgb, TXyz } from "../../utility/color-processing";
 
 /**
  * Force a ``value`` into a range specified by ``lower`` and ``upper``.
@@ -123,6 +125,10 @@ export class ColorizerColor {
     return convertXyzToOklch(this.toJSON());
   }
 
+  public toHsl(): THsl {
+    return convertXyzToHsl(this.toJSON());
+  }
+
   /**
    * Create a ``ColorizerColor`` instance from RGB values in range [0..1].
    *
@@ -191,6 +197,19 @@ export class ColorizerColor {
       l: forceValueIntoRange(lightness, 0, 1),
       c: forceValueIntoRange(chroma, 0, 1),
       h: hue,
+    });
+    return new ColorizerColor(xyz.x, xyz.y, xyz.z);
+  }
+
+  public static fromHsl(hue: number, saturation: number, light: number) {
+    // Note: The conversion functions will handle ``hue`` and make sure to keep
+    //       it in range [0..360].
+    if (Number.isNaN(hue)) hue = 0;
+
+    const xyz = convertHslToXyz({
+      h: hue,
+      s: forceValueIntoRange(saturation, 0, 1),
+      l: forceValueIntoRange(light, 0, 1),
     });
     return new ColorizerColor(xyz.x, xyz.y, xyz.z);
   }
