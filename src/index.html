@@ -51,6 +51,42 @@
     </div>
   </fieldset>
 
+  <fieldset id="color-form-hsl" class="color-form-input-method">
+    <legend>
+      <strong>HSL input</strong>
+      <span class="tooltip-anchor">
+        <button type="button" aria-label="Description of the HSL input">?</button>
+        <div class="tooltip-display" role="status"></div>
+      </span>
+    </legend>
+    <fieldset class="component-hue">
+      <legend>Hue component</legend> <label for="color-form-hsl-h-slider" class="hide-visually">Slider to adjust hue component</label>
+      <input id="color-form-hsl-h-slider" type="range" min="0" max="360" step="1" aria-describedby="color-form-hsl-tooltip">
+      <label for="color-form-hsl-h" class="hide-visually">Decimal input for hue component</label>
+      <input id="color-form-hsl-h" type="text" pattern="^(360|((3[0-5][0-9]|[12][0-9]{2}|([1-9]?[0-9]{1}))(\.[0-9]+)?))$" inputmode="numeric" aria-describedby="color-form-hsl-tooltip">
+    </fieldset>
+    <fieldset class="component-saturation">
+      <legend>Saturation component</legend>
+      <label for="color-form-hsl-s-slider" class="hide-visually">Slider to adjust saturation component</label>
+      <input id="color-form-hsl-s-slider" type="range" min="0" max="100" step="0.01" aria-describedby="color-form-hsl-tooltip">
+      <label for="color-form-hsl-s" class="hide-visually">Decimal input for saturation component</label>
+      <input id="color-form-hsl-s" type="text" pattern="^(100|[1-9]?[0-9](\.[0-9]+)?)$" inputmode="numeric" aria-describedby="color-form-hsl-tooltip">
+    </fieldset>
+    <fieldset class="component-light">
+      <legend>Light component</legend>
+      <label for="color-form-hsl-l-slider" class="hide-visually">Slider to adjust light component</label>
+      <input id="color-form-hsl-l-slider" type="range" min="0" max="100" step="0.01" aria-describedby="color-form-hsl-tooltip">
+      <label for="color-form-hsl-l" class="hide-visually">Decimal input for light component</label>
+      <input id="color-form-hsl-l" type="text" pattern="^(100|[1-9]?[0-9](\.[0-9]+)?)$" inputmode="numeric" aria-describedby="color-form-hsl-tooltip">
+    </fieldset>
+    <div role="tooltip" id="color-form-hsl-tooltip" class="tooltip-content">
+      <p><strong>HSL</strong> is a different notation for the <em>sRGB</em> colorspace.</p>
+      <p>It lets you specify the <strong>Hue</strong> (H), <strong>Saturation</strong> (S) and <strong>Light</strong> (L).</p>
+      <p>While Saturation and Light are specified in percent-based values in range [0..100], the Hue is an angle in range [0..360].</p>
+      <p>The values may be entered directly or using the corresponding sliders.</p>
+    </div>
+  </fieldset>
+
   <fieldset id="color-form-oklch" class="color-form-input-method">
     <legend>
       <strong>Oklch input</strong>
