@@ -16,9 +16,6 @@
   /* transition: all .2s ease; */
   width: 100%;
   height: $color-form-input-range-track-height;
-
-  // FIXME: [#32] Build an overall colorscheme
-  border: 1px solid rgb(0 0 0);
   border-radius: 5em;
 
   // FIXME: [#32] Build an overall colorscheme
@@ -26,6 +23,9 @@
   //        specific block, visualizing the component's impact on the current
   //        color.
   background: rgb(200 200 200);
+
+  // FIXME: [#32] Build an overall colorscheme
+  box-shadow: 0 0 2px 2px rgb(0 0 0), inset 0 0 1px 1px rgb(255 255 255);
   cursor: pointer;
 }
 
@@ -40,15 +40,15 @@
 @mixin input-method-range-thumb {
   width: $color-form-input-range-thumb-size;
   height: $color-form-input-range-thumb-size;
-
-  // FIXME: [#32] Build an overall colorscheme
-  border: 1px solid rgb(0 0 0);
   border-radius: 999px;
 
   // FIXME: [#32] Build an overall colorscheme
   //        The thumb's ``background`` is actually styled in the input method's
   //        specific block, visualizing the current color.
   background: rgb(255 0 255);
+
+  // FIXME: [#32] Build an overall colorscheme
+  box-shadow: 0 0 2px 2px rgb(0 0 0), inset 0 0 1px 1px rgb(255 255 255);
   cursor: pointer;
 }
 
@@ -67,12 +67,20 @@
     padding: $color-form-input-vertical-padding 0.5em;
 
     // FIXME: [#32] Build an overall colorscheme
-    border: 1px solid rgb(0 0 0);
+    // border: 1px solid rgb(0 0 0);
+    border: 0; // If this is kept in the final stylesheet, it may be removed from type=range selector!
 
     // FIXME: Create and use font-stacks!
     font-family: monospace;
     font-size: $color-form-input-text-size;
     vertical-align: middle;
+  }
+
+  > input[type="text"] {
+    border-radius: 5px;
+
+    // FIXME: [#32] Build an overall colorscheme
+    box-shadow: 0 0 2px 2px rgb(0 0 0), inset 0 0 1px 1px rgb(255 255 255);
   }
 
   > input[type="range"] {
