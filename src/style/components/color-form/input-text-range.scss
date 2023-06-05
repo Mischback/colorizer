@@ -364,3 +364,234 @@
   }
 }
 /* stylelint-enable no-descending-specificity */
+
+/**
+ * HSL input
+ *
+ * The overall idea is identical to RGB inputs, but the sliders' gradients have
+ * some *more resolution*, because the components do not work strictly linear.
+ */
+/* stylelint-disable no-descending-specificity */
+#color-form-hsl {
+  > fieldset {
+    > input[type="text"] {
+      // TODO: Works on Ubuntu with Firefox and Chromium. Dependent on the
+      //       font-stack for monospace fonts.
+      //       Required width: three digits with two decimal places (``ddd.dd``).
+      width: 5em;
+    }
+
+    > input[type="range"] {
+      &::-webkit-slider-thumb {
+        /* prettier-ignore */
+        background: hsl(calc(var(--this-hue) * 1deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%));
+      }
+
+      &::-moz-range-thumb {
+        /* prettier-ignore */
+        background: hsl(calc(var(--this-hue) * 1deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%));
+      }
+    }
+  }
+
+  > .component-hue {
+    > input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hsl(0deg calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 0%,
+          hsl(calc(0.1 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 10%,
+          hsl(calc(0.2 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 20%,
+          hsl(calc(0.3 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 30%,
+          hsl(calc(0.4 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 40%,
+          hsl(calc(0.5 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 50%,
+          hsl(calc(0.6 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 60%,
+          hsl(calc(0.7 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 70%,
+          hsl(calc(0.8 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 80%,
+          hsl(calc(0.9 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 90%,
+          hsl(360deg calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hsl(0deg calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 0%,
+          hsl(calc(0.1 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 10%,
+          hsl(calc(0.2 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 20%,
+          hsl(calc(0.3 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 30%,
+          hsl(calc(0.4 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 40%,
+          hsl(calc(0.5 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 50%,
+          hsl(calc(0.6 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 60%,
+          hsl(calc(0.7 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 70%,
+          hsl(calc(0.8 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 80%,
+          hsl(calc(0.9 * 360deg) calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 90%,
+          hsl(360deg calc(var(--this-saturation) * 1%) calc(var(--this-light) * 1%)) 100%
+        );
+      }
+    }
+  }
+
+  > .component-saturation {
+    > input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hsl(calc(var(--this-hue) * 1deg) 0% calc(var(--this-light) * 1%)) 0%,
+          hsl(calc(var(--this-hue) * 1deg) 100% calc(var(--this-light) * 1%)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hsl(calc(var(--this-hue) * 1deg) 0% calc(var(--this-light) * 1%)) 0%,
+          hsl(calc(var(--this-hue) * 1deg) 100% calc(var(--this-light) * 1%)) 100%
+        );
+      }
+    }
+  }
+
+  > .component-light {
+    > input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hsl(calc(var(--this-hue) * 1deg) calc(var(--this-saturation) * 1%) 0%) 0%,
+          hsl(calc(var(--this-hue) * 1deg) calc(var(--this-saturation) * 1%) 100%) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hsl(calc(var(--this-hue) * 1deg) calc(var(--this-saturation) * 1%) 0%) 0%,
+          hsl(calc(var(--this-hue) * 1deg) calc(var(--this-saturation) * 1%) 50%) 50%,
+          hsl(calc(var(--this-hue) * 1deg) calc(var(--this-saturation) * 1%) 100%) 100%
+        );
+      }
+    }
+  }
+}
+/* stylelint-enable no-descending-specificity */
+
+/**
+ * HWB input
+ *
+ * The overall idea is identical to RGB inputs, but the sliders' gradients have
+ * some *more resolution*, because the components do not work strictly linear.
+ */
+/* stylelint-disable no-descending-specificity */
+#color-form-hwb {
+  > fieldset {
+    > input[type="text"] {
+      // TODO: Works on Ubuntu with Firefox and Chromium. Dependent on the
+      //       font-stack for monospace fonts.
+      //       Required width: three digits with two decimal places (``ddd.dd``).
+      width: 5em;
+    }
+
+    > input[type="range"] {
+      &::-webkit-slider-thumb {
+        /* prettier-ignore */
+        background: hwb(calc(var(--this-hue) * 1deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%));
+      }
+
+      &::-moz-range-thumb {
+        /* prettier-ignore */
+        background: hwb(calc(var(--this-hue) * 1deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%));
+      }
+    }
+  }
+
+  > .component-hue {
+    > input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hwb(0deg calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 0%,
+          hwb(calc(0.1 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 10%,
+          hwb(calc(0.2 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 20%,
+          hwb(calc(0.3 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 30%,
+          hwb(calc(0.4 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 40%,
+          hwb(calc(0.5 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 50%,
+          hwb(calc(0.6 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 60%,
+          hwb(calc(0.7 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 70%,
+          hwb(calc(0.8 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 80%,
+          hwb(calc(0.9 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 90%,
+          hwb(360deg calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hwb(0deg calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 0%,
+          hwb(calc(0.1 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 10%,
+          hwb(calc(0.2 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 20%,
+          hwb(calc(0.3 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 30%,
+          hwb(calc(0.4 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 40%,
+          hwb(calc(0.5 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 50%,
+          hwb(calc(0.6 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 60%,
+          hwb(calc(0.7 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 70%,
+          hwb(calc(0.8 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 80%,
+          hwb(calc(0.9 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 90%,
+          hwb(360deg calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 100%
+        );
+      }
+    }
+  }
+
+  > .component-white {
+    > input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hwb(calc(var(--this-hue) * 1deg) 0.1% calc(var(--this-black) * 1%)) 0%,
+          hwb(calc(var(--this-hue) * 1deg) 100% calc(var(--this-black) * 1%)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hwb(calc(var(--this-hue) * 1deg) 0.1% calc(var(--this-black) * 1%)) 0%,
+          hwb(calc(var(--this-hue) * 1deg) 100% calc(var(--this-black) * 1%)) 100%
+        );
+      }
+    }
+  }
+
+  > .component-black {
+    > input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hwb(calc(var(--this-hue) * 1deg) calc(var(--this-white) * 1%) 0.1%) 0%,
+          hwb(calc(var(--this-hue) * 1deg) calc(var(--this-white) * 1%) 100%) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hwb(calc(var(--this-hue) * 1deg) calc(var(--this-white) * 1%) 0.1%) 0%,
+          hwb(calc(var(--this-hue) * 1deg) calc(var(--this-white) * 1%) 100%) 100%
+        );
+      }
+    }
+  }
+}
+/* stylelint-enable no-descending-specificity */
