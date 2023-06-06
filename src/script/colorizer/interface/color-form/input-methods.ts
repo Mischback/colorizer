@@ -541,7 +541,7 @@ class ColorizerFormInputOklch
   public getColor(): ColorizerColor {
     return ColorizerColor.fromOklch(
       Number(this.cAText.value) / 100,
-      Number(this.cBText.value) / 100,
+      (Number(this.cBText.value) / 100) * 0.4,
       Number(this.cCText.value)
     );
   }
@@ -561,7 +561,7 @@ class ColorizerFormInputOklch
     this.updateCoordinateInStyleProperty(this.cAProperty, tmp);
 
     // TODO: [#23] Expose precision!
-    tmp = roundToPrecision(colorOklch.c * 100, 2).toString();
+    tmp = roundToPrecision((colorOklch.c / 0.4) * 100, 2).toString();
     this.cBText.value = tmp;
     this.cBSlider.value = tmp;
     this.updateCoordinateInStyleProperty(this.cBProperty, tmp);
