@@ -3,16 +3,15 @@
 // SPDX-FileType: SOURCE
 
 import { ColorizerForm } from "./colorizer/interface/color-form";
+import { ColorizerPalette } from "./colorizer/interface/palette";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const form = new ColorizerForm(["rgb", "hsl", "hwb", "oklch"], (color) => {
-    console.log("ColorizerForm submitted!");
+  const palette = new ColorizerPalette();
+  console.debug(palette);
 
-    const raw = color.toJSON();
-    console.log(`  Raw: { x: ${raw.x}, y: ${raw.y}, z: ${raw.z} }`);
-
-    const rgb = color.toRgb255();
-    console.log(`  RGB: { r: ${rgb.r}, g: ${rgb.g}, b: ${rgb.b} }`);
-  });
+  const form = new ColorizerForm(
+    ["rgb", "hsl", "hwb", "oklch"],
+    palette.add.bind(palette)
+  );
   console.debug(form);
 });

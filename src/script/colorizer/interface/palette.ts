@@ -3,7 +3,6 @@
 // SPDX-FileType: SOURCE
 
 import { ColorizerColor } from "../lib/color";
-import type { TXyz } from "../../utility/color-processing";
 import type {
   IColorizerPaletteObservable,
   IColorizerPaletteObserver,
@@ -14,10 +13,14 @@ class ColorizerPaletteItem {
   private sorting: number;
   private id: number | undefined;
 
-  public constructor(id: number | undefined, sorting: number, xyz: TXyz) {
+  public constructor(
+    id: number | undefined,
+    sorting: number,
+    color: ColorizerColor
+  ) {
     this.id = id;
     this.sorting = sorting;
-    this.color = ColorizerColor.fromXyz(xyz.x, xyz.y, xyz.z);
+    this.color = color;
 
     console.debug(this.id);
     console.debug(this.sorting);
@@ -30,8 +33,22 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
   private palette: ColorizerPaletteItem[] = [];
 
   public constructor() {
-    console.debug(this.palette);
+    console.debug("Initializing ColorizerPalette");
+  }
+
+  public add(color: ColorizerColor): void {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    console.debug(`add(): ${color}`);
+    this.addPaletteItem(color);
     this.notifyPaletteObservers();
+  }
+
+  private addPaletteItem(color: ColorizerColor): void {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    console.debug(`addPaletteItem(): ${color}`);
+    this.palette.push(
+      new ColorizerPaletteItem(undefined, this.palette.length + 1, color)
+    );
   }
 
   /**
@@ -84,6 +101,10 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
    * Observer pattern work.
    */
   private notifyPaletteObservers(): void {
+    this.palette.forEach((item) => {
+      console.debug(item);
+    });
+
     this.paletteObservers.forEach((obs) => {
       obs.update(this);
     });
