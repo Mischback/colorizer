@@ -286,4 +286,16 @@ export class ColorizerColor {
     });
     return new ColorizerColor(xyz.x, xyz.y, xyz.z);
   }
+
+  /**
+   * Create a ``ColorizerColor`` instance from XYZ input.
+   *
+   * @param x
+   * @param y
+   * @param z
+   * @returns ``ColorizerColor`` instance.
+   */
+  public static fromXyz(x: number, y: number, z: number) {
+    return new ColorizerColor(x, y, z);
+  }
 }
