@@ -6,7 +6,10 @@ import { getColorizerFormInput } from "./input-methods";
 import { ColorizerColor } from "../../lib/color";
 import { getDomElement } from "../../../utility";
 import type { TColorizerFormInputMethod } from "./input-methods";
-import type { IColorizerObserver, IColorizerSubject } from "../../lib/types";
+import type {
+  IColorizerColorObserver,
+  IColorizerSubject,
+} from "../../lib/types";
 
 /**
  * Prototype of the ``ColorizerForm.receiveColor()`` method.
@@ -56,7 +59,7 @@ export class ColorizerForm implements IColorizerSubject {
   // Part of the implementation of the Observer pattern, required to make
   // ``IColorizerSubject`` work.
   // This is the list of *Observers*.
-  private colorObservers: IColorizerObserver[] = [];
+  private colorObservers: IColorizerColorObserver[] = [];
 
   // This function is to be executed, when the ``<form ...>`` is submitted.
   //
@@ -110,12 +113,12 @@ export class ColorizerForm implements IColorizerSubject {
    * Add an *Observer* to the form.
    *
    * @param obs The *Observer* to attach. Must implement the
-   *            ``IColorizerObserver`` interface!
+   *            ``IColorizerColorObserver`` interface!
    *
    * This is part of the implementation of the Observer pattern, required by
    * ``IColorizerSubject``.
    */
-  public addColorObserver(obs: IColorizerObserver): void {
+  public addColorObserver(obs: IColorizerColorObserver): void {
     const obsIndex = this.colorObservers.indexOf(obs);
     if (obsIndex !== -1) {
       console.warn("That observer is already attached!");
@@ -129,12 +132,12 @@ export class ColorizerForm implements IColorizerSubject {
    * Remove an *Observer* from the form.
    *
    * @param obs The *Observer* to remove. Must implement the
-   *            ``IColorizerObserver`` interface!
+   *            ``IColorizerColorObserver`` interface!
    *
    * This is part of the implementation of the Observer pattern, required by
    * ``IColorizerSubject``.
    */
-  public removeColorObserver(obs: IColorizerObserver): void {
+  public removeColorObserver(obs: IColorizerColorObserver): void {
     // const obsIndex = this.colorObservers.indexOf(obs);
     // if (obsIndex === -1) {
     //   console.warn("That observer does not exist!");

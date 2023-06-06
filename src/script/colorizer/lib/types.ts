@@ -9,7 +9,7 @@ import type { ColorizerColor } from "./color";
  *
  * This is part of the implementation of the Observer pattern.
  */
-export interface IColorizerObserver {
+export interface IColorizerColorObserver {
   updateColor(color: ColorizerColor): void;
 }
 
@@ -24,6 +24,6 @@ export interface IColorizerObserver {
  * ``ColorForm`` has a **private** ``notifyColorObservers()`` method).
  */
 export interface IColorizerSubject {
-  addColorObserver(obs: IColorizerObserver): void;
-  removeColorObserver(obs: IColorizerObserver): void;
+  addColorObserver(obs: IColorizerColorObserver): void;
+  removeColorObserver(obs: IColorizerColorObserver): void;
 }

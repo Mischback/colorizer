@@ -5,7 +5,7 @@
 import { ColorizerColor } from "../../lib/color";
 import { getDomElement, roundToPrecision } from "../../../utility";
 import type { TColorizerFormReceiverCallback } from "./form";
-import type { IColorizerObserver } from "../../lib/types";
+import type { IColorizerColorObserver } from "../../lib/types";
 
 /**
  * Dedicated typing for the available input methods.
@@ -109,7 +109,7 @@ export function getColorizerFormInput(
  *   element and follow a pre-defined structure;
  */
 abstract class ColorizerFormInputMethod
-  implements IColorizerFormInputMethod, IColorizerObserver
+  implements IColorizerFormInputMethod, IColorizerColorObserver
 {
   private fieldset: HTMLFieldSetElement;
   private inputReceiver: TColorizerFormReceiverCallback;
@@ -317,7 +317,7 @@ abstract class ColorizerFormInputMethod
    * @param color The new color.
    *
    * This is part of the implementation of the Observer pattern, required by
-   * ``IColorizerObserver``.
+   * ``IColorizerColorObserver``.
    *
    * Internally, it calls ``setColor()`` of the concrete (child) class.
    */
