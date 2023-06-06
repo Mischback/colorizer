@@ -23,7 +23,7 @@ export interface IColorizerColorObserver {
  * its implementation and visibility to the implementing class (e.g.
  * ``ColorForm`` has a **private** ``notifyColorObservers()`` method).
  */
-export interface IColorizerSubject {
+export interface IColorizerColorObservable {
   addColorObserver(obs: IColorizerColorObserver): void;
   removeColorObserver(obs: IColorizerColorObserver): void;
 }
