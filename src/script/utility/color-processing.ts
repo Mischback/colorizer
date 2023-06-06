@@ -199,12 +199,13 @@ export function convertLinearRgbToXyz(rgb: TLinRgb): TXyz {
 }
 
 /**
- * Convert Oklab to Oklch.
+ * Convert OkLab to OkLCH.
  *
- * @param oklab An object literal with ``l``, ``a`` and ``b`` attributes in
- *              range [0..1].
- * @returns An object literal with ``l``, ``c`` and ``h`` attributes in
- *          range [0..1], representing Oklch color coordinates.
+ * @param oklab An object literal with ``l`` in range [0..1] and ``a``/``b``
+ *              attributes in range [-0.4..0.4].
+ * @returns An object literal with attribute ``l`` in range [0..1], ``c``
+ *          in range [0..0.4] and attribute ``h`` in range [0..360],
+ *          representing OkLCH color coordinates.
  *
  * The implementation is adapted from
  * https://www.w3.org/TR/css-color-4/#color-conversion-code and complemented
@@ -220,10 +221,10 @@ export function convertOklabToOklch(oklab: TOklab): TOklch {
 }
 
 /**
- * Convert Oklab to CIE XYZ (D65).
+ * Convert OkLab to CIE XYZ (D65).
  *
- * @param oklab An object literal with ``l``, ``a`` and ``b`` attributes in
- *              range [0..1].
+ * @param oklab An object literal with ``l`` in range [0..1] and ``a``/``b``
+ *              attributes in range [-0.4..0.4].
  * @returns An object literal with ``x``, ``y`` and ``z`` attributes,
  *          representing coordinates in CIE XYZ.
  *
@@ -264,12 +265,13 @@ export function convertOklabToXyz(oklab: TOklab): TXyz {
 }
 
 /**
- * Convert Oklch to Oklab.
+ * Convert OkLCH to OkLab.
  *
- * @param oklch An object literal with attributes ``l``, ``c`` in range [0..1]
- *              and attribute ``h`` in range [0..360].
- * @returns An object literal with ``l``, ``a`` and ``b`` attributes in
- *          range [0..1], representing Oklab color coordinates.
+ * @param oklch An object literal with attribute ``l`` in range [0..1], ``c``
+ *              in range [0..0.4] and attribute ``h`` in range [0..360].
+ * @returns An object literal with ``l`` in range [0..1] and ``a``/``b``
+ *          attributes in range [-0.4..0.4], representing OkLab color
+ *          coordinates.
  *
  * The implementation is adapted from
  * https://www.w3.org/TR/css-color-4/#color-conversion-code and complemented
@@ -285,8 +287,8 @@ export function convertOklchToOklab(oklch: TOklch): TOklab {
 
 /**
  *
- * @param oklch An object literal with attributes ``l``, ``c`` in range [0..1]
- *              and attribute ``h`` in range [0..360].
+ * @param oklch An object literal with attribute ``l`` in range [0..1], ``c``
+ *              in range [0..0.4] and attribute ``h`` in range [0..360].
  * @returns An object literal with ``x``, ``y`` and ``z`` attributes,
  *          representing coordinates in CIE XYZ.
  *
@@ -386,12 +388,13 @@ export function convertXyzToLinearRgb(xyz: TXyz): TLinRgb {
 }
 
 /**
- * Convert CIE XYZ (D65) to Oklab.
+ * Convert CIE XYZ (D65) to OkLab.
  *
  * @param xyz An object literal with ``x``, ``y`` and ``z`` attributes,
  *            representing coordinates in CIE XYZ.
- * @returns An object literal with ``l``, ``a`` and ``b`` attributes in
- *          range [0..1], representing Oklab color coordinates.
+ * @returns An object literal with ``l`` in range [0..1] and ``a``/``b``
+ *          attributes in range [-0.4..0.4], representing OkLab color
+ *          coordinates.
  *
  * The implementation is adapted from
  * https://www.w3.org/TR/css-color-4/#color-conversion-code and complemented
@@ -428,12 +431,13 @@ export function convertXyzToOklab(xyz: TXyz): TOklab {
 }
 
 /**
- * Convert CIE XYZ (D65) to Oklch.
+ * Convert CIE XYZ (D65) to OkLCH.
  *
  * @param xyz An object literal with ``x``, ``y`` and ``z`` attributes,
  *            representing coordinates in CIE XYZ.
- * @returns An object literal with ``l``, ``c`` and ``h`` attributes in
- *          range [0..1], representing Oklch color coordinates.
+ * @returns An object literal with attribute ``l`` in range [0..1], ``c``
+ *          in range [0..0.4] and attribute ``h`` in range [0..360],
+ *          representing OkLCH color coordinates.
  *
  * This is a shortcut function. See ``convertXyzToOklab()`` and
  * ``convertOklabToOklch()`` for implementation details.
