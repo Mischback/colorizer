@@ -3,6 +3,7 @@
 // SPDX-FileType: SOURCE
 
 import { ColorizerColor } from "../lib/color";
+import { mHash } from "../../utility";
 import type {
   IColorizerPaletteObservable,
   IColorizerPaletteObserver,
@@ -10,21 +11,32 @@ import type {
 
 class ColorizerPaletteItem {
   private color: ColorizerColor;
+  private paletteItemId: string;
   private sorting: number;
-  private id: number | undefined;
 
   public constructor(
-    id: number | undefined,
-    sorting: number,
-    color: ColorizerColor
+    color: ColorizerColor,
+    sorting?: number,
+    paletteItemId?: string
   ) {
-    this.id = id;
-    this.sorting = sorting;
     this.color = color;
 
-    console.debug(this.id);
-    console.debug(this.sorting);
+    if (sorting !== undefined) {
+      this.sorting = sorting;
+    } else {
+      this.sorting = 999;
+    }
+
+    if (paletteItemId !== undefined) {
+      this.paletteItemId = paletteItemId;
+    } else {
+      const tmp = color.toJSON();
+      this.paletteItemId = mHash(`${tmp.x}-${tmp.y}-${tmp.z}`);
+    }
+
     console.debug(this.color);
+    console.debug(this.sorting);
+    console.debug(this.paletteItemId);
   }
 }
 
@@ -37,18 +49,18 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
   }
 
   public add(color: ColorizerColor): void {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.debug(`add(): ${color}`);
+    console.debug("add()");
     this.addPaletteItem(color);
     this.notifyPaletteObservers();
   }
 
-  private addPaletteItem(color: ColorizerColor): void {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.debug(`addPaletteItem(): ${color}`);
-    this.palette.push(
-      new ColorizerPaletteItem(undefined, this.palette.length + 1, color)
-    );
+  private addPaletteItem(
+    color: ColorizerColor,
+    sorting?: number,
+    paletteItemId?: string
+  ): void {
+    console.debug("addPaletteItem()");
+    this.palette.push(new ColorizerPaletteItem(color, sorting, paletteItemId));
   }
 
   /**
