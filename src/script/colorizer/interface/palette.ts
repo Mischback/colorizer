@@ -9,8 +9,27 @@ import type {
   IColorizerPaletteObserver,
 } from "../lib/types";
 
+/**
+ * Represent a single color of the application's palette.
+ *
+ * While the internal representation of actual colors is provided by instances
+ * of ``ColorizerColor``, this class adds more meta information, including
+ * an instance's *unique identifier* (``paletteItemId``) and its *sorting*
+ * in the overall palette (``sorting``).
+ *
+ * @param color An instance of ``ColorizerColor``, providing the actual color
+ *              information.
+ * @param sorting An **optional** parameter, setting the value of the
+ *                ``sorting`` attribute. Default: ``999``.
+ * @param paletteItemId An **optional** parameter, setting the value of the
+ *                      ``paletteItemId`` attribute. If not specified, the
+ *                      instance's *unique identifier* is determined using
+ *                      the app-specific ``mHash()`` function with a string
+ *                      generated from the ``x``, ``y`` and ``z`` attributes
+ *                      of the ``color`` parameter.
+ */
 class ColorizerPaletteItem {
-  private color: ColorizerColor;
+  private _color: ColorizerColor;
   private paletteItemId: string;
   private sorting: number;
 
@@ -19,7 +38,7 @@ class ColorizerPaletteItem {
     sorting?: number,
     paletteItemId?: string
   ) {
-    this.color = color;
+    this._color = color;
 
     if (sorting !== undefined) {
       this.sorting = sorting;
@@ -34,9 +53,18 @@ class ColorizerPaletteItem {
       this.paletteItemId = mHash(`${tmp.x}-${tmp.y}-${tmp.z}`);
     }
 
-    console.debug(this.color);
+    console.debug(this._color);
     console.debug(this.sorting);
     console.debug(this.paletteItemId);
+  }
+
+  /**
+   * Return the color of the instance.
+   *
+   * @returns The color as ``ColorizerColor`` instance.
+   */
+  public get color(): ColorizerColor {
+    return this._color;
   }
 }
 
@@ -48,6 +76,18 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     console.debug("Initializing ColorizerPalette");
   }
 
+  /**
+   * Add a color to the palette.
+   *
+   * @param color An instance of ``ColorizerColor``.
+   *
+   * This method is meant to be attached to an instance of ``ColorizerForm`` as
+   * its ``submitCallback``. Thus, this function **must** follow the type
+   * definition of ``TColorizerFormSubmitCallback``.
+   *
+   * Internally, this relies on ``addPaletteItem()`` and the function will
+   * notify the instance's observers (by ``notifyPaletteObservers()``).
+   */
   public add(color: ColorizerColor): void {
     console.debug("add()");
     this.addPaletteItem(color);
@@ -114,7 +154,7 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
    */
   private notifyPaletteObservers(): void {
     this.palette.forEach((item) => {
-      console.debug(item);
+      console.debug(item.color);
     });
 
     this.paletteObservers.forEach((obs) => {
