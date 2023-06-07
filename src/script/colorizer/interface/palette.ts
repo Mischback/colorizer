@@ -3,7 +3,7 @@
 // SPDX-FileType: SOURCE
 
 import { ColorizerColor } from "../lib/color";
-import { mHash } from "../../utility";
+import { getDomElement, mHash } from "../../utility";
 import type {
   IColorizerPaletteObservable,
   IColorizerPaletteObserver,
@@ -30,7 +30,7 @@ import type {
  */
 export class ColorizerPaletteItem {
   private _color: ColorizerColor;
-  private paletteItemId: string;
+  private _paletteItemId: string;
   private sorting: number;
 
   public constructor(
@@ -47,10 +47,10 @@ export class ColorizerPaletteItem {
     }
 
     if (paletteItemId !== undefined) {
-      this.paletteItemId = paletteItemId;
+      this._paletteItemId = paletteItemId;
     } else {
       const tmp = color.toJSON();
-      this.paletteItemId = mHash(`${tmp.x}-${tmp.y}-${tmp.z}`);
+      this._paletteItemId = mHash(`${tmp.x}-${tmp.y}-${tmp.z}`);
     }
 
     console.debug(this._color);
@@ -66,6 +66,10 @@ export class ColorizerPaletteItem {
   public get color(): ColorizerColor {
     return this._color;
   }
+
+  public get paletteItemId(): string {
+    return this._paletteItemId;
+  }
 }
 
 export class ColorizerPalette
@@ -74,8 +78,17 @@ export class ColorizerPalette
   private paletteObservers: IColorizerPaletteObserver[] = [];
   private _palette: ColorizerPaletteItem[] = [];
 
+  private paletteContainer: HTMLElement;
+  private paletteList: HTMLUListElement;
+
   public constructor() {
     console.debug("Initializing ColorizerPalette");
+
+    this.paletteContainer = <HTMLElement>getDomElement(null, "#color-palette");
+    this.paletteList = <HTMLUListElement>(
+      getDomElement(this.paletteContainer, "ul")
+    );
+
     this.addPaletteObserver(this);
   }
 
@@ -112,7 +125,7 @@ export class ColorizerPalette
     paletteItemId?: string
   ): void {
     console.debug("addPaletteItem()");
-    this.palette.push(new ColorizerPaletteItem(color, sorting, paletteItemId));
+    this._palette.push(new ColorizerPaletteItem(color, sorting, paletteItemId));
   }
 
   /**
@@ -124,7 +137,31 @@ export class ColorizerPalette
    * **Observer** part.
    */
   public update(palette: ColorizerPaletteItem[]): void {
-    console.log(palette);
+    console.debug(palette);
+
+    // empty the existing palette to prevent duplicates
+    while (this.paletteList.firstChild) {
+      this.paletteList.removeChild(this.paletteList.firstChild);
+    }
+
+    if (palette.length < 1) {
+      return;
+    }
+
+    for (let i = 0; i < palette.length; i++) {
+      this.paletteList.appendChild(
+        this.generatePaletteItemForDom(<ColorizerPaletteItem>palette[i])
+      );
+    }
+  }
+
+  /**
+   */
+  private generatePaletteItemForDom(item: ColorizerPaletteItem): HTMLLIElement {
+    const listItem = document.createElement("li");
+    listItem.setAttribute("palette-item-id", item.paletteItemId);
+
+    return listItem;
   }
 
   /**
