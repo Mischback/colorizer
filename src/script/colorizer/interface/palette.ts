@@ -28,7 +28,7 @@ import type {
  *                      generated from the ``x``, ``y`` and ``z`` attributes
  *                      of the ``color`` parameter.
  */
-class ColorizerPaletteItem {
+export class ColorizerPaletteItem {
   private _color: ColorizerColor;
   private paletteItemId: string;
   private sorting: number;
@@ -68,12 +68,24 @@ class ColorizerPaletteItem {
   }
 }
 
-export class ColorizerPalette implements IColorizerPaletteObservable {
+export class ColorizerPalette
+  implements IColorizerPaletteObservable, IColorizerPaletteObserver
+{
   private paletteObservers: IColorizerPaletteObserver[] = [];
-  private palette: ColorizerPaletteItem[] = [];
+  private _palette: ColorizerPaletteItem[] = [];
 
   public constructor() {
     console.debug("Initializing ColorizerPalette");
+    this.addPaletteObserver(this);
+  }
+
+  /**
+   * Return the actual palette.
+   *
+   * @returns The internal palette.
+   */
+  public get palette(): ColorizerPaletteItem[] {
+    return this._palette;
   }
 
   /**
@@ -101,6 +113,18 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
   ): void {
     console.debug("addPaletteItem()");
     this.palette.push(new ColorizerPaletteItem(color, sorting, paletteItemId));
+  }
+
+  /**
+   * Perform actions on palette updates.
+   *
+   * @param palette The updated/changed palette.
+   *
+   * This class implements both parts of the *Observer* pattern. This is the
+   * **Observer** part.
+   */
+  public update(palette: ColorizerPaletteItem[]): void {
+    console.log(palette);
   }
 
   /**
@@ -158,7 +182,7 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     });
 
     this.paletteObservers.forEach((obs) => {
-      obs.update(this);
+      obs.update(this.palette);
     });
   }
 }

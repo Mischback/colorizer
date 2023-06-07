@@ -3,6 +3,7 @@
 // SPDX-FileType: SOURCE
 
 import type { ColorizerColor } from "./color";
+import type { ColorizerPaletteItem } from "../interface/palette";
 
 /**
  * Type for a Subject that will propagate its (internal) ``color``.
@@ -49,5 +50,5 @@ export interface IColorizerPaletteObservable {
  * This is part of the implementation of the Observer pattern.
  */
 export interface IColorizerPaletteObserver {
-  update(palette: IColorizerPaletteObservable): void;
+  update(palette: ColorizerPaletteItem[]): void;
 }
