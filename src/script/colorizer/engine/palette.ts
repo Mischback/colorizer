@@ -3,7 +3,6 @@
 // SPDX-FileType: SOURCE
 
 import { ColorizerColor } from "../lib/color";
-import { ColorizerPaletteInterface } from "../interface/palette";
 import { mHash } from "../../utility";
 import type {
   IColorizerPaletteObservable,
@@ -76,13 +75,9 @@ export class ColorizerPaletteItem {
 export class ColorizerPalette implements IColorizerPaletteObservable {
   private paletteObservers: IColorizerPaletteObserver[] = [];
   private _palette: ColorizerPaletteItem[] = [];
-  private interface: ColorizerPaletteInterface;
 
   public constructor() {
     console.debug("Initializing ColorizerPalette");
-
-    this.interface = new ColorizerPaletteInterface();
-    this.addPaletteObserver(this.interface);
   }
 
   /**

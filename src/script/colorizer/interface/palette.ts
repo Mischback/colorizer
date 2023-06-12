@@ -3,15 +3,19 @@
 // SPDX-FileType: SOURCE
 
 import { getDomElement } from "../../utility";
-import type { ColorizerPaletteItem } from "../engine/palette";
+import type { ColorizerPalette, ColorizerPaletteItem } from "../engine/palette";
 import type { IColorizerPaletteObserver } from "../lib/types";
 
 export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
+  private palette: ColorizerPalette;
   private paletteContainer: HTMLElement;
   private paletteList: HTMLUListElement;
 
-  public constructor() {
+  public constructor(palette: ColorizerPalette) {
     console.debug("Initializing ColorizerPaletteInterface");
+
+    this.palette = palette;
+    this.palette.addPaletteObserver(this);
 
     this.paletteContainer = <HTMLElement>getDomElement(null, "#color-palette");
     this.paletteList = <HTMLUListElement>(
@@ -56,7 +60,7 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
     );
 
     // TODO: Here we go!
-    // this.engine.deletePaletteItemById(paletteItemId);
+    // this.palette.deletePaletteItemById(paletteItemId);
   }
 
   /**
