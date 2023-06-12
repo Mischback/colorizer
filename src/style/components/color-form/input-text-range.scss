@@ -13,6 +13,8 @@
  * https://github.com/darlanrod/input-range-scss (MIT licensed).
  */
 @mixin input-method-range-track {
+  @include color-preview-shadow;
+
   /* transition: all .2s ease; */
   width: 100%;
   height: $color-form-input-range-track-height;
@@ -23,9 +25,6 @@
   //        specific block, visualizing the component's impact on the current
   //        color.
   background: rgb(200 200 200);
-
-  // FIXME: [#32] Build an overall colorscheme
-  box-shadow: 0 0 2px 2px rgb(0 0 0), inset 0 0 1px 1px rgb(255 255 255);
   cursor: pointer;
 }
 
@@ -38,6 +37,8 @@
  * https://github.com/darlanrod/input-range-scss (MIT licensed).
  */
 @mixin input-method-range-thumb {
+  @include color-preview-shadow;
+
   width: $color-form-input-range-thumb-size;
   height: $color-form-input-range-thumb-size;
   border-radius: 999px;
@@ -46,9 +47,6 @@
   //        The thumb's ``background`` is actually styled in the input method's
   //        specific block, visualizing the current color.
   background: rgb(255 0 255);
-
-  // FIXME: [#32] Build an overall colorscheme
-  box-shadow: 0 0 2px 2px rgb(0 0 0), inset 0 0 1px 1px rgb(255 255 255);
   cursor: pointer;
 }
 
@@ -77,10 +75,9 @@
   }
 
   > input[type="text"] {
-    border-radius: 5px;
+    @include color-preview-shadow;
 
-    // FIXME: [#32] Build an overall colorscheme
-    box-shadow: 0 0 2px 2px rgb(0 0 0), inset 0 0 1px 1px rgb(255 255 255);
+    border-radius: 5px;
   }
 
   > input[type="range"] {

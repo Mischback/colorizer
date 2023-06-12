@@ -22,8 +22,11 @@
     }
 
     .preview {
+      @include color-preview-shadow;
+
       width: 1.5em;
       height: 1.5em;
+      border-radius: 999px;
       background-color: color(
         xyz var(--palette-item-color-x) var(--palette-item-color-y)
           var(--palette-item-color-z)
