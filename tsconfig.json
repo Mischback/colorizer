@@ -32,7 +32,7 @@
      * This included "ES2020" (from ``ViteJS``'s reference configuration). As "target"
      * and "module" are tuned down, this is adjusted, too.
      */
-    "lib": ["es2015", "DOM", "DOM.Iterable"],
+    "lib": ["es2018", "DOM", "DOM.Iterable"],
 
     /* https://www.typescriptlang.org/tsconfig#skipLibCheck
      *
