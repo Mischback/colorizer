@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const form = new ColorizerForm(
     ["rgb", "hsl", "hwb", "oklch"],
-    palette.add.bind(palette)
+    palette.addPaletteItem.bind(palette)
   );
   console.debug(form);
 });

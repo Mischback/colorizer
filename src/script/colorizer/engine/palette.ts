@@ -106,19 +106,17 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
    * Internally, this relies on ``addPaletteItem()`` and the function will
    * notify the instance's observers (by ``notifyPaletteObservers()``).
    */
-  public add(color: ColorizerColor): void {
-    // FIXME: Make this method the private one!
+  public addPaletteItem(color: ColorizerColor): void {
     console.debug("add()");
-    this.addPaletteItem(color);
+    this.add(color);
     this.notifyPaletteObservers();
   }
 
-  private addPaletteItem(
+  private add(
     color: ColorizerColor,
     sorting?: number,
     paletteItemId?: string
   ): void {
-    // FIXME: Make this method the public one! Be verbose!
     console.debug("addPaletteItem()");
     this._palette.push(new ColorizerPaletteItem(color, sorting, paletteItemId));
   }
