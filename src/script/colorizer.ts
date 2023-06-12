@@ -2,16 +2,9 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import { ColorizerForm } from "./colorizer/interface/color-form";
-import { ColorizerPalette } from "./colorizer/engine/palette";
+import { ColorizerController } from "./colorizer/engine/controller";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const palette = new ColorizerPalette();
-  console.debug(palette);
-
-  const form = new ColorizerForm(
-    ["rgb", "hsl", "hwb", "oklch"],
-    palette.addPaletteItem.bind(palette)
-  );
-  console.debug(form);
+  // @ts-expect-error TS6133 value never read
+  const colorizerController = new ColorizerController();
 });
