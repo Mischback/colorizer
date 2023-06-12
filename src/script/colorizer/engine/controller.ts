@@ -3,11 +3,14 @@
 // SPDX-FileType: SOURCE
 
 import { ColorizerPalette } from "./palette";
+import { ColorizerDatabase } from "./database";
 import { ColorizerForm } from "../interface/color-form";
 import { ColorizerPaletteInterface } from "../interface/palette";
 import type { TColorizerFormInputMethod } from "../interface/color-form";
 
 export class ColorizerController {
+  // @ts-expect-error TS6133 value never read
+  private db: ColorizerDatabase;
   // @ts-expect-error TS6133 value never read
   private form: ColorizerForm;
   private palette: ColorizerPalette;
@@ -18,6 +21,7 @@ export class ColorizerController {
     inputMethods: TColorizerFormInputMethod[] = ["rgb", "hsl", "hwb", "oklch"]
   ) {
     this.palette = new ColorizerPalette();
+    this.db = new ColorizerDatabase();
 
     // Setup the ColorizerForm to add colors
     //
