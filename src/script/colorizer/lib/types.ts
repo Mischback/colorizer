@@ -3,7 +3,7 @@
 // SPDX-FileType: SOURCE
 
 import type { ColorizerColor } from "./color";
-import type { ColorizerPaletteItem } from "../interface/palette";
+import type { ColorizerPaletteItem } from "../engine/palette";
 
 /**
  * Type for a Subject that will propagate its (internal) ``color``.

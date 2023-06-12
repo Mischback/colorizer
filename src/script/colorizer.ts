@@ -3,7 +3,7 @@
 // SPDX-FileType: SOURCE
 
 import { ColorizerForm } from "./colorizer/interface/color-form";
-import { ColorizerPalette } from "./colorizer/interface/palette";
+import { ColorizerPalette } from "./colorizer/engine/palette";
 
 document.addEventListener("DOMContentLoaded", () => {
   const palette = new ColorizerPalette();
