@@ -8,18 +8,19 @@ import type { IColorizerPaletteObserver } from "../lib/types";
 
 export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
   private palette: ColorizerPalette;
-  private paletteContainer: HTMLElement;
   private paletteList: HTMLUListElement;
 
   public constructor(palette: ColorizerPalette) {
     console.debug("Initializing ColorizerPaletteInterface");
 
+    // Store a reference to the ``ColorizerPalette`` instance and register
+    // this instance as an *Observer*.
     this.palette = palette;
     this.palette.addPaletteObserver(this);
 
-    this.paletteContainer = <HTMLElement>getDomElement(null, "#color-palette");
+    // Get the required DOM elements
     this.paletteList = <HTMLUListElement>(
-      getDomElement(this.paletteContainer, "ul")
+      getDomElement(null, "#color-palette ul")
     );
   }
 
@@ -28,8 +29,8 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
    *
    * @param palette The updated/changed palette.
    *
-   * This class implements both parts of the *Observer* pattern. This is the
-   * **Observer** part.
+   * This is part of the implementation of the Observer pattern. This class
+   * acts as an *Observer* to the ``ColorizerPalette`` *Observable*.
    */
   public update(palette: ColorizerPaletteItem[]): void {
     console.debug(palette);
@@ -45,27 +46,54 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
 
     for (let i = 0; i < palette.length; i++) {
       this.paletteList.appendChild(
-        this.generatePaletteItemForDom(<ColorizerPaletteItem>palette[i])
+        this.generatePaletteItem(<ColorizerPaletteItem>palette[i])
       );
     }
   }
 
+  /**
+   * Handle clicks on the *delete* button.
+   *
+   * @param evt The DOM's ``click`` event.
+   *
+   * The method determines the ``palette-item-id`` of the parent *list item*
+   * (see ``generatePaletteItem()``) and calls ``deletePaletteItemByID()`` of
+   * the actual ``ColorizerPalette`` instance.
+   */
   private deleteButtonEventHandler(evt: Event): void {
-    console.debug("deleteButtonEventHandler()");
-    console.debug(evt);
-    console.debug(
-      ((evt.target as HTMLElement).parentNode as HTMLElement).getAttribute(
-        "palette-item-id"
-      )
-    );
+    evt.preventDefault();
+    evt.stopPropagation();
 
-    // TODO: Here we go!
-    // this.palette.deletePaletteItemById(paletteItemId);
+    const paletteItemId = (
+      (evt.target as HTMLElement).parentNode as HTMLElement
+    ).getAttribute("palette-item-id");
+    if (paletteItemId === null) {
+      throw new Error("Could not determine ID of PaletteItem");
+    }
+
+    console.debug(`paletteItemId: ${paletteItemId}`);
+
+    this.palette.deletePaletteItemById(paletteItemId);
   }
 
   /**
+   * Create a DOM element representing one palette item.
+   *
+   * @param item An instance of ``ColorizerPaletteItem``.
+   * @returns A representation of a *palette item*, provided as
+   *          ``HTMLLIElement``.
+   *
+   * This uses the *template* ``tpl-palette-item`` internally, see
+   * ``index.html``. It sets the (logically) required attributes, adds event
+   * handlers and prepares the DOM representation of a *palette item*. It is
+   * appended to the existing DOM structure in ``update()``.
+   *
+   * References:
+   * - https://developer.mozilla.org/en-US/docs/Web/API/Web_components
+   * - https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template
+   * - https://css-tricks.com/an-introduction-to-web-components/
    */
-  private generatePaletteItemForDom(item: ColorizerPaletteItem): HTMLLIElement {
+  private generatePaletteItem(item: ColorizerPaletteItem): HTMLLIElement {
     const template = <HTMLTemplateElement>(
       document.getElementById("tpl-palette-item")
     );
@@ -83,8 +111,9 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
     const label = <HTMLDivElement>getDomElement(paletteItem, ".label");
     label.innerHTML = item.paletteItemId;
 
+    // Attach Event Listeners
     const deleteButton = <HTMLButtonElement>(
-      getDomElement(paletteItem, "button")
+      getDomElement(paletteItem, ".button-delete")
     );
     deleteButton.addEventListener(
       "click",
