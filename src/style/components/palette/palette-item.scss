@@ -2,6 +2,33 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-#color-palette ul li {
-  border: 1px solid #999;
+#color-palette ul {
+  margin: 0 1em;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: inline-block;
+    margin: 0.25em 0.5em;
+    padding: 0.5em 1em;
+
+    /* stylelint-disable selector-max-compound-selectors */
+    * {
+      vertical-align: middle;
+    }
+
+    div {
+      display: inline-block;
+    }
+
+    .preview {
+      width: 1.5em;
+      height: 1.5em;
+      background-color: color(
+        xyz var(--palette-item-color-x) var(--palette-item-color-y)
+          var(--palette-item-color-z)
+      );
+    }
+    /* stylelint-enable selector-max-compound-selectors */
+  }
 }

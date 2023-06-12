@@ -166,10 +166,13 @@ export class ColorizerPalette
       template.content.firstElementChild as HTMLLIElement
     ).cloneNode(true) as HTMLLIElement;
 
+    const paletteItemColor = item.color.toJSON();
+
     paletteItem.setAttribute("palette-item-id", item.paletteItemId);
+    paletteItem.style.cssText = `--palette-item-color-x: ${paletteItemColor.x}; --palette-item-color-y: ${paletteItemColor.y}; --palette-item-color-z: ${paletteItemColor.z};`;
 
     // TODO: This needs more attention!
-    const label = getDomElement(paletteItem, ".label");
+    const label = <HTMLDivElement>getDomElement(paletteItem, ".label");
     label.innerHTML = item.paletteItemId;
 
     return paletteItem;
