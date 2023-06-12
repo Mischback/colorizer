@@ -158,10 +158,21 @@ export class ColorizerPalette
   /**
    */
   private generatePaletteItemForDom(item: ColorizerPaletteItem): HTMLLIElement {
-    const listItem = document.createElement("li");
-    listItem.setAttribute("palette-item-id", item.paletteItemId);
+    const template = <HTMLTemplateElement>(
+      document.getElementById("tpl-palette-item")
+    );
 
-    return listItem;
+    const paletteItem = (
+      template.content.firstElementChild as HTMLLIElement
+    ).cloneNode(true) as HTMLLIElement;
+
+    paletteItem.setAttribute("palette-item-id", item.paletteItemId);
+
+    // TODO: This needs more attention!
+    const label = getDomElement(paletteItem, ".label");
+    label.innerHTML = item.paletteItemId;
+
+    return paletteItem;
   }
 
   /**
