@@ -46,6 +46,19 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
     }
   }
 
+  private deleteButtonEventHandler(evt: Event): void {
+    console.debug("deleteButtonEventHandler()");
+    console.debug(evt);
+    console.debug(
+      ((evt.target as HTMLElement).parentNode as HTMLElement).getAttribute(
+        "palette-item-id"
+      )
+    );
+
+    // TODO: Here we go!
+    // this.engine.deletePaletteItemById(paletteItemId);
+  }
+
   /**
    */
   private generatePaletteItemForDom(item: ColorizerPaletteItem): HTMLLIElement {
@@ -65,6 +78,14 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
     // TODO: This needs more attention!
     const label = <HTMLDivElement>getDomElement(paletteItem, ".label");
     label.innerHTML = item.paletteItemId;
+
+    const deleteButton = <HTMLButtonElement>(
+      getDomElement(paletteItem, "button")
+    );
+    deleteButton.addEventListener(
+      "click",
+      this.deleteButtonEventHandler.bind(this)
+    );
 
     return paletteItem;
   }

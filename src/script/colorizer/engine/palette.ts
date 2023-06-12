@@ -107,6 +107,7 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
    * notify the instance's observers (by ``notifyPaletteObservers()``).
    */
   public add(color: ColorizerColor): void {
+    // FIXME: Make this method the private one!
     console.debug("add()");
     this.addPaletteItem(color);
     this.notifyPaletteObservers();
@@ -117,8 +118,14 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     sorting?: number,
     paletteItemId?: string
   ): void {
+    // FIXME: Make this method the public one! Be verbose!
     console.debug("addPaletteItem()");
     this._palette.push(new ColorizerPaletteItem(color, sorting, paletteItemId));
+  }
+
+  public deletePaletteItemById(paletteItemId: string): void {
+    // TODO: Here we go!
+    console.debug(`deletePaletteItemById() ${paletteItemId}`);
   }
 
   /**
