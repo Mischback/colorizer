@@ -18,7 +18,6 @@ const ColorizerDbSchemaVersion = 1;
 export class ColorizerDatabase {
   private dbName: string;
   private dbVersion: number;
-  // @ts-expect-error TS6133 value never read
   private db;
 
   public constructor(
@@ -34,6 +33,7 @@ export class ColorizerDatabase {
 
     this.db = openDB<ColorizerDbSchema>(this.dbName, this.dbVersion, {
       upgrade: this.setupDatabase.bind(this),
+      terminated: this.handleTermination.bind(this),
     });
   }
 
@@ -64,5 +64,10 @@ export class ColorizerDatabase {
         });
         paletteStore.createIndex("sorted", "sorting");
     }
+  }
+
+  private handleTermination(): void {
+    console.debug(this.db); // for whatever it is worth!
+    throw new Error("Connection to IndexedDB terminated abnormally");
   }
 }
