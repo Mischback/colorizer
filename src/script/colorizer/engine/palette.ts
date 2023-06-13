@@ -9,6 +9,12 @@ import type {
   IColorizerPaletteObserver,
 } from "../lib/types";
 
+export interface IColorizerPaletteItem {
+  paletteItemId: string;
+  color: ColorizerColor;
+  sorting: number;
+}
+
 /**
  * Represent a single color of the application's palette.
  *
@@ -28,10 +34,10 @@ import type {
  *                      generated from the ``x``, ``y`` and ``z`` attributes
  *                      of the ``color`` parameter.
  */
-export class ColorizerPaletteItem {
+export class ColorizerPaletteItem implements IColorizerPaletteItem {
   private _color: ColorizerColor;
   private _paletteItemId: string;
-  private sorting: number;
+  private _sorting: number;
 
   public constructor(
     color: ColorizerColor,
@@ -41,9 +47,9 @@ export class ColorizerPaletteItem {
     this._color = color;
 
     if (sorting !== undefined) {
-      this.sorting = sorting;
+      this._sorting = sorting;
     } else {
-      this.sorting = 999;
+      this._sorting = 999;
     }
 
     if (paletteItemId !== undefined) {
@@ -52,10 +58,6 @@ export class ColorizerPaletteItem {
       const tmp = color.toJSON();
       this._paletteItemId = mHash(`${tmp.x}-${tmp.y}-${tmp.z}`);
     }
-
-    console.debug(this._color);
-    console.debug(this.sorting);
-    console.debug(this.paletteItemId);
   }
 
   /**
@@ -69,6 +71,10 @@ export class ColorizerPaletteItem {
 
   public get paletteItemId(): string {
     return this._paletteItemId;
+  }
+
+  public get sorting(): number {
+    return this._sorting;
   }
 }
 
