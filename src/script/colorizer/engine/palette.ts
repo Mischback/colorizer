@@ -172,6 +172,25 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     this.notifyPaletteObservers();
   }
 
+  public moveItemInPalette(
+    oldItemIndex: number | undefined,
+    newItemIndex: number | undefined
+  ) {
+    // FIXME: This is **unfinished**, but a better solution requires changes
+    //        to the implementation of ColorizerPaletteItem first.
+    console.debug("moveItemInPalette()");
+
+    if (oldItemIndex === undefined || oldItemIndex >= this._palette.length)
+      return;
+    if (newItemIndex === undefined || newItemIndex >= this._palette.length)
+      return;
+
+    // @ts-expect-error TS2532
+    console.debug(`Old sorting: ${this._palette[oldItemIndex].sorting}`);
+    // @ts-expect-error TS2532
+    console.debug(`New sorting: ${this._palette[newItemIndex].sorting}`);
+  }
+
   private async add(
     color: ColorizerColor,
     sorting?: number,

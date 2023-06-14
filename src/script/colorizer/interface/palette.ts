@@ -31,6 +31,8 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           `dragged element from ${evt.oldIndex} to ${evt.newIndex}`
         );
+
+        this.palette.moveItemInPalette(evt.oldIndex, evt.newIndex);
       },
     });
     console.log(sortable);
