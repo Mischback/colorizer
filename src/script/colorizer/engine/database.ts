@@ -4,7 +4,7 @@
 
 import { openDB } from "idb";
 import type { IColorizerPaletteItem } from "./palette";
-import type { IDBPDatabase, DBSchema } from "idb";
+import type { IDBPDatabase, DBSchema, StoreNames, StoreValue } from "idb";
 
 interface ColorizerDbSchema extends DBSchema {
   palette: {
@@ -35,6 +35,56 @@ export class ColorizerDatabase {
       upgrade: this.setupDatabase.bind(this),
       terminated: this.handleTermination.bind(this),
     });
+  }
+
+  /**
+   * Put a single value into a given IndexedDB store.
+   *
+   * @param store The store to work on.
+   * @param value The value to be *put*. May *add* a new value to the store or
+   *              modify the existing value.
+   *
+   * Internally the operation is wrapped in a transaction (see
+   * ``getTransaction()``) and this method returns, when the transaction is
+   * completed!
+   */
+  public async put<Name extends StoreNames<ColorizerDbSchema>>(
+    store: Name,
+    value: StoreValue<ColorizerDbSchema, Name>
+  ) {
+    const tx = await this.getTransaction(store, true);
+
+    void tx.store.put?.(value);
+
+    return await tx.done;
+  }
+
+  /**
+   * Get a transaction for a given IndexedDB store.
+   *
+   * @param store
+   * @param writeMode Provide ``true`` to create a *writable* transaction.
+   *                  Default: ``false``
+   */
+  private async getTransaction(
+    store: StoreNames<ColorizerDbSchema>,
+    writeMode = false
+  ) {
+    const db = await this.db;
+    const mode = writeMode ? "readwrite" : "readonly";
+
+    return db.transaction(store, mode);
+  }
+
+  /**
+   * Handle abnormal terminations of the connection to the IndexedDB database.
+   *
+   * This method is applied to the ``openDB()`` call (see ``constructor()``).
+   * In the default IndexedDB API this would be the ``terminated`` callback.
+   */
+  private handleTermination(): void {
+    console.error(this.db); // for whatever it is worth!
+    throw new Error("Connection to IndexedDB terminated abnormally");
   }
 
   /**
@@ -79,16 +129,5 @@ export class ColorizerDatabase {
         });
         paletteStore.createIndex("sorted", "sorting");
     }
-  }
-
-  /**
-   * Handle abnormal terminations of the connection to the IndexedDB database.
-   *
-   * This method is applied to the ``openDB()`` call (see ``constructor()``).
-   * In the default IndexedDB API this would be the ``terminated`` callback.
-   */
-  private handleTermination(): void {
-    console.error(this.db); // for whatever it is worth!
-    throw new Error("Connection to IndexedDB terminated abnormally");
   }
 }
