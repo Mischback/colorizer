@@ -35,7 +35,7 @@ export class ColorizerController {
     this.form = new ColorizerForm(
       inputMethods,
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      this.palette.addPaletteItem.bind(this.palette)
+      this.palette.addColorToPalette.bind(this.palette)
     );
 
     // Setup the palette interface.

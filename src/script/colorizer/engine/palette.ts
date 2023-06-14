@@ -135,8 +135,8 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
    * Internally, this relies on ``add()`` and the function will
    * notify the instance's observers (by ``notifyPaletteObservers()``).
    */
-  public async addPaletteItem(color: ColorizerColor): Promise<void> {
-    console.debug("addPaletteItem()");
+  public async addColorToPalette(color: ColorizerColor): Promise<void> {
+    console.debug("addColorToPalette()");
 
     await this.add(color);
 
