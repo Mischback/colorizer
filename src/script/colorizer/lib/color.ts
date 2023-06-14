@@ -286,4 +286,19 @@ export class ColorizerColor {
     });
     return new ColorizerColor(xyz.x, xyz.y, xyz.z);
   }
+
+  /**
+   * Create a ``ColorizerColor`` instance from XYZ input.
+   *
+   * @param x The X coordinate.
+   * @param y The Y coordinate.
+   * @param z The Z coordinate.
+   * @returns ``ColorizerColor`` instance.
+   *
+   * This is the most raw method to create instances and meant to be used
+   * internally only (e.g. after fetching *flat JSON data* from the database).
+   */
+  public static fromXyz(x: number, y: number, z: number) {
+    return new ColorizerColor(x, y, z);
+  }
 }

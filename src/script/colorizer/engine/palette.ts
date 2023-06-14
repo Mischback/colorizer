@@ -112,6 +112,9 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     console.debug("Initializing ColorizerPalette");
 
     this.db = dbInstance;
+
+    // Properly initialize the internal palette from the database.
+    void this.synchronizePaletteFromDb();
   }
 
   /**
@@ -156,6 +159,47 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     await this.db.put("palette", paletteItem.toJSON());
 
     this._palette.push(paletteItem);
+  }
+
+  /**
+   * Refresh the palette from the IndexedDB database.
+   *
+   * The IndexedDB database does not store the *semantic objects*, but *flat
+   * JSON objects*. The method creates valid ``ColorizerPaletteItem`` instances
+   * from the stored values, re-builds the internal ``_palette`` and will
+   * notify the instance's observers (by ``notifyPaletteObservers()``).
+   *
+   * This is an expensive operation, as all existing instances of
+   * ``ColorizerPaletteItem`` are discarded and re-created.
+   */
+  private async synchronizePaletteFromDb(): Promise<void> {
+    const rawDb = await this.db.raw();
+
+    const palette = await rawDb.getAllFromIndex("palette", "sorted");
+
+    // Reset the existing palette
+    this._palette = [];
+    // The ``sorting`` attribute is refreshed every time. This makes reordering
+    // of the palette easy (implementation-wise).
+    let newSorting = 1;
+
+    palette.forEach((item) => {
+      this._palette.push(
+        new ColorizerPaletteItem(
+          // ``IColorizerPaletteItem`` defines the ``color`` attribute as type
+          // ``ColorizerColor``. However, this comes as a plain JS object from
+          // the database, so the visibility of attributes is no concern.
+          //
+          // @ts-expect-error TS2341 Accessing private attributes
+          ColorizerColor.fromXyz(item.color.x, item.color.y, item.color.z),
+          newSorting * 5,
+          item.paletteItemId
+        )
+      );
+      newSorting++;
+    });
+
+    this.notifyPaletteObservers();
   }
 
   public deletePaletteItemById(paletteItemId: string): void {

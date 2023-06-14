@@ -33,8 +33,6 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
    * acts as an *Observer* to the ``ColorizerPalette`` *Observable*.
    */
   public update(palette: ColorizerPaletteItem[]): void {
-    console.debug(palette);
-
     // empty the existing palette to prevent duplicates
     while (this.paletteList.firstChild) {
       this.paletteList.removeChild(this.paletteList.firstChild);

@@ -60,6 +60,13 @@ export class ColorizerDatabase {
   }
 
   /**
+   * Make the raw database object available.
+   */
+  public async raw() {
+    return await this.db;
+  }
+
+  /**
    * Get a transaction for a given IndexedDB store.
    *
    * @param store
