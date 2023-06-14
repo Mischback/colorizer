@@ -3,6 +3,7 @@
 // SPDX-FileType: SOURCE
 
 import { getDomElement } from "../../utility";
+import Sortable from "sortablejs";
 import type { ColorizerPalette, ColorizerPaletteItem } from "../engine/palette";
 import type { IColorizerPaletteObserver } from "../lib/types";
 
@@ -22,6 +23,17 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
     this.paletteList = <HTMLUListElement>(
       getDomElement(null, "#color-palette ul")
     );
+
+    const sortable = Sortable.create(this.paletteList, {
+      draggable: ".sortable-item",
+      onEnd: (evt) => {
+        console.debug(
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          `dragged element from ${evt.oldIndex} to ${evt.newIndex}`
+        );
+      },
+    });
+    console.log(sortable);
   }
 
   /**
