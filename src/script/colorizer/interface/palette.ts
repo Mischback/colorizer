@@ -71,7 +71,7 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
 
     console.debug(`paletteItemId: ${paletteItemId}`);
 
-    this.palette.removePaletteItemById(paletteItemId);
+    void this.palette.removePaletteItemById(paletteItemId);
   }
 
   /**
