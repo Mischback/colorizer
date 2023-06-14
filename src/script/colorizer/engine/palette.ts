@@ -146,6 +146,32 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     this.notifyPaletteObservers();
   }
 
+  /**
+   * Remove a palette item from the palette.
+   *
+   * @param paletteItemId The ID of the item to be removed.
+   *
+   * This method is called from the ``ColorizerPaletteInterface``, which
+   * provides a *remove button* for all items.
+   */
+  public async removePaletteItemById(paletteItemId: string): Promise<void> {
+    console.debug(`removePaletteItemById() ${paletteItemId}`);
+
+    // Remove item from the IndexedDB database
+    await this.db.deleteById("palette", paletteItemId);
+
+    // Remove the item from the internal ``_palette``
+    const item = this._palette.find(
+      (needle) => needle.paletteItemId === paletteItemId
+    );
+    if (item === undefined) return;
+    const itemIndex = this._palette.indexOf(item);
+    if (itemIndex === -1) return;
+    this._palette.splice(itemIndex, 1);
+
+    this.notifyPaletteObservers();
+  }
+
   private async add(
     color: ColorizerColor,
     sorting?: number,
@@ -200,11 +226,6 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     });
 
     this.notifyPaletteObservers();
-  }
-
-  public removePaletteItemById(paletteItemId: string): void {
-    // TODO: Here we go!
-    console.debug(`removePaletteItemById() ${paletteItemId}`);
   }
 
   /**

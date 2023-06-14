@@ -4,7 +4,13 @@
 
 import { openDB } from "idb";
 import type { IColorizerPaletteItem } from "./palette";
-import type { IDBPDatabase, DBSchema, StoreNames, StoreValue } from "idb";
+import type {
+  IDBPDatabase,
+  DBSchema,
+  StoreKey,
+  StoreNames,
+  StoreValue,
+} from "idb";
 
 interface ColorizerDbSchema extends DBSchema {
   palette: {
@@ -35,6 +41,27 @@ export class ColorizerDatabase {
       upgrade: this.setupDatabase.bind(this),
       terminated: this.handleTermination.bind(this),
     });
+  }
+
+  /**
+   * Delete a value from a given IndexedDB store.
+   *
+   * @param store The store to work on.
+   * @param id The key to the value to be removed.
+   *
+   * Internally the operation is wrapped in a transaction (see
+   * ``getTransaction()``) and this method returns, when the transaction is
+   * completed!
+   */
+  public async deleteById<Name extends StoreNames<ColorizerDbSchema>>(
+    store: Name,
+    id: StoreKey<ColorizerDbSchema, Name>
+  ) {
+    const tx = await this.getTransaction(store, true);
+
+    void tx.store.delete?.(id);
+
+    return await tx.done;
   }
 
   /**
