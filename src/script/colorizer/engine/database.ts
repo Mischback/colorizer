@@ -37,12 +37,27 @@ export class ColorizerDatabase {
     });
   }
 
+  /**
+   * Provide the required setup of the IndexedDB database.
+   *
+   * @param upgradeDb A local handle to the database, meant to perform the
+   *                  setup operation.
+   * @param oldVersion The current version of the database, as found in the
+   *                   client. Will be ``0`` if the application is launched for
+   *                   the very first time.
+   * @param newVersion The applications current version, as provided in the
+   *                   call to ``openDB()``. After running this method, the
+   *                   client's version will be equal to this value.
+   *
+   * This method is applied to the ``openDB()`` call (see ``constructor()``).
+   * In the default IndexedDB API this would be the ``upgradeneeded`` callback.
+   */
   private setupDatabase(
     upgradeDb: IDBPDatabase<ColorizerDbSchema>,
     oldVersion: number,
     newVersion: number | null
   ): void {
-    console.log(
+    console.info(
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       `Perform setup of database (from v${oldVersion} to v${newVersion})`
     );
@@ -66,8 +81,14 @@ export class ColorizerDatabase {
     }
   }
 
+  /**
+   * Handle abnormal terminations of the connection to the IndexedDB database.
+   *
+   * This method is applied to the ``openDB()`` call (see ``constructor()``).
+   * In the default IndexedDB API this would be the ``terminated`` callback.
+   */
   private handleTermination(): void {
-    console.debug(this.db); // for whatever it is worth!
+    console.error(this.db); // for whatever it is worth!
     throw new Error("Connection to IndexedDB terminated abnormally");
   }
 }
