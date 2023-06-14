@@ -4,10 +4,17 @@
 
 import { ColorizerColor } from "../lib/color";
 import { mHash } from "../../utility";
+import type { ColorizerDatabase } from "./database";
 import type {
   IColorizerPaletteObservable,
   IColorizerPaletteObserver,
 } from "../lib/types";
+
+export interface IColorizerPaletteItem {
+  paletteItemId: string;
+  color: ColorizerColor;
+  sorting: number;
+}
 
 /**
  * Represent a single color of the application's palette.
@@ -28,10 +35,10 @@ import type {
  *                      generated from the ``x``, ``y`` and ``z`` attributes
  *                      of the ``color`` parameter.
  */
-export class ColorizerPaletteItem {
+export class ColorizerPaletteItem implements IColorizerPaletteItem {
   private _color: ColorizerColor;
   private _paletteItemId: string;
-  private sorting: number;
+  private _sorting: number;
 
   public constructor(
     color: ColorizerColor,
@@ -41,9 +48,9 @@ export class ColorizerPaletteItem {
     this._color = color;
 
     if (sorting !== undefined) {
-      this.sorting = sorting;
+      this._sorting = sorting;
     } else {
-      this.sorting = 999;
+      this._sorting = 999;
     }
 
     if (paletteItemId !== undefined) {
@@ -52,10 +59,6 @@ export class ColorizerPaletteItem {
       const tmp = color.toJSON();
       this._paletteItemId = mHash(`${tmp.x}-${tmp.y}-${tmp.z}`);
     }
-
-    console.debug(this._color);
-    console.debug(this.sorting);
-    console.debug(this.paletteItemId);
   }
 
   /**
@@ -67,17 +70,51 @@ export class ColorizerPaletteItem {
     return this._color;
   }
 
+  /**
+   * Return the ID of this palette item.
+   *
+   * @returns The ``_paletteItemId``.
+   */
   public get paletteItemId(): string {
     return this._paletteItemId;
+  }
+
+  /**
+   * Return the sorting value of this palette item in the overall palette.
+   */
+  public get sorting(): number {
+    return this._sorting;
+  }
+
+  /**
+   * Return a *flat* JSON representation of the object.
+   *
+   * While this class handles its attributes internally and provides the
+   * required ``getters()`` for ``color``, ``paletteItemId`` and ``sorting``,
+   * this does not work with IndexedDB's requirements, where the object to be
+   * stored **must have** its attributes plainly accessible.
+   */
+  public toJSON() {
+    return {
+      paletteItemId: this.paletteItemId,
+      color: this.color,
+      sorting: this.sorting,
+    };
   }
 }
 
 export class ColorizerPalette implements IColorizerPaletteObservable {
   private paletteObservers: IColorizerPaletteObserver[] = [];
   private _palette: ColorizerPaletteItem[] = [];
+  private db;
 
-  public constructor() {
+  public constructor(dbInstance: ColorizerDatabase) {
     console.debug("Initializing ColorizerPalette");
+
+    this.db = dbInstance;
+
+    // Properly initialize the internal palette from the database.
+    void this.synchronizePaletteFromDb();
   }
 
   /**
@@ -98,27 +135,97 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
    * its ``submitCallback``. Thus, this function **must** follow the type
    * definition of ``TColorizerFormSubmitCallback``.
    *
-   * Internally, this relies on ``addPaletteItem()`` and the function will
+   * Internally, this relies on ``add()`` and the function will
    * notify the instance's observers (by ``notifyPaletteObservers()``).
    */
-  public addPaletteItem(color: ColorizerColor): void {
-    console.debug("add()");
-    this.add(color);
+  public async addColorToPalette(color: ColorizerColor): Promise<void> {
+    console.debug("addColorToPalette()");
+
+    await this.add(color);
+
     this.notifyPaletteObservers();
   }
 
-  private add(
+  /**
+   * Remove a palette item from the palette.
+   *
+   * @param paletteItemId The ID of the item to be removed.
+   *
+   * This method is called from the ``ColorizerPaletteInterface``, which
+   * provides a *remove button* for all items.
+   */
+  public async removePaletteItemById(paletteItemId: string): Promise<void> {
+    console.debug(`removePaletteItemById() ${paletteItemId}`);
+
+    // Remove item from the IndexedDB database
+    await this.db.deleteById("palette", paletteItemId);
+
+    // Remove the item from the internal ``_palette``
+    const item = this._palette.find(
+      (needle) => needle.paletteItemId === paletteItemId
+    );
+    if (item === undefined) return;
+    const itemIndex = this._palette.indexOf(item);
+    if (itemIndex === -1) return;
+    this._palette.splice(itemIndex, 1);
+
+    this.notifyPaletteObservers();
+  }
+
+  private async add(
     color: ColorizerColor,
     sorting?: number,
     paletteItemId?: string
-  ): void {
-    console.debug("addPaletteItem()");
-    this._palette.push(new ColorizerPaletteItem(color, sorting, paletteItemId));
+  ): Promise<void> {
+    console.debug("add()");
+
+    const paletteItem = new ColorizerPaletteItem(color, sorting, paletteItemId);
+
+    // The paletteItem must be converted to *flat* JSON for IndexedDB.
+    await this.db.put("palette", paletteItem.toJSON());
+
+    this._palette.push(paletteItem);
   }
 
-  public deletePaletteItemById(paletteItemId: string): void {
-    // TODO: Here we go!
-    console.debug(`deletePaletteItemById() ${paletteItemId}`);
+  /**
+   * Refresh the palette from the IndexedDB database.
+   *
+   * The IndexedDB database does not store the *semantic objects*, but *flat
+   * JSON objects*. The method creates valid ``ColorizerPaletteItem`` instances
+   * from the stored values, re-builds the internal ``_palette`` and will
+   * notify the instance's observers (by ``notifyPaletteObservers()``).
+   *
+   * This is an expensive operation, as all existing instances of
+   * ``ColorizerPaletteItem`` are discarded and re-created.
+   */
+  private async synchronizePaletteFromDb(): Promise<void> {
+    const rawDb = await this.db.raw();
+
+    const palette = await rawDb.getAllFromIndex("palette", "sorted");
+
+    // Reset the existing palette
+    this._palette = [];
+    // The ``sorting`` attribute is refreshed every time. This makes reordering
+    // of the palette easy (implementation-wise).
+    let newSorting = 1;
+
+    palette.forEach((item) => {
+      this._palette.push(
+        new ColorizerPaletteItem(
+          // ``IColorizerPaletteItem`` defines the ``color`` attribute as type
+          // ``ColorizerColor``. However, this comes as a plain JS object from
+          // the database, so the visibility of attributes is no concern.
+          //
+          // @ts-expect-error TS2341 Accessing private attributes
+          ColorizerColor.fromXyz(item.color.x, item.color.y, item.color.z),
+          newSorting * 5,
+          item.paletteItemId
+        )
+      );
+      newSorting++;
+    });
+
+    this.notifyPaletteObservers();
   }
 
   /**
@@ -171,10 +278,6 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
    * Observer pattern work.
    */
   private notifyPaletteObservers(): void {
-    this.palette.forEach((item) => {
-      console.debug(item.color);
-    });
-
     this.paletteObservers.forEach((obs) => {
       obs.update(this._palette);
     });

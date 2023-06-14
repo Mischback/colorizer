@@ -3,11 +3,13 @@
 // SPDX-FileType: SOURCE
 
 import { ColorizerPalette } from "./palette";
+import { ColorizerDatabase } from "./database";
 import { ColorizerForm } from "../interface/color-form";
 import { ColorizerPaletteInterface } from "../interface/palette";
 import type { TColorizerFormInputMethod } from "../interface/color-form";
 
 export class ColorizerController {
+  private db: ColorizerDatabase;
   // @ts-expect-error TS6133 value never read
   private form: ColorizerForm;
   private palette: ColorizerPalette;
@@ -17,7 +19,14 @@ export class ColorizerController {
   public constructor(
     inputMethods: TColorizerFormInputMethod[] = ["rgb", "hsl", "hwb", "oklch"]
   ) {
-    this.palette = new ColorizerPalette();
+    // Setup the app-specific IndexedDB wrapper
+    this.db = new ColorizerDatabase();
+
+    // Setup the palette.
+    //
+    // This is the *engine* that manages the palette internally. For the actual
+    // visualization in the frontend, see ``this.paletteInterface`` below.
+    this.palette = new ColorizerPalette(this.db);
 
     // Setup the ColorizerForm to add colors
     //
@@ -25,7 +34,8 @@ export class ColorizerController {
     // function to actually process new colors.
     this.form = new ColorizerForm(
       inputMethods,
-      this.palette.addPaletteItem.bind(this.palette)
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      this.palette.addColorToPalette.bind(this.palette)
     );
 
     // Setup the palette interface.
