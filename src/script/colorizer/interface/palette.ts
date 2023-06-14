@@ -50,15 +50,15 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
   }
 
   /**
-   * Handle clicks on the *delete* button.
+   * Handle clicks on the *remove* button.
    *
    * @param evt The DOM's ``click`` event.
    *
    * The method determines the ``palette-item-id`` of the parent *list item*
-   * (see ``generatePaletteItem()``) and calls ``deletePaletteItemByID()`` of
+   * (see ``generatePaletteItem()``) and calls ``removePaletteItemByID()`` of
    * the actual ``ColorizerPalette`` instance.
    */
-  private deleteButtonEventHandler(evt: Event): void {
+  private removeButtonEventHandler(evt: Event): void {
     evt.preventDefault();
     evt.stopPropagation();
 
@@ -71,7 +71,7 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
 
     console.debug(`paletteItemId: ${paletteItemId}`);
 
-    this.palette.deletePaletteItemById(paletteItemId);
+    this.palette.removePaletteItemById(paletteItemId);
   }
 
   /**
@@ -110,12 +110,12 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
     label.innerHTML = item.paletteItemId;
 
     // Attach Event Listeners
-    const deleteButton = <HTMLButtonElement>(
-      getDomElement(paletteItem, ".button-delete")
+    const removeButton = <HTMLButtonElement>(
+      getDomElement(paletteItem, ".button-remove")
     );
-    deleteButton.addEventListener(
+    removeButton.addEventListener(
       "click",
-      this.deleteButtonEventHandler.bind(this)
+      this.removeButtonEventHandler.bind(this)
     );
 
     return paletteItem;

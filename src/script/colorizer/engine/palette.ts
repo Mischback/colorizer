@@ -202,9 +202,9 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     this.notifyPaletteObservers();
   }
 
-  public deletePaletteItemById(paletteItemId: string): void {
+  public removePaletteItemById(paletteItemId: string): void {
     // TODO: Here we go!
-    console.debug(`deletePaletteItemById() ${paletteItemId}`);
+    console.debug(`removePaletteItemById() ${paletteItemId}`);
   }
 
   /**
