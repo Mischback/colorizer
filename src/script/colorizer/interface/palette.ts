@@ -10,6 +10,8 @@ import type { IColorizerPaletteObserver } from "../lib/types";
 export class ColorizerPaletteIO implements IColorizerPaletteObserver {
   private palette: ColorizerPalette;
   private paletteList: HTMLUListElement;
+  // @ts-expect-error TS6133 value never read
+  private sortable: Sortable;
 
   public constructor(palette: ColorizerPalette) {
     // Store a reference to the ``ColorizerPalette`` instance and register
@@ -22,13 +24,12 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
       getDomElement(null, "#color-palette ul")
     );
 
-    const sortable = Sortable.create(this.paletteList, {
+    this.sortable = Sortable.create(this.paletteList, {
       draggable: ".sortable-item",
       onEnd: (evt) => {
         void this.palette.moveItemInPalette(evt.oldIndex, evt.newIndex);
       },
     });
-    console.log(sortable);
   }
 
   /**
@@ -75,8 +76,6 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     if (paletteItemId === null) {
       throw new Error("Could not determine ID of PaletteItem");
     }
-
-    console.debug(`paletteItemId: ${paletteItemId}`);
 
     void this.palette.removePaletteItemById(paletteItemId);
   }

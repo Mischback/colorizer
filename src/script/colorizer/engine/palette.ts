@@ -104,8 +104,6 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     dbInstance: ColorizerDatabase,
     sortingInitializer = "foobar"
   ) {
-    console.debug("Initializing ColorizerPalette");
-
     // Store a reference to the database wrapper
     this.db = dbInstance;
 
@@ -144,8 +142,6 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
    * notify the instance's observers (by ``notifyPaletteObservers()``).
    */
   public async addColorToPalette(color: ColorizerColor): Promise<void> {
-    console.debug("addColorToPalette()");
-
     await this.add(color, this.nextSorting);
 
     this.notifyPaletteObservers();
@@ -160,7 +156,7 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
    * *remove button* for all items.
    */
   public async removePaletteItemById(paletteItemId: string): Promise<void> {
-    console.debug(`removePaletteItemById() ${paletteItemId}`);
+    // console.debug(`removePaletteItemById() ${paletteItemId}`);
 
     // Remove item from the IndexedDB database
     await this.db.deleteById("palette", paletteItemId);
@@ -268,8 +264,6 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     sorting: string,
     paletteItemId?: string
   ): Promise<void> {
-    console.debug("add()");
-
     const paletteItem = new ColorizerPaletteItem(color, sorting, paletteItemId);
 
     // The paletteItem must be converted to *flat* JSON for IndexedDB.
@@ -338,8 +332,6 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
    * items aswell.
    */
   private async update(paletteItem: ColorizerPaletteItem): Promise<void> {
-    console.debug("update()");
-
     await this.db.put("palette", paletteItem.toJSON());
   }
 
@@ -380,7 +372,7 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
 
     // this.paletteObservers.splice(obsIndex, 1);
     // console.info("Observer removed successfully");
-    console.debug(obs);
+    console.error(obs);
     throw new Error(`[BAM] Now go implement this!`);
   }
 
