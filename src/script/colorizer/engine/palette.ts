@@ -177,7 +177,7 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     this.notifyPaletteObservers();
   }
 
-  public moveItemInPalette(
+  public async moveItemInPalette(
     oldItemIndex: number | undefined,
     newItemIndex: number | undefined
   ) {
@@ -235,6 +235,9 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
 
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     console.debug(`new sorting: ${theItem?.sorting}`);
+
+    // The paletteItem must be converted to *flat* JSON for IndexedDB.
+    await this.db.put("palette", (theItem as ColorizerPaletteItem).toJSON());
 
     this.notifyPaletteObservers();
   }
