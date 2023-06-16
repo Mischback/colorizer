@@ -243,9 +243,15 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     theItem.sorting = LexoRank.between(left, right).toString();
 
     // The paletteItem must be converted to *flat* JSON for IndexedDB.
-    await this.db.put("palette", (theItem as ColorizerPaletteItem).toJSON());
+    await this.update(theItem as ColorizerPaletteItem);
 
     this.notifyPaletteObservers();
+  }
+
+  private async update(paletteItem: ColorizerPaletteItem): Promise<void> {
+    console.debug("update()");
+
+    await this.db.put("palette", paletteItem.toJSON());
   }
 
   private async add(
