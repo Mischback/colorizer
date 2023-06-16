@@ -27,11 +27,6 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
     const sortable = Sortable.create(this.paletteList, {
       draggable: ".sortable-item",
       onEnd: (evt) => {
-        console.debug(
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          `dragged element from ${evt.oldIndex} to ${evt.newIndex}`
-        );
-
         this.palette.moveItemInPalette(evt.oldIndex, evt.newIndex);
       },
     });

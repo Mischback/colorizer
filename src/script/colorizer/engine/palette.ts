@@ -39,7 +39,7 @@ export interface IColorizerPaletteItem {
 export class ColorizerPaletteItem implements IColorizerPaletteItem {
   private _color: ColorizerColor;
   private _paletteItemId: string;
-  private _sorting: string;
+  public sorting: string;
 
   public constructor(
     color: ColorizerColor,
@@ -47,7 +47,7 @@ export class ColorizerPaletteItem implements IColorizerPaletteItem {
     paletteItemId?: string
   ) {
     this._color = color;
-    this._sorting = sorting;
+    this.sorting = sorting;
 
     if (paletteItemId !== undefined) {
       this._paletteItemId = paletteItemId;
@@ -76,19 +76,14 @@ export class ColorizerPaletteItem implements IColorizerPaletteItem {
   }
 
   /**
-   * Return the sorting value of this palette item in the overall palette.
-   */
-  public get sorting(): string {
-    return this._sorting;
-  }
-
-  /**
    * Return a *flat* JSON representation of the object.
    *
    * While this class handles its attributes internally and provides the
    * required ``getters()`` for ``color``, ``paletteItemId`` and ``sorting``,
    * this does not work with IndexedDB's requirements, where the object to be
    * stored **must have** its attributes plainly accessible.
+   *
+   * FIXME: Should ``toJSON()`` be called on ``this.color``?!
    */
   public toJSON() {
     return {
@@ -186,19 +181,62 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     oldItemIndex: number | undefined,
     newItemIndex: number | undefined
   ) {
-    // FIXME: This is **unfinished**, but a better solution requires changes
-    //        to the implementation of ColorizerPaletteItem first.
     console.debug("moveItemInPalette()");
 
+    // TODO: Something went wrong, notify the user
     if (oldItemIndex === undefined || oldItemIndex >= this._palette.length)
       return;
     if (newItemIndex === undefined || newItemIndex >= this._palette.length)
       return;
 
-    // @ts-expect-error TS2532
-    console.debug(`Old sorting: ${this._palette[oldItemIndex].sorting}`);
-    // @ts-expect-error TS2532
-    console.debug(`New sorting: ${this._palette[newItemIndex].sorting}`);
+    console.debug(`old: ${oldItemIndex} / new: ${newItemIndex}`);
+
+    // TODO: Nothing to do... No notification required
+    if (oldItemIndex === newItemIndex) return;
+
+    // Get the item. This is safe at the spot of ``oldItemIndex``!
+    const theItem = this._palette[oldItemIndex];
+
+    // Remove the old item
+    //
+    // This changes the length of the array and might have an effect on
+    // ``newItemIndex``:
+    //   - if ``oldItemIndex`` < ``newItemIndex``, ``newItemIndex`` is actually
+    //     lower by one after the splicing
+    //   - if ``oldItemIndex`` > ``newItemIndex``, ``newItemIndex`` did not
+    //     change
+    this._palette.splice(oldItemIndex, 1);
+
+    // insert at new position
+    this._palette.splice(newItemIndex, 0, theItem as ColorizerPaletteItem);
+
+    let left = null;
+    let right = null;
+    if (newItemIndex > 0) {
+      left = LexoRank.from(
+        (this._palette[newItemIndex - 1] as ColorizerPaletteItem).sorting
+      );
+    }
+    if (newItemIndex < this._palette.length - 1) {
+      right = LexoRank.from(
+        (this._palette[newItemIndex + 1] as ColorizerPaletteItem).sorting
+      );
+    }
+
+    // TODO: Something went wrong, notify the user
+    if (left === null && right === null) return;
+
+    // Only one of the parameters of ``between()`` may be ``null``, and in fact
+    // the code does ensure that. TypeScript can not detect this, so the
+    // TS2769 error is expected.
+    //
+    // @ts-expect-error TS2769
+    theItem.sorting = LexoRank.between(left, right).toString();
+
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    console.debug(`new sorting: ${theItem?.sorting}`);
+
+    this.notifyPaletteObservers();
   }
 
   private async add(
