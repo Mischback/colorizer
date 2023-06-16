@@ -4,6 +4,7 @@
 
 import { ColorizerColor } from "../lib/color";
 import { mHash } from "../../utility";
+import LexoRank from "@kayron013/lexorank";
 import type { ColorizerDatabase } from "./database";
 import type {
   IColorizerPaletteObservable,
@@ -102,15 +103,28 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
   private paletteObservers: IColorizerPaletteObserver[] = [];
   private _palette: ColorizerPaletteItem[] = [];
   private db;
-  private nextSorting = "a";
+  private _nextSorting;
 
-  public constructor(dbInstance: ColorizerDatabase) {
+  public constructor(
+    dbInstance: ColorizerDatabase,
+    sortingInitializer = "foobar"
+  ) {
     console.debug("Initializing ColorizerPalette");
 
+    // Store a reference to the database wrapper
     this.db = dbInstance;
+
+    // Initialize the lexicographical sorting
+    this._nextSorting = new LexoRank(sortingInitializer);
 
     // Properly initialize the internal palette from the database.
     void this.synchronizePaletteFromDb();
+  }
+
+  private get nextSorting(): string {
+    this._nextSorting = this._nextSorting.increment();
+
+    return this._nextSorting.toString();
   }
 
   /**
@@ -235,6 +249,16 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
         )
       );
     });
+
+    // Set the internal ``_nextSorting`` to the maximum ``sorting`` value from
+    // the IndexedDB dataset.
+    //
+    // The items were retrieved ordered by their ``sorting`` attribute, so the
+    // last item in ``_palette`` has the *highest* value of ``sorting``. Take
+    // it, increment it and store it internally.
+    this._nextSorting = LexoRank.from(
+      (this._palette[this._palette.length - 1] as ColorizerPaletteItem).sorting
+    ).increment();
 
     this.notifyPaletteObservers();
   }
