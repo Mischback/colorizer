@@ -248,12 +248,21 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     this.notifyPaletteObservers();
   }
 
-  private async update(paletteItem: ColorizerPaletteItem): Promise<void> {
-    console.debug("update()");
-
-    await this.db.put("palette", paletteItem.toJSON());
-  }
-
+  /**
+   * Add a new color to the palette.
+   *
+   * @param color The actual color, provided as ``ColorizerColor`` instance.
+   * @param sorting The sorting of the new palette item. This is managed
+   *                internally in this class, see ``addColorToPalette()`` and
+   *                the getter of ``nextSorting``.
+   * @param paletteItemId This parameter is optional. If it is not provided,
+   *                      ``ColorizerPaletteItem`` takes care of calculating
+   *                      a ``paletteItemId``.
+   *
+   * This is the internal (private) method to add a new color. The public
+   * interface of the class provides ``addColorToPalette()``, which relies on
+   * this method internally.
+   */
   private async add(
     color: ColorizerColor,
     sorting: string,
@@ -316,6 +325,22 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     }
 
     this.notifyPaletteObservers();
+  }
+
+  /**
+   * Update an existing palette item in the IndexedDB database.
+   *
+   * @param paletteItem An actual ``ColorizerPaletteItem`` instance that will
+   *                    be updated in the database.
+   *
+   * This is meant to update an existing item, but internally relies on
+   * ``IndexedDB``'s ``put()`` method, so this *may be used* to create new
+   * items aswell.
+   */
+  private async update(paletteItem: ColorizerPaletteItem): Promise<void> {
+    console.debug("update()");
+
+    await this.db.put("palette", paletteItem.toJSON());
   }
 
   /**
