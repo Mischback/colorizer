@@ -177,19 +177,28 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     this.notifyPaletteObservers();
   }
 
+  /**
+   * Move an item in the palette.
+   *
+   * @param oldItemIndex The old index of the item.
+   * @param newItemIndex The new index of the item.
+   *
+   * The actual drag'n'drop operation is handled by an external library, which
+   * is attached in ``ColorizerPaletteInterface``. This method is called, when
+   * the drag operation is finished to make the operation persistent in the
+   * application and especially in the database.
+   */
   public async moveItemInPalette(
     oldItemIndex: number | undefined,
     newItemIndex: number | undefined
   ) {
-    console.debug("moveItemInPalette()");
-
     // TODO: Something went wrong, notify the user
     if (oldItemIndex === undefined || oldItemIndex >= this._palette.length)
       return;
     if (newItemIndex === undefined || newItemIndex >= this._palette.length)
       return;
 
-    console.debug(`old: ${oldItemIndex} / new: ${newItemIndex}`);
+    // console.debug(`old: ${oldItemIndex} / new: ${newItemIndex}`);
 
     // TODO: Nothing to do... No notification required
     if (oldItemIndex === newItemIndex) return;
@@ -232,9 +241,6 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     //
     // @ts-expect-error TS2769
     theItem.sorting = LexoRank.between(left, right).toString();
-
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.debug(`new sorting: ${theItem?.sorting}`);
 
     // The paletteItem must be converted to *flat* JSON for IndexedDB.
     await this.db.put("palette", (theItem as ColorizerPaletteItem).toJSON());
