@@ -111,12 +111,11 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     paletteItem.setAttribute("palette-item-id", item.paletteItemId);
     paletteItem.style.cssText = `--palette-item-color-x: ${paletteItemColor.x}; --palette-item-color-y: ${paletteItemColor.y}; --palette-item-color-z: ${paletteItemColor.z};`;
 
-    // TODO: This needs more attention!
+    // TODO: [#41] Semantic names for PaletteItems
     //       Should a color's *label* be adjustable by the user? This would
     //       allow the user to provide a *semantic name* for the color.
-    // FIXME: Remove output of ``sorting`` attribute, this is just for development
     const label = <HTMLDivElement>getDomElement(paletteItem, ".label");
-    label.innerHTML = `${item.paletteItemId} (${item.sorting})`;
+    label.innerHTML = `${item.paletteItemId}`;
 
     // Attach Event Listeners
     const removeButton = <HTMLButtonElement>(

@@ -83,7 +83,13 @@ export class ColorizerPaletteItem implements IColorizerPaletteItem {
    * this does not work with IndexedDB's requirements, where the object to be
    * stored **must have** its attributes plainly accessible.
    *
-   * FIXME: Should ``toJSON()`` be called on ``this.color``?!
+   * Note: ``this.color`` is an instance of ``ColorizerColor``, which does
+   * provide a specific ``toJSON()`` method. As of now, this method is **not**
+   * called explicitly (in fact does calling that mehtod here break the
+   * internal typing), but the ``ColorizerColor`` instance is successfully
+   * serialized for storing. The application handles the *deserialization*
+   * in ``ColorizerPalette.synchronizePaletteFromDb()``, which is working as
+   * expected.
    */
   public toJSON() {
     return {
@@ -144,6 +150,8 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
   public async addColorToPalette(color: ColorizerColor): Promise<void> {
     await this.add(color, this.nextSorting);
 
+    // TODO: [#42] Successfully added a color, show success message
+
     this.notifyPaletteObservers();
   }
 
@@ -170,6 +178,8 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     if (itemIndex === -1) return;
     this._palette.splice(itemIndex, 1);
 
+    // TODO: [#42] Successfully removed a color, show success message
+
     this.notifyPaletteObservers();
   }
 
@@ -188,7 +198,7 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     oldItemIndex: number | undefined,
     newItemIndex: number | undefined
   ) {
-    // TODO: Something went wrong, notify the user
+    // TODO: [#42] Something went wrong, notify the user
     if (oldItemIndex === undefined || oldItemIndex >= this._palette.length)
       return;
     if (newItemIndex === undefined || newItemIndex >= this._palette.length)
@@ -196,7 +206,7 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
 
     // console.debug(`old: ${oldItemIndex} / new: ${newItemIndex}`);
 
-    // TODO: Nothing to do... No notification required
+    // Nothing to do... No notification required (see [#42])
     if (oldItemIndex === newItemIndex) return;
 
     // Get the item. This is safe at the spot of ``oldItemIndex``!
@@ -228,7 +238,7 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
       );
     }
 
-    // TODO: Something went wrong, notify the user
+    // TODO: [#42] Something went wrong, notify the user
     if (left === null && right === null) return;
 
     // Only one of the parameters of ``between()`` may be ``null``, and in fact
