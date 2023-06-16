@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
+export { mHash } from "./murmurhash";
+
 /**
  * Get a DOM element by a given query.
  *

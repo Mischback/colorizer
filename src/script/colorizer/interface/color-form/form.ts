@@ -6,7 +6,10 @@ import { getColorizerFormInput } from "./input-methods";
 import { ColorizerColor } from "../../lib/color";
 import { getDomElement } from "../../../utility";
 import type { TColorizerFormInputMethod } from "./input-methods";
-import type { IColorizerObserver, IColorizerSubject } from "../../lib/types";
+import type {
+  IColorizerColorObserver,
+  IColorizerColorObservable,
+} from "../../lib/types";
 
 /**
  * Prototype of the ``ColorizerForm.receiveColor()`` method.
@@ -41,9 +44,9 @@ export type TColorizerFormSubmitCallback = (color: ColorizerColor) => void;
  * must be provided during instantiation of the class (``submitCallback``).
  *
  * Instances of this class are acting as the *Subject* in the Observer pattern
- * implementation (implementing ``IColorizerSubject``).
+ * implementation (implementing ``IColorizerColorObservable``).
  */
-export class ColorizerForm implements IColorizerSubject {
+export class ColorizerForm implements IColorizerColorObservable {
   private form: HTMLFormElement;
 
   // Initialization of color **is done** in the ``constructor()`` by calling
@@ -54,9 +57,9 @@ export class ColorizerForm implements IColorizerSubject {
   private color: ColorizerColor;
 
   // Part of the implementation of the Observer pattern, required to make
-  // ``IColorizerSubject`` work.
+  // ``IColorizerColorObservable`` work.
   // This is the list of *Observers*.
-  private colorObservers: IColorizerObserver[] = [];
+  private colorObservers: IColorizerColorObserver[] = [];
 
   // This function is to be executed, when the ``<form ...>`` is submitted.
   //
@@ -110,12 +113,12 @@ export class ColorizerForm implements IColorizerSubject {
    * Add an *Observer* to the form.
    *
    * @param obs The *Observer* to attach. Must implement the
-   *            ``IColorizerObserver`` interface!
+   *            ``IColorizerColorObserver`` interface!
    *
    * This is part of the implementation of the Observer pattern, required by
-   * ``IColorizerSubject``.
+   * ``IColorizerColorObservable``.
    */
-  public addColorObserver(obs: IColorizerObserver): void {
+  public addColorObserver(obs: IColorizerColorObserver): void {
     const obsIndex = this.colorObservers.indexOf(obs);
     if (obsIndex !== -1) {
       console.warn("That observer is already attached!");
@@ -129,12 +132,12 @@ export class ColorizerForm implements IColorizerSubject {
    * Remove an *Observer* from the form.
    *
    * @param obs The *Observer* to remove. Must implement the
-   *            ``IColorizerObserver`` interface!
+   *            ``IColorizerColorObserver`` interface!
    *
    * This is part of the implementation of the Observer pattern, required by
-   * ``IColorizerSubject``.
+   * ``IColorizerColorObservable``.
    */
-  public removeColorObserver(obs: IColorizerObserver): void {
+  public removeColorObserver(obs: IColorizerColorObserver): void {
     // const obsIndex = this.colorObservers.indexOf(obs);
     // if (obsIndex === -1) {
     //   console.warn("That observer does not exist!");
@@ -143,7 +146,7 @@ export class ColorizerForm implements IColorizerSubject {
 
     // this.colorObservers.splice(obsIndex, 1);
     // console.info("Observer removed successfully");
-    console.debug(obs);
+    console.error(obs);
     throw new Error(`[BAM] Now go implement this!`);
   }
 
@@ -151,7 +154,7 @@ export class ColorizerForm implements IColorizerSubject {
    * Notify the *Observers* and provide the current ``color``.
    *
    * This is part of the implementation of the Observer pattern. It is
-   * **not required** by ``IColorizerSubject``, as it is not part of the
+   * **not required** by ``IColorizerColorObservable``, as it is not part of the
    * interface's *contract*, but it is obviously required to make the Observer
    * pattern work.
    *

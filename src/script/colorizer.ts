@@ -2,17 +2,11 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import { ColorizerForm } from "./colorizer/interface/color-form";
+import { ColorizerController } from "./colorizer/engine/controller";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const form = new ColorizerForm(["rgb", "hsl", "hwb", "oklch"], (color) => {
-    console.log("ColorizerForm submitted!");
-
-    const raw = color.toJSON();
-    console.log(`  Raw: { x: ${raw.x}, y: ${raw.y}, z: ${raw.z} }`);
-
-    const rgb = color.toRgb255();
-    console.log(`  RGB: { r: ${rgb.r}, g: ${rgb.g}, b: ${rgb.b} }`);
-  });
-  console.debug(form);
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  // @ts-expect-error TS6133 value never read
+  const colorizerController = new ColorizerController();
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 });
