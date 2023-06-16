@@ -7,13 +7,11 @@ import Sortable from "sortablejs";
 import type { ColorizerPalette, ColorizerPaletteItem } from "../engine/palette";
 import type { IColorizerPaletteObserver } from "../lib/types";
 
-export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
+export class ColorizerPaletteIO implements IColorizerPaletteObserver {
   private palette: ColorizerPalette;
   private paletteList: HTMLUListElement;
 
   public constructor(palette: ColorizerPalette) {
-    console.debug("Initializing ColorizerPaletteInterface");
-
     // Store a reference to the ``ColorizerPalette`` instance and register
     // this instance as an *Observer*.
     this.palette = palette;
@@ -27,7 +25,7 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
     const sortable = Sortable.create(this.paletteList, {
       draggable: ".sortable-item",
       onEnd: (evt) => {
-        this.palette.moveItemInPalette(evt.oldIndex, evt.newIndex);
+        void this.palette.moveItemInPalette(evt.oldIndex, evt.newIndex);
       },
     });
     console.log(sortable);

@@ -156,8 +156,8 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
    *
    * @param paletteItemId The ID of the item to be removed.
    *
-   * This method is called from the ``ColorizerPaletteInterface``, which
-   * provides a *remove button* for all items.
+   * This method is called from the ``ColorizerPaletteIO``, which provides a
+   * *remove button* for all items.
    */
   public async removePaletteItemById(paletteItemId: string): Promise<void> {
     console.debug(`removePaletteItemById() ${paletteItemId}`);
@@ -184,8 +184,8 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
    * @param newItemIndex The new index of the item.
    *
    * The actual drag'n'drop operation is handled by an external library, which
-   * is attached in ``ColorizerPaletteInterface``. This method is called, when
-   * the drag operation is finished to make the operation persistent in the
+   * is attached in ``ColorizerPaletteIO``. This method is called, when the
+   * drag operation is finished to make the operation persistent in the
    * application and especially in the database.
    */
   public async moveItemInPalette(

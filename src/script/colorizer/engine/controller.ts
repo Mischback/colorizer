@@ -5,7 +5,7 @@
 import { ColorizerPalette } from "./palette";
 import { ColorizerDatabase } from "./database";
 import { ColorizerForm } from "../interface/color-form";
-import { ColorizerPaletteInterface } from "../interface/palette";
+import { ColorizerPaletteIO } from "../interface/palette";
 import type { TColorizerFormInputMethod } from "../interface/color-form";
 
 export class ColorizerController {
@@ -14,7 +14,7 @@ export class ColorizerController {
   private form: ColorizerForm;
   private palette: ColorizerPalette;
   // @ts-expect-error TS6133 value never read
-  private paletteInterface: ColorizerPaletteInterface;
+  private paletteInterface: ColorizerPaletteIO;
 
   public constructor(
     inputMethods: TColorizerFormInputMethod[] = ["rgb", "hsl", "hwb", "oklch"]
@@ -42,6 +42,6 @@ export class ColorizerController {
     //
     // This is directly attached to the ``ColorizerPalette`` instance, which
     // provides the actual data management methods (CRUD operations).
-    this.paletteInterface = new ColorizerPaletteInterface(this.palette);
+    this.paletteInterface = new ColorizerPaletteIO(this.palette);
   }
 }
