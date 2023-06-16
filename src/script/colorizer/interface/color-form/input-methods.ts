@@ -225,8 +225,8 @@ abstract class ColorizerFormInputMethod
       // Ref: https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation#validating_forms_using_javascript
       if ((evt.target as HTMLInputElement).validity.valid === false) {
         console.warn("Input invalid!");
-        console.debug(evt.target);
-        console.debug((evt.target as HTMLInputElement).validity);
+        // console.debug(evt.target);
+        // console.debug((evt.target as HTMLInputElement).validity);
         // return;  // uncomment to actually stop processing the ``InputEvent``
       }
     }

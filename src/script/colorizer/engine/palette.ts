@@ -4,6 +4,7 @@
 
 import { ColorizerColor } from "../lib/color";
 import { mHash } from "../../utility";
+import LexoRank from "@kayron013/lexorank";
 import type { ColorizerDatabase } from "./database";
 import type {
   IColorizerPaletteObservable,
@@ -13,7 +14,7 @@ import type {
 export interface IColorizerPaletteItem {
   paletteItemId: string;
   color: ColorizerColor;
-  sorting: number;
+  sorting: string;
 }
 
 /**
@@ -38,20 +39,15 @@ export interface IColorizerPaletteItem {
 export class ColorizerPaletteItem implements IColorizerPaletteItem {
   private _color: ColorizerColor;
   private _paletteItemId: string;
-  private _sorting: number;
+  public sorting: string;
 
   public constructor(
     color: ColorizerColor,
-    sorting?: number,
+    sorting: string,
     paletteItemId?: string
   ) {
     this._color = color;
-
-    if (sorting !== undefined) {
-      this._sorting = sorting;
-    } else {
-      this._sorting = 999;
-    }
+    this.sorting = sorting;
 
     if (paletteItemId !== undefined) {
       this._paletteItemId = paletteItemId;
@@ -80,19 +76,20 @@ export class ColorizerPaletteItem implements IColorizerPaletteItem {
   }
 
   /**
-   * Return the sorting value of this palette item in the overall palette.
-   */
-  public get sorting(): number {
-    return this._sorting;
-  }
-
-  /**
    * Return a *flat* JSON representation of the object.
    *
    * While this class handles its attributes internally and provides the
    * required ``getters()`` for ``color``, ``paletteItemId`` and ``sorting``,
    * this does not work with IndexedDB's requirements, where the object to be
    * stored **must have** its attributes plainly accessible.
+   *
+   * Note: ``this.color`` is an instance of ``ColorizerColor``, which does
+   * provide a specific ``toJSON()`` method. As of now, this method is **not**
+   * called explicitly (in fact does calling that mehtod here break the
+   * internal typing), but the ``ColorizerColor`` instance is successfully
+   * serialized for storing. The application handles the *deserialization*
+   * in ``ColorizerPalette.synchronizePaletteFromDb()``, which is working as
+   * expected.
    */
   public toJSON() {
     return {
@@ -107,14 +104,26 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
   private paletteObservers: IColorizerPaletteObserver[] = [];
   private _palette: ColorizerPaletteItem[] = [];
   private db;
+  private _nextSorting;
 
-  public constructor(dbInstance: ColorizerDatabase) {
-    console.debug("Initializing ColorizerPalette");
-
+  public constructor(
+    dbInstance: ColorizerDatabase,
+    sortingInitializer = "foobar"
+  ) {
+    // Store a reference to the database wrapper
     this.db = dbInstance;
+
+    // Initialize the lexicographical sorting
+    this._nextSorting = new LexoRank(sortingInitializer);
 
     // Properly initialize the internal palette from the database.
     void this.synchronizePaletteFromDb();
+  }
+
+  private get nextSorting(): string {
+    this._nextSorting = this._nextSorting.increment();
+
+    return this._nextSorting.toString();
   }
 
   /**
@@ -139,9 +148,9 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
    * notify the instance's observers (by ``notifyPaletteObservers()``).
    */
   public async addColorToPalette(color: ColorizerColor): Promise<void> {
-    console.debug("addColorToPalette()");
+    await this.add(color, this.nextSorting);
 
-    await this.add(color);
+    // TODO: [#42] Successfully added a color, show success message
 
     this.notifyPaletteObservers();
   }
@@ -151,11 +160,11 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
    *
    * @param paletteItemId The ID of the item to be removed.
    *
-   * This method is called from the ``ColorizerPaletteInterface``, which
-   * provides a *remove button* for all items.
+   * This method is called from the ``ColorizerPaletteIO``, which provides a
+   * *remove button* for all items.
    */
   public async removePaletteItemById(paletteItemId: string): Promise<void> {
-    console.debug(`removePaletteItemById() ${paletteItemId}`);
+    // console.debug(`removePaletteItemById() ${paletteItemId}`);
 
     // Remove item from the IndexedDB database
     await this.db.deleteById("palette", paletteItemId);
@@ -169,16 +178,102 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     if (itemIndex === -1) return;
     this._palette.splice(itemIndex, 1);
 
+    // TODO: [#42] Successfully removed a color, show success message
+
     this.notifyPaletteObservers();
   }
 
+  /**
+   * Move an item in the palette.
+   *
+   * @param oldItemIndex The old index of the item.
+   * @param newItemIndex The new index of the item.
+   *
+   * The actual drag'n'drop operation is handled by an external library, which
+   * is attached in ``ColorizerPaletteIO``. This method is called, when the
+   * drag operation is finished to make the operation persistent in the
+   * application and especially in the database.
+   */
+  public async moveItemInPalette(
+    oldItemIndex: number | undefined,
+    newItemIndex: number | undefined
+  ) {
+    // TODO: [#42] Something went wrong, notify the user
+    if (oldItemIndex === undefined || oldItemIndex >= this._palette.length)
+      return;
+    if (newItemIndex === undefined || newItemIndex >= this._palette.length)
+      return;
+
+    // console.debug(`old: ${oldItemIndex} / new: ${newItemIndex}`);
+
+    // Nothing to do... No notification required (see [#42])
+    if (oldItemIndex === newItemIndex) return;
+
+    // Get the item. This is safe at the spot of ``oldItemIndex``!
+    const theItem = this._palette[oldItemIndex];
+
+    // Remove the old item
+    //
+    // This changes the length of the array and might have an effect on
+    // ``newItemIndex``:
+    //   - if ``oldItemIndex`` < ``newItemIndex``, ``newItemIndex`` is actually
+    //     lower by one after the splicing
+    //   - if ``oldItemIndex`` > ``newItemIndex``, ``newItemIndex`` did not
+    //     change
+    this._palette.splice(oldItemIndex, 1);
+
+    // insert at new position
+    this._palette.splice(newItemIndex, 0, theItem as ColorizerPaletteItem);
+
+    let left = null;
+    let right = null;
+    if (newItemIndex > 0) {
+      left = LexoRank.from(
+        (this._palette[newItemIndex - 1] as ColorizerPaletteItem).sorting
+      );
+    }
+    if (newItemIndex < this._palette.length - 1) {
+      right = LexoRank.from(
+        (this._palette[newItemIndex + 1] as ColorizerPaletteItem).sorting
+      );
+    }
+
+    // TODO: [#42] Something went wrong, notify the user
+    if (left === null && right === null) return;
+
+    // Only one of the parameters of ``between()`` may be ``null``, and in fact
+    // the code does ensure that. TypeScript can not detect this, so the
+    // TS2769 error is expected.
+    //
+    // @ts-expect-error TS2769
+    theItem.sorting = LexoRank.between(left, right).toString();
+
+    // The paletteItem must be converted to *flat* JSON for IndexedDB.
+    await this.update(theItem as ColorizerPaletteItem);
+
+    this.notifyPaletteObservers();
+  }
+
+  /**
+   * Add a new color to the palette.
+   *
+   * @param color The actual color, provided as ``ColorizerColor`` instance.
+   * @param sorting The sorting of the new palette item. This is managed
+   *                internally in this class, see ``addColorToPalette()`` and
+   *                the getter of ``nextSorting``.
+   * @param paletteItemId This parameter is optional. If it is not provided,
+   *                      ``ColorizerPaletteItem`` takes care of calculating
+   *                      a ``paletteItemId``.
+   *
+   * This is the internal (private) method to add a new color. The public
+   * interface of the class provides ``addColorToPalette()``, which relies on
+   * this method internally.
+   */
   private async add(
     color: ColorizerColor,
-    sorting?: number,
+    sorting: string,
     paletteItemId?: string
   ): Promise<void> {
-    console.debug("add()");
-
     const paletteItem = new ColorizerPaletteItem(color, sorting, paletteItemId);
 
     // The paletteItem must be converted to *flat* JSON for IndexedDB.
@@ -205,9 +300,6 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
 
     // Reset the existing palette
     this._palette = [];
-    // The ``sorting`` attribute is refreshed every time. This makes reordering
-    // of the palette easy (implementation-wise).
-    let newSorting = 1;
 
     palette.forEach((item) => {
       this._palette.push(
@@ -218,14 +310,39 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
           //
           // @ts-expect-error TS2341 Accessing private attributes
           ColorizerColor.fromXyz(item.color.x, item.color.y, item.color.z),
-          newSorting * 5,
+          item.sorting,
           item.paletteItemId
         )
       );
-      newSorting++;
     });
 
+    // Set the internal ``_nextSorting`` to the maximum ``sorting`` value from
+    // the IndexedDB dataset.
+    //
+    // The items were retrieved ordered by their ``sorting`` attribute, so the
+    // last item in ``_palette`` has the *highest* value of ``sorting``.
+    if (this._palette.length >= 1) {
+      this._nextSorting = LexoRank.from(
+        (this._palette[this._palette.length - 1] as ColorizerPaletteItem)
+          .sorting
+      );
+    }
+
     this.notifyPaletteObservers();
+  }
+
+  /**
+   * Update an existing palette item in the IndexedDB database.
+   *
+   * @param paletteItem An actual ``ColorizerPaletteItem`` instance that will
+   *                    be updated in the database.
+   *
+   * This is meant to update an existing item, but internally relies on
+   * ``IndexedDB``'s ``put()`` method, so this *may be used* to create new
+   * items aswell.
+   */
+  private async update(paletteItem: ColorizerPaletteItem): Promise<void> {
+    await this.db.put("palette", paletteItem.toJSON());
   }
 
   /**
@@ -265,7 +382,7 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
 
     // this.paletteObservers.splice(obsIndex, 1);
     // console.info("Observer removed successfully");
-    console.debug(obs);
+    console.error(obs);
     throw new Error(`[BAM] Now go implement this!`);
   }
 

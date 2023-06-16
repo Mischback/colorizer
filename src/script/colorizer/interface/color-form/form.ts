@@ -146,7 +146,7 @@ export class ColorizerForm implements IColorizerColorObservable {
 
     // this.colorObservers.splice(obsIndex, 1);
     // console.info("Observer removed successfully");
-    console.debug(obs);
+    console.error(obs);
     throw new Error(`[BAM] Now go implement this!`);
   }
 

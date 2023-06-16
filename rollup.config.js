@@ -22,7 +22,8 @@
  * - https://rollupjs.org/configuration-options/#output-file
  */
 
-import nodeResolve from "@rollup/plugin-node-resolve"; // Not in use as of now!
+import commonjs from "@rollup/plugin-commonjs";
+import nodeResolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
 
@@ -43,7 +44,7 @@ const config = {
     assetFileNames: "[name][extname]",
     format: outputFormat,
   },
-  plugins: [typescript(), nodeResolve()],
+  plugins: [typescript(), nodeResolve(), commonjs()],
 };
 
 if (devMode === true) {

@@ -3,16 +3,17 @@
 // SPDX-FileType: SOURCE
 
 import { getDomElement } from "../../utility";
+import Sortable from "sortablejs";
 import type { ColorizerPalette, ColorizerPaletteItem } from "../engine/palette";
 import type { IColorizerPaletteObserver } from "../lib/types";
 
-export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
+export class ColorizerPaletteIO implements IColorizerPaletteObserver {
   private palette: ColorizerPalette;
   private paletteList: HTMLUListElement;
+  // @ts-expect-error TS6133 value never read
+  private sortable: Sortable;
 
   public constructor(palette: ColorizerPalette) {
-    console.debug("Initializing ColorizerPaletteInterface");
-
     // Store a reference to the ``ColorizerPalette`` instance and register
     // this instance as an *Observer*.
     this.palette = palette;
@@ -22,6 +23,13 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
     this.paletteList = <HTMLUListElement>(
       getDomElement(null, "#color-palette ul")
     );
+
+    this.sortable = Sortable.create(this.paletteList, {
+      draggable: ".sortable-item",
+      onEnd: (evt) => {
+        void this.palette.moveItemInPalette(evt.oldIndex, evt.newIndex);
+      },
+    });
   }
 
   /**
@@ -69,8 +77,6 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
       throw new Error("Could not determine ID of PaletteItem");
     }
 
-    console.debug(`paletteItemId: ${paletteItemId}`);
-
     void this.palette.removePaletteItemById(paletteItemId);
   }
 
@@ -105,9 +111,11 @@ export class ColorizerPaletteInterface implements IColorizerPaletteObserver {
     paletteItem.setAttribute("palette-item-id", item.paletteItemId);
     paletteItem.style.cssText = `--palette-item-color-x: ${paletteItemColor.x}; --palette-item-color-y: ${paletteItemColor.y}; --palette-item-color-z: ${paletteItemColor.z};`;
 
-    // TODO: This needs more attention!
+    // TODO: [#41] Semantic names for PaletteItems
+    //       Should a color's *label* be adjustable by the user? This would
+    //       allow the user to provide a *semantic name* for the color.
     const label = <HTMLDivElement>getDomElement(paletteItem, ".label");
-    label.innerHTML = item.paletteItemId;
+    label.innerHTML = `${item.paletteItemId}`;
 
     // Attach Event Listeners
     const removeButton = <HTMLButtonElement>(
