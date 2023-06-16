@@ -36,12 +36,17 @@ export class ColorizerContrastGrid implements IColorizerPaletteObserver {
    * acts as an *Observer* to the ``ColorizerPalette`` *Observable*.
    */
   public update(palette: ColorizerPaletteItem[]): void {
-    palette.forEach((item) => {
-      console.log(item);
+    // empty the existing table to prevent duplicates
+    while (this.gridTable.firstChild) {
+      this.gridTable.removeChild(this.gridTable.firstChild);
+    }
 
-      this.gridTable.appendChild(
-        this.generateGridRow(item, palette)
-      );
+    if (palette.length < 1) {
+      return;
+    }
+
+    palette.forEach((item) => {
+      this.gridTable.appendChild(this.generateGridRow(item, palette));
     });
   }
 
@@ -59,9 +64,32 @@ export class ColorizerContrastGrid implements IColorizerPaletteObserver {
 
     const itemColor = rowItem.color.toJSON();
 
-    tableRow.setAttribute("palette-item-id", rowItem.paletteItemId);
+    tableRow.setAttribute("row-item-id", rowItem.paletteItemId);
     tableRow.style.cssText = `--row-color-x: ${itemColor.x}; --row-color-y: ${itemColor.y}; --row-color-z: ${itemColor.z};`;
 
+    palette.forEach((item) => {
+      tableRow.appendChild(this.generateGridColumn(item));
+    });
+
     return tableRow;
+  }
+
+  private generateGridColumn(
+    columnItem: ColorizerPaletteItem
+  ): HTMLTableColElement {
+    const template = <HTMLTemplateElement>(
+      document.getElementById("tpl-grid-column")
+    );
+
+    const tableColumn = (
+      template.content.firstElementChild as HTMLTableColElement
+    ).cloneNode(true) as HTMLTableColElement;
+
+    const itemColor = columnItem.color.toJSON();
+
+    tableColumn.setAttribute("column-item-id", columnItem.paletteItemId);
+    tableColumn.style.cssText = `--col-color-x: ${itemColor.x}; --col-color-y: ${itemColor.y}; --col-color-z: ${itemColor.z};`;
+
+    return tableColumn;
   }
 }
