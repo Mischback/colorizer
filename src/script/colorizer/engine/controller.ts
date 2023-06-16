@@ -13,6 +13,7 @@ export class ColorizerController {
   private db: ColorizerDatabase;
   // @ts-expect-error TS6133 value never read
   private form: ColorizerForm;
+  // @ts-expect-error TS6133 value never read
   private grid: ColorizerContrastGrid;
   private palette: ColorizerPalette;
   // @ts-expect-error TS6133 value never read

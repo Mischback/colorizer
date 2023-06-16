@@ -3,6 +3,7 @@
 // SPDX-FileType: SOURCE
 
 import { luminanceFromRgb } from "./calculus";
+import { roundToPrecision } from "../../../utility";
 import type {
   ColorizerPalette,
   ColorizerPaletteItem,
@@ -32,9 +33,15 @@ export class ColorizerContrastGrid implements IColorizerPaletteObserver {
     palette.forEach((item) => {
       console.log(item);
       const rgb = item.color.toRgb();
+      const xyz = item.color.toJSON();
       const luminanceCalc = luminanceFromRgb(rgb.r, rgb.g, rgb.b);
 
-      console.log(`calc: ${luminanceCalc} / Y: ${item.color.y}`);
+      console.log(
+        `calc: ${luminanceCalc}; Y: ${xyz.y}; diff: ${roundToPrecision(
+          Math.abs(luminanceCalc - xyz.y),
+          3
+        )}`
+      );
     });
   }
 }
