@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
+import { luminanceFromRgb } from "./calculus";
 import type {
   ColorizerPalette,
   ColorizerPaletteItem,
@@ -27,8 +28,13 @@ export class ColorizerContrastGrid implements IColorizerPaletteObserver {
    * acts as an *Observer* to the ``ColorizerPalette`` *Observable*.
    */
   public update(palette: ColorizerPaletteItem[]): void {
+    // FIXME: The current code is meant to research #34!
     palette.forEach((item) => {
       console.log(item);
+      const rgb = item.color.toRgb();
+      const luminanceCalc = luminanceFromRgb(rgb.r, rgb.g, rgb.b);
+
+      console.log(`calc: ${luminanceCalc} / Y: ${item.color.y}`);
     });
   }
 }
