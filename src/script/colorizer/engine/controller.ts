@@ -5,6 +5,7 @@
 import { ColorizerPalette } from "./palette";
 import { ColorizerDatabase } from "./database";
 import { ColorizerForm } from "../interface/color-form";
+import { ColorizerContrastGrid } from "../interface/contrast-grid/grid";
 import { ColorizerPaletteIO } from "../interface/palette";
 import type { TColorizerFormInputMethod } from "../interface/color-form";
 
@@ -12,6 +13,7 @@ export class ColorizerController {
   private db: ColorizerDatabase;
   // @ts-expect-error TS6133 value never read
   private form: ColorizerForm;
+  private grid: ColorizerContrastGrid;
   private palette: ColorizerPalette;
   // @ts-expect-error TS6133 value never read
   private paletteInterface: ColorizerPaletteIO;
@@ -43,5 +45,7 @@ export class ColorizerController {
     // This is directly attached to the ``ColorizerPalette`` instance, which
     // provides the actual data management methods (CRUD operations).
     this.paletteInterface = new ColorizerPaletteIO(this.palette);
+
+    this.grid = new ColorizerContrastGrid(this.palette);
   }
 }
