@@ -254,11 +254,13 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     // the IndexedDB dataset.
     //
     // The items were retrieved ordered by their ``sorting`` attribute, so the
-    // last item in ``_palette`` has the *highest* value of ``sorting``. Take
-    // it, increment it and store it internally.
-    this._nextSorting = LexoRank.from(
-      (this._palette[this._palette.length - 1] as ColorizerPaletteItem).sorting
-    ).increment();
+    // last item in ``_palette`` has the *highest* value of ``sorting``.
+    if (this._palette.length >= 1) {
+      this._nextSorting = LexoRank.from(
+        (this._palette[this._palette.length - 1] as ColorizerPaletteItem)
+          .sorting
+      );
+    }
 
     this.notifyPaletteObservers();
   }
