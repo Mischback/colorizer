@@ -13,7 +13,7 @@ import type {
 export interface IColorizerPaletteItem {
   paletteItemId: string;
   color: ColorizerColor;
-  sorting: number;
+  sorting: string;
 }
 
 /**
@@ -38,20 +38,15 @@ export interface IColorizerPaletteItem {
 export class ColorizerPaletteItem implements IColorizerPaletteItem {
   private _color: ColorizerColor;
   private _paletteItemId: string;
-  private _sorting: number;
+  private _sorting: string;
 
   public constructor(
     color: ColorizerColor,
-    sorting?: number,
+    sorting: string,
     paletteItemId?: string
   ) {
     this._color = color;
-
-    if (sorting !== undefined) {
-      this._sorting = sorting;
-    } else {
-      this._sorting = 999;
-    }
+    this._sorting = sorting;
 
     if (paletteItemId !== undefined) {
       this._paletteItemId = paletteItemId;
@@ -82,7 +77,7 @@ export class ColorizerPaletteItem implements IColorizerPaletteItem {
   /**
    * Return the sorting value of this palette item in the overall palette.
    */
-  public get sorting(): number {
+  public get sorting(): string {
     return this._sorting;
   }
 
@@ -107,6 +102,7 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
   private paletteObservers: IColorizerPaletteObserver[] = [];
   private _palette: ColorizerPaletteItem[] = [];
   private db;
+  private nextSorting = "a";
 
   public constructor(dbInstance: ColorizerDatabase) {
     console.debug("Initializing ColorizerPalette");
@@ -141,7 +137,7 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
   public async addColorToPalette(color: ColorizerColor): Promise<void> {
     console.debug("addColorToPalette()");
 
-    await this.add(color);
+    await this.add(color, this.nextSorting);
 
     this.notifyPaletteObservers();
   }
@@ -193,7 +189,7 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
 
   private async add(
     color: ColorizerColor,
-    sorting?: number,
+    sorting: string,
     paletteItemId?: string
   ): Promise<void> {
     console.debug("add()");
@@ -224,9 +220,6 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
 
     // Reset the existing palette
     this._palette = [];
-    // The ``sorting`` attribute is refreshed every time. This makes reordering
-    // of the palette easy (implementation-wise).
-    let newSorting = 1;
 
     palette.forEach((item) => {
       this._palette.push(
@@ -237,11 +230,10 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
           //
           // @ts-expect-error TS2341 Accessing private attributes
           ColorizerColor.fromXyz(item.color.x, item.color.y, item.color.z),
-          newSorting * 5,
+          item.sorting,
           item.paletteItemId
         )
       );
-      newSorting++;
     });
 
     this.notifyPaletteObservers();
