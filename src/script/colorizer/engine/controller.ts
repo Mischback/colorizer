@@ -15,7 +15,7 @@ export class ColorizerController {
   private form: ColorizerForm;
   private grid: ColorizerContrastGrid;
   private palette: ColorizerPalette;
-  private paletteInterface: ColorizerPaletteIO;
+  private paletteIO: ColorizerPaletteIO;
 
   public constructor(
     inputMethods: TColorizerFormInputMethod[] = ["rgb", "hsl", "hwb", "oklch"]
@@ -43,8 +43,13 @@ export class ColorizerController {
     //
     // This is directly attached to the ``ColorizerPalette`` instance, which
     // provides the actual data management methods (CRUD operations).
-    this.paletteInterface = new ColorizerPaletteIO(this.palette);
-    this.palette.addPaletteObserver(this.paletteInterface);
+    this.paletteIO = new ColorizerPaletteIO(
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      this.palette.moveItemInPalette.bind(this.palette),
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      this.palette.removePaletteItemById.bind(this.palette)
+    );
+    this.palette.addPaletteObserver(this.paletteIO);
 
     this.grid = new ColorizerContrastGrid(this.palette);
     this.palette.addPaletteObserver(this.grid);

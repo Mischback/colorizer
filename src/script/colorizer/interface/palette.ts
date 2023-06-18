@@ -4,20 +4,26 @@
 
 import { getDomElement } from "../../utility";
 import Sortable from "sortablejs";
-import type { ColorizerPalette, ColorizerPaletteItem } from "../engine/palette";
+import type { ColorizerPaletteItem } from "../engine/palette";
 import type { IColorizerPaletteObserver } from "../lib/types";
 
+type TMoveItemCallback = (
+  oldIndex: number | undefined,
+  newIndex: number | undefined
+) => void;
+type TRemoveItemCallback = (paletteItemId: string) => void;
+
 export class ColorizerPaletteIO implements IColorizerPaletteObserver {
-  private palette: ColorizerPalette;
   private paletteList: HTMLUListElement;
+  private removeItemCallback: TRemoveItemCallback;
   // @ts-expect-error TS6133 value never read
   private sortable: Sortable;
 
-  public constructor(palette: ColorizerPalette) {
-    // Store a reference to the ``ColorizerPalette`` instance. This is an
-    // additional reference, used for communicating things back to the palette
-    // and **not** part of the *Observer pattern* implementation.
-    this.palette = palette;
+  public constructor(
+    moveItemCallback: TMoveItemCallback,
+    removeItemCallback: TRemoveItemCallback
+  ) {
+    this.removeItemCallback = removeItemCallback;
 
     // Get the required DOM elements
     this.paletteList = <HTMLUListElement>(
@@ -27,7 +33,7 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     this.sortable = Sortable.create(this.paletteList, {
       draggable: ".sortable-item",
       onEnd: (evt) => {
-        void this.palette.moveItemInPalette(evt.oldIndex, evt.newIndex);
+        void moveItemCallback(evt.oldIndex, evt.newIndex);
       },
     });
   }
@@ -77,7 +83,7 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
       throw new Error("Could not determine ID of PaletteItem");
     }
 
-    void this.palette.removePaletteItemById(paletteItemId);
+    void this.removeItemCallback(paletteItemId);
   }
 
   /**
