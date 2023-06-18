@@ -13,10 +13,8 @@ export class ColorizerController {
   private db: ColorizerDatabase;
   // @ts-expect-error TS6133 value never read
   private form: ColorizerForm;
-  // @ts-expect-error TS6133 value never read
   private grid: ColorizerContrastGrid;
   private palette: ColorizerPalette;
-  // @ts-expect-error TS6133 value never read
   private paletteInterface: ColorizerPaletteIO;
 
   public constructor(
@@ -46,7 +44,9 @@ export class ColorizerController {
     // This is directly attached to the ``ColorizerPalette`` instance, which
     // provides the actual data management methods (CRUD operations).
     this.paletteInterface = new ColorizerPaletteIO(this.palette);
+    this.palette.addPaletteObserver(this.paletteInterface);
 
     this.grid = new ColorizerContrastGrid(this.palette);
+    this.palette.addPaletteObserver(this.grid);
   }
 }

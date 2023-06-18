@@ -14,10 +14,10 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
   private sortable: Sortable;
 
   public constructor(palette: ColorizerPalette) {
-    // Store a reference to the ``ColorizerPalette`` instance and register
-    // this instance as an *Observer*.
+    // Store a reference to the ``ColorizerPalette`` instance. This is an
+    // additional reference, used for communicating things back to the palette
+    // and **not** part of the *Observer pattern* implementation.
     this.palette = palette;
-    this.palette.addPaletteObserver(this);
 
     // Get the required DOM elements
     this.paletteList = <HTMLUListElement>(
