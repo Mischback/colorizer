@@ -51,7 +51,7 @@ export class ColorizerController {
     );
     this.palette.addPaletteObserver(this.paletteIO);
 
-    this.grid = new ColorizerContrastGrid(this.palette);
+    this.grid = new ColorizerContrastGrid();
     this.palette.addPaletteObserver(this.grid);
   }
 }

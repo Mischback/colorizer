@@ -3,23 +3,13 @@
 // SPDX-FileType: SOURCE
 
 import { getDomElement } from "../../../utility";
-import type {
-  ColorizerPalette,
-  ColorizerPaletteItem,
-} from "../../engine/palette";
+import type { ColorizerPaletteItem } from "../../engine/palette";
 import type { IColorizerPaletteObserver } from "../../lib/types";
 
 export class ColorizerContrastGrid implements IColorizerPaletteObserver {
   private gridTable: HTMLTableElement;
-  // @ts-expect-error TS6133 value never read
-  private palette: ColorizerPalette;
 
-  public constructor(palette: ColorizerPalette) {
-    // Store a reference to the ``ColorizerPalette`` instance. This is an
-    // additional reference, used for communicating things back to the palette
-    // and **not** part of the *Observer pattern* implementation.
-    this.palette = palette;
-
+  public constructor() {
     // Get the required DOM elements
     this.gridTable = <HTMLTableElement>(
       getDomElement(null, "#contrast-grid table")
