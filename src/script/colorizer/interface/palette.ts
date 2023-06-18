@@ -105,7 +105,7 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
    */
   private generatePaletteItem(item: ColorizerPaletteItem): HTMLLIElement {
     const template = <HTMLTemplateElement>(
-      document.getElementById("tpl-palette-item")
+      getDomElement(null, "#tpl-palette-item")
     );
 
     const paletteItem = (

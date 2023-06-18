@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import { getDomElement } from "../../../utility";
+import { getContrastValue, getWcagCat } from "./calculus";
+import { getDomElement, roundToPrecision } from "../../../utility";
 import type { ColorizerPaletteItem } from "../../engine/palette";
 import type { IColorizerPaletteObserver } from "../../lib/types";
 
@@ -59,27 +60,38 @@ export class ColorizerContrastGrid implements IColorizerPaletteObserver {
     tableRow.style.cssText = `--row-color-x: ${itemColor.x}; --row-color-y: ${itemColor.y}; --row-color-z: ${itemColor.z};`;
 
     palette.forEach((item) => {
-      tableRow.appendChild(this.generateGridColumn(item));
+      tableRow.appendChild(this.generateGridColumn(rowItem, item));
     });
 
     return tableRow;
   }
 
   private generateGridColumn(
+    rowItem: ColorizerPaletteItem,
     columnItem: ColorizerPaletteItem
   ): HTMLTableColElement {
     const template = <HTMLTemplateElement>(
-      document.getElementById("tpl-grid-column")
+      getDomElement(null, "#tpl-grid-column")
     );
 
     const tableColumn = (
       template.content.firstElementChild as HTMLTableColElement
     ).cloneNode(true) as HTMLTableColElement;
 
-    const itemColor = columnItem.color.toJSON();
+    const colColor = columnItem.color.toJSON();
+    const rowColor = rowItem.color.toJSON();
+    const contrastValue = getContrastValue(colColor.y, rowColor.y);
 
     tableColumn.setAttribute("column-item-id", columnItem.paletteItemId);
-    tableColumn.style.cssText = `--col-color-x: ${itemColor.x}; --col-color-y: ${itemColor.y}; --col-color-z: ${itemColor.z};`;
+    tableColumn.style.cssText = `--col-color-x: ${colColor.x}; --col-color-y: ${colColor.y}; --col-color-z: ${colColor.z};`;
+
+    const cat = <HTMLParagraphElement>getDomElement(tableColumn, ".wcag-cat");
+    cat.innerHTML = getWcagCat(contrastValue);
+
+    const contrast = <HTMLParagraphElement>(
+      getDomElement(tableColumn, ".wcag-contrast")
+    );
+    contrast.innerHTML = roundToPrecision(contrastValue, 2).toString();
 
     return tableColumn;
   }
