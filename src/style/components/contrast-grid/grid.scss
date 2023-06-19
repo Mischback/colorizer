@@ -3,15 +3,35 @@
 // SPDX-FileType: SOURCE
 
 #contrast-grid table {
-  border: 1px solid #000;
+  border-collapse: collapse;
 
-  tr {
-    background-color: color(
-      xyz var(--row-color-x) var(--row-color-y) var(--row-color-z)
-    );
+  td,
+  th {
+    // FIXME: [#32] Build an overall colorscheme
+    border: 1px solid #000;
+  }
 
+  th {
+    font-size: 0.6em;
+  }
+
+  .head-row {
     /* stylelint-disable selector-max-compound-selectors */
     td {
+      border: 0;
+    }
+
+    th {
+      font-weight: bold;
+    }
+  }
+
+  .grid-row {
+    td {
+      padding: 0.75em 0.25em;
+      background-color: color(
+        xyz var(--row-color-x) var(--row-color-y) var(--row-color-z)
+      );
       color: color(
         xyz var(--col-color-x) var(--col-color-y) var(--col-color-z)
       );
@@ -24,6 +44,7 @@
       .wcag-cat {
         font-size: 1.5em;
         font-weight: bold;
+        text-align: center;
       }
 
       .wcag-contrast {
@@ -31,6 +52,5 @@
         text-align: end;
       }
     }
-    /* stylelint-enable selector-max-compound-selectors */
   }
 }
