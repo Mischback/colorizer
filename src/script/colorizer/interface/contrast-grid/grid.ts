@@ -4,17 +4,34 @@
 
 import { getContrastValue, getWcagCat } from "./calculus";
 import { getDomElement, roundToPrecision } from "../../../utility";
-import type { ColorizerPaletteItem } from "../../engine/palette";
+import Sortable from "sortablejs";
+import type {
+  ColorizerPaletteItem,
+  TMoveItemCallback,
+} from "../../engine/palette";
 import type { IColorizerPaletteObserver } from "../../lib/types";
 
 export class ColorizerContrastGrid implements IColorizerPaletteObserver {
   private gridTable: HTMLTableElement;
+  // @ts-expect-error TS6133 value never read
+  private sortable: Sortable;
 
-  public constructor() {
+  public constructor(moveItemCallback: TMoveItemCallback) {
     // Get the required DOM elements
     this.gridTable = <HTMLTableElement>(
       getDomElement(null, "#contrast-grid table")
     );
+
+    this.sortable = Sortable.create(this.gridTable, {
+      draggable: ".grid-row",
+      onEnd: (evt) => {
+        // The indexes are decremented by ``1``, because there is one additional
+        // table row and one additional column per row (the captions).
+        //
+        // @ts-expect-error TS18048 Might be undefined
+        void moveItemCallback(evt.oldIndex - 1, evt.newIndex - 1);
+      },
+    });
 
     console.debug(this.gridTable);
   }

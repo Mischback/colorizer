@@ -4,14 +4,12 @@
 
 import { getDomElement } from "../../utility";
 import Sortable from "sortablejs";
-import type { ColorizerPaletteItem } from "../engine/palette";
+import type {
+  ColorizerPaletteItem,
+  TMoveItemCallback,
+  TRemoveItemCallback,
+} from "../engine/palette";
 import type { IColorizerPaletteObserver } from "../lib/types";
-
-type TMoveItemCallback = (
-  oldIndex: number | undefined,
-  newIndex: number | undefined
-) => void;
-type TRemoveItemCallback = (paletteItemId: string) => void;
 
 export class ColorizerPaletteIO implements IColorizerPaletteObserver {
   private paletteList: HTMLUListElement;

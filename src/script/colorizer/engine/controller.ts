@@ -51,7 +51,10 @@ export class ColorizerController {
     );
     this.palette.addPaletteObserver(this.paletteIO);
 
-    this.grid = new ColorizerContrastGrid();
+    this.grid = new ColorizerContrastGrid(
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      this.palette.moveItemInPalette.bind(this.palette)
+    );
     this.palette.addPaletteObserver(this.grid);
   }
 }
