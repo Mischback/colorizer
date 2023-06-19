@@ -37,30 +37,60 @@ export class ColorizerContrastGrid implements IColorizerPaletteObserver {
       return;
     }
 
-    palette.forEach((item) => {
-      this.gridTable.appendChild(this.generateGridRow(item, palette));
+    // Get the templates.
+    //
+    // The actual ``#tpl-grid-table`` is a full HTML table, but only specific
+    // siblings are actually needed for templating.
+    //
+    // However, the full template is cloned in order to get access to the
+    // specific siblings, which are then passed on to ``generateGridRow()`` and
+    // consequently to ``generateGridColumn()``.
+    const template = (
+      (getDomElement(null, "#tpl-grid-table") as HTMLTemplateElement).content
+        .firstElementChild as HTMLTableElement
+    ).cloneNode(true) as HTMLTableElement;
+
+    const headRow = getDomElement(template, ".head-row");
+    const headRowCol = getDomElement(headRow, "th");
+    headRow.removeChild(headRowCol);
+    const gridRowTemplate = <HTMLTableRowElement>(
+      getDomElement(template, ".grid-row")
+    );
+    const gridColTemplate = <HTMLTableColElement>(
+      getDomElement(gridRowTemplate, ".grid-col")
+    );
+    gridRowTemplate.removeChild(gridColTemplate);
+
+    // First of all, append a *head row* to the <table>.
+    // This does only include two cells.
+    this.gridTable.appendChild(headRow);
+
+    palette.forEach((rowItem) => {
+      // FIXME: headRowCol needs customization
+      headRow.appendChild(headRowCol.cloneNode(true));
+      this.gridTable.appendChild(
+        this.generateGridRow(rowItem, palette, gridRowTemplate, gridColTemplate)
+      );
     });
   }
 
   private generateGridRow(
     rowItem: ColorizerPaletteItem,
-    palette: ColorizerPaletteItem[]
+    palette: ColorizerPaletteItem[],
+    rowTemplate: HTMLTableRowElement,
+    colTemplate: HTMLTableColElement
   ): HTMLTableRowElement {
-    const template = <HTMLTemplateElement>(
-      document.getElementById("tpl-grid-row")
-    );
-
-    const tableRow = (
-      template.content.firstElementChild as HTMLTableRowElement
-    ).cloneNode(true) as HTMLTableRowElement;
+    const tableRow = <HTMLTableRowElement>rowTemplate.cloneNode(true);
 
     const itemColor = rowItem.color.toJSON();
 
     tableRow.setAttribute("row-item-id", rowItem.paletteItemId);
     tableRow.style.cssText = `--row-color-x: ${itemColor.x}; --row-color-y: ${itemColor.y}; --row-color-z: ${itemColor.z};`;
 
-    palette.forEach((item) => {
-      tableRow.appendChild(this.generateGridColumn(rowItem, item));
+    palette.forEach((colItem) => {
+      tableRow.appendChild(
+        this.generateGridColumn(rowItem, colItem, colTemplate)
+      );
     });
 
     return tableRow;
@@ -68,31 +98,26 @@ export class ColorizerContrastGrid implements IColorizerPaletteObserver {
 
   private generateGridColumn(
     rowItem: ColorizerPaletteItem,
-    columnItem: ColorizerPaletteItem
+    columnItem: ColorizerPaletteItem,
+    colTemplate: HTMLTableColElement
   ): HTMLTableColElement {
-    const template = <HTMLTemplateElement>(
-      getDomElement(null, "#tpl-grid-column")
-    );
-
-    const tableColumn = (
-      template.content.firstElementChild as HTMLTableColElement
-    ).cloneNode(true) as HTMLTableColElement;
+    const tableCol = <HTMLTableColElement>colTemplate.cloneNode(true);
 
     const colColor = columnItem.color.toJSON();
     const rowColor = rowItem.color.toJSON();
     const contrastValue = getContrastValue(colColor.y, rowColor.y);
 
-    tableColumn.setAttribute("column-item-id", columnItem.paletteItemId);
-    tableColumn.style.cssText = `--col-color-x: ${colColor.x}; --col-color-y: ${colColor.y}; --col-color-z: ${colColor.z};`;
+    tableCol.setAttribute("column-item-id", columnItem.paletteItemId);
+    tableCol.style.cssText = `--col-color-x: ${colColor.x}; --col-color-y: ${colColor.y}; --col-color-z: ${colColor.z};`;
 
-    const cat = <HTMLParagraphElement>getDomElement(tableColumn, ".wcag-cat");
+    const cat = <HTMLParagraphElement>getDomElement(tableCol, ".wcag-cat");
     cat.innerHTML = getWcagCat(contrastValue);
 
     const contrast = <HTMLParagraphElement>(
-      getDomElement(tableColumn, ".wcag-contrast")
+      getDomElement(tableCol, ".wcag-contrast")
     );
     contrast.innerHTML = roundToPrecision(contrastValue, 2).toString();
 
-    return tableColumn;
+    return tableCol;
   }
 }

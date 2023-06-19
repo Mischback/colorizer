@@ -189,17 +189,20 @@
   </li>
 </template>
 
-<template id="tpl-grid-row">
-  <tr>
-    <th scope="row">foo</th>
-  </tr>
-</template>
-
-<template id="tpl-grid-column">
-  <td>
-    <p class="wcag-cat">FAIL</p>
-    <p class="wcag-contrast">0.0</p>
-  </td>
+<template id="tpl-grid-table">
+  <table>
+    <tr class="head-row">
+      <td>Meant to be empty</td>
+      <th scope="col">bar</th>
+    </tr>
+    <tr class="grid-row">
+      <th class="head-col" scope="row">foo</th>
+      <td class="grid-col">
+        <p class="wcag-cat">FAIL</p>
+        <p class="wcag-contrast">0.0</p>
+      </td>
+    </tr>
+  </table>
 </template>
 
   </body>
