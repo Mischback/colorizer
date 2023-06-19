@@ -3,7 +3,6 @@
 // SPDX-FileType: SOURCE
 
 import { getDomElement } from "../../utility";
-import Sortable from "sortablejs";
 import type {
   ColorizerPaletteItem,
   TMoveItemCallback,
@@ -14,8 +13,6 @@ import type { IColorizerPaletteObserver } from "../lib/types";
 export class ColorizerPaletteIO implements IColorizerPaletteObserver {
   private paletteList: HTMLUListElement;
   private removeItemCallback: TRemoveItemCallback;
-  // @ts-expect-error TS6133 value never read
-  private sortable: Sortable;
 
   public constructor(
     moveItemCallback: TMoveItemCallback,
@@ -28,12 +25,7 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
       getDomElement(null, "#color-palette ul")
     );
 
-    this.sortable = Sortable.create(this.paletteList, {
-      draggable: ".sortable-item",
-      onEnd: (evt) => {
-        void moveItemCallback(evt.oldIndex, evt.newIndex);
-      },
-    });
+    console.debug(moveItemCallback);
   }
 
   /**
