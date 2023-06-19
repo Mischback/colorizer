@@ -65,9 +65,13 @@ export class ColorizerContrastGrid implements IColorizerPaletteObserver {
     // This does only include two cells.
     this.gridTable.appendChild(headRow);
 
+    let headCol;
     palette.forEach((rowItem) => {
       // FIXME: headRowCol needs customization
-      headRow.appendChild(headRowCol.cloneNode(true));
+      headCol = <HTMLTableCellElement>headRowCol.cloneNode(true);
+      headCol.innerHTML = rowItem.paletteItemId;
+      headRow.appendChild(headCol);
+
       this.gridTable.appendChild(
         this.generateGridRow(rowItem, palette, gridRowTemplate, gridColTemplate)
       );
@@ -86,6 +90,9 @@ export class ColorizerContrastGrid implements IColorizerPaletteObserver {
 
     tableRow.setAttribute("row-item-id", rowItem.paletteItemId);
     tableRow.style.cssText = `--row-color-x: ${itemColor.x}; --row-color-y: ${itemColor.y}; --row-color-z: ${itemColor.z};`;
+
+    const head = <HTMLTableCellElement>getDomElement(tableRow, ".head-col");
+    head.innerHTML = rowItem.paletteItemId;
 
     palette.forEach((colItem) => {
       tableRow.appendChild(
