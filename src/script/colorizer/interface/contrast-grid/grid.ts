@@ -32,8 +32,6 @@ export class ColorizerContrastGrid implements IColorizerPaletteObserver {
         void moveItemCallback(evt.oldIndex - 1, evt.newIndex - 1);
       },
     });
-
-    console.debug(this.gridTable);
   }
 
   /**
