@@ -177,12 +177,34 @@
   </form>
 </section>
 
+<section id="contrast-grid">
+  <table></table>
+</section>
+
 <template id="tpl-palette-item">
   <li class="sortable-item">
     <div class="label">foo</div>
     <div class="preview"></div>
     <button type="button" class="button-remove">remove</button>
   </li>
+</template>
+
+<template id="tpl-grid-table">
+  <table>
+    <tr class="head-row">
+      <td>
+        <!-- FIXME: This might be the place for a "help" button -->
+      </td>
+      <th scope="col">bar</th>
+    </tr>
+    <tr class="grid-row">
+      <th class="head-col" scope="row">foo</th>
+      <td class="grid-col">
+        <p class="wcag-cat">FAIL</p>
+        <p class="wcag-contrast">0.0</p>
+      </td>
+    </tr>
+  </table>
 </template>
 
   </body>

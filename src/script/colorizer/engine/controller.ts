@@ -5,6 +5,7 @@
 import { ColorizerPalette } from "./palette";
 import { ColorizerDatabase } from "./database";
 import { ColorizerForm } from "../interface/color-form";
+import { ColorizerContrastGrid } from "../interface/contrast-grid/grid";
 import { ColorizerPaletteIO } from "../interface/palette";
 import type { TColorizerFormInputMethod } from "../interface/color-form";
 
@@ -12,9 +13,9 @@ export class ColorizerController {
   private db: ColorizerDatabase;
   // @ts-expect-error TS6133 value never read
   private form: ColorizerForm;
+  private grid: ColorizerContrastGrid;
   private palette: ColorizerPalette;
-  // @ts-expect-error TS6133 value never read
-  private paletteInterface: ColorizerPaletteIO;
+  private paletteIO: ColorizerPaletteIO;
 
   public constructor(
     inputMethods: TColorizerFormInputMethod[] = ["rgb", "hsl", "hwb", "oklch"]
@@ -42,6 +43,18 @@ export class ColorizerController {
     //
     // This is directly attached to the ``ColorizerPalette`` instance, which
     // provides the actual data management methods (CRUD operations).
-    this.paletteInterface = new ColorizerPaletteIO(this.palette);
+    this.paletteIO = new ColorizerPaletteIO(
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      this.palette.moveItemInPalette.bind(this.palette),
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      this.palette.removePaletteItemById.bind(this.palette)
+    );
+    this.palette.addPaletteObserver(this.paletteIO);
+
+    this.grid = new ColorizerContrastGrid(
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      this.palette.moveItemInPalette.bind(this.palette)
+    );
+    this.palette.addPaletteObserver(this.grid);
   }
 }

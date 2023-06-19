@@ -4,20 +4,24 @@
 
 import { getDomElement } from "../../utility";
 import Sortable from "sortablejs";
-import type { ColorizerPalette, ColorizerPaletteItem } from "../engine/palette";
+import type {
+  ColorizerPaletteItem,
+  TMoveItemCallback,
+  TRemoveItemCallback,
+} from "../engine/palette";
 import type { IColorizerPaletteObserver } from "../lib/types";
 
 export class ColorizerPaletteIO implements IColorizerPaletteObserver {
-  private palette: ColorizerPalette;
   private paletteList: HTMLUListElement;
+  private removeItemCallback: TRemoveItemCallback;
   // @ts-expect-error TS6133 value never read
   private sortable: Sortable;
 
-  public constructor(palette: ColorizerPalette) {
-    // Store a reference to the ``ColorizerPalette`` instance and register
-    // this instance as an *Observer*.
-    this.palette = palette;
-    this.palette.addPaletteObserver(this);
+  public constructor(
+    moveItemCallback: TMoveItemCallback,
+    removeItemCallback: TRemoveItemCallback
+  ) {
+    this.removeItemCallback = removeItemCallback;
 
     // Get the required DOM elements
     this.paletteList = <HTMLUListElement>(
@@ -27,7 +31,7 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     this.sortable = Sortable.create(this.paletteList, {
       draggable: ".sortable-item",
       onEnd: (evt) => {
-        void this.palette.moveItemInPalette(evt.oldIndex, evt.newIndex);
+        void moveItemCallback(evt.oldIndex, evt.newIndex);
       },
     });
   }
@@ -77,7 +81,7 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
       throw new Error("Could not determine ID of PaletteItem");
     }
 
-    void this.palette.removePaletteItemById(paletteItemId);
+    void this.removeItemCallback(paletteItemId);
   }
 
   /**
@@ -99,7 +103,7 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
    */
   private generatePaletteItem(item: ColorizerPaletteItem): HTMLLIElement {
     const template = <HTMLTemplateElement>(
-      document.getElementById("tpl-palette-item")
+      getDomElement(null, "#tpl-palette-item")
     );
 
     const paletteItem = (
