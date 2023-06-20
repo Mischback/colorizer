@@ -11,6 +11,25 @@ export class DragToOrder {
     this.container = container;
     this.itemQuery = draggableItemQuery;
 
+    this.container.addEventListener(
+      "dragstart",
+      this.handlerDragStart.bind(this)
+    );
+    this.container.addEventListener("dragend", this.handlerDragEnd.bind(this));
+    this.container.addEventListener(
+      "dragover",
+      this.handlerDragOver.bind(this)
+    );
+    this.container.addEventListener("drop", this.handlerDragDrop.bind(this));
+    this.container.addEventListener(
+      "dragenter",
+      this.handlerDragEnter.bind(this)
+    );
+    this.container.addEventListener(
+      "dragleave",
+      this.handlerDragLeave.bind(this)
+    );
+
     // Observe mutations of the container, in particular the addition of new
     // child elements.
     this.containerMutationObserver = new MutationObserver(
@@ -24,7 +43,14 @@ export class DragToOrder {
 
   private createItem(item: HTMLElement): void {
     console.debug("createItem()");
-    console.debug(item);
+
+    if (item.getAttribute("draggable") === "true") {
+      console.debug("Item is already draggable");
+      return;
+    }
+
+    console.debug("Item must be processed");
+    item.setAttribute("draggable", "true");
   }
 
   /**
@@ -35,6 +61,36 @@ export class DragToOrder {
    */
   private getItems(): NodeListOf<HTMLElement> {
     return this.container.querySelectorAll(this.itemQuery);
+  }
+
+  private handlerDragStart(evt: DragEvent): void {
+    console.debug("handlerDragStart()");
+    console.debug(evt);
+  }
+
+  private handlerDragEnd(evt: DragEvent): void {
+    console.debug("handlerDragEnd()");
+    console.debug(evt);
+  }
+
+  private handlerDragOver(evt: DragEvent): void {
+    console.debug("handlerDragOver()");
+    console.debug(evt);
+  }
+
+  private handlerDragDrop(evt: DragEvent): void {
+    console.debug("handlerDragDrop()");
+    console.debug(evt);
+  }
+
+  private handlerDragEnter(evt: DragEvent): void {
+    console.debug("handlerDragEnter()");
+    console.debug(evt);
+  }
+
+  private handlerDragLeave(evt: DragEvent): void {
+    console.debug("handlerDragLeave()");
+    console.debug(evt);
   }
 
   /**
