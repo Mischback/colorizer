@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
+export { DragToOrder } from "./drag-to-order";
 export { mHash } from "./murmurhash";
 
 /**
