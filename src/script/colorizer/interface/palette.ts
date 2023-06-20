@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import { getDomElement } from "../../utility";
+import { getDomElement, DragToOrder } from "../../utility";
 import type {
   ColorizerPaletteItem,
   TMoveItemCallback,
@@ -13,6 +13,8 @@ import type { IColorizerPaletteObserver } from "../lib/types";
 export class ColorizerPaletteIO implements IColorizerPaletteObserver {
   private paletteList: HTMLUListElement;
   private removeItemCallback: TRemoveItemCallback;
+  // @ts-expect-error TS6133 value never read
+  private dragToOrder: DragToOrder;
 
   public constructor(
     moveItemCallback: TMoveItemCallback,
@@ -24,6 +26,8 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     this.paletteList = <HTMLUListElement>(
       getDomElement(null, "#color-palette ul")
     );
+
+    this.dragToOrder = new DragToOrder(this.paletteList, ".palette-item");
 
     console.debug(moveItemCallback);
   }
