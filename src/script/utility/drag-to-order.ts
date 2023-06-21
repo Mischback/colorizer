@@ -13,17 +13,25 @@ export class DragToOrder {
   private activeDrag: boolean;
   private container: HTMLElement;
   private containerMutationObserver;
-  // @ts-expect-error TS6133 value never read
   private draggedItem: HTMLElement | undefined;
   private dropZone: HTMLElement | undefined;
   private instanceId;
   private itemQuery: string;
   private newIndex: number;
   private oldIndex: number;
+  private styleCurrentlyDragged: string;
+  private styleDropTargetHover: string;
 
-  constructor(container: HTMLElement, draggableItemQuery: string) {
+  constructor(
+    container: HTMLElement,
+    draggableItemQuery: string,
+    styleCurrentlyDragged = "dragtoorder-currently-dragged",
+    styleDropTargetHover = "dragtoorder-drop-target-hover"
+  ) {
     this.container = container;
     this.itemQuery = draggableItemQuery;
+    this.styleCurrentlyDragged = styleCurrentlyDragged;
+    this.styleDropTargetHover = styleDropTargetHover;
 
     this.draggedItem = undefined;
     this.oldIndex = -1;
@@ -135,15 +143,13 @@ export class DragToOrder {
     // @ts-expect-error TS18047 Might be ``null``... Nope!
     evt.dataTransfer.effectAllowed = "move";
 
-    // FIXME: Make the class name configurable!
-    // evt.target.classList.add("currently-dragged");
+    (evt.target as HTMLElement).classList.add(this.styleCurrentlyDragged);
 
     this.draggedItem = <HTMLElement>evt.target;
     this.oldIndex = tmpIndex;
     this.activeDrag = true;
   }
 
-  // @ts-expect-error TS6133 value never read
   private handlerDragEnd(evt: DragEvent): void {
     // If multiple instances are attached to the same ``container``, this
     // reduces the execution of (expensive) event handlers.
@@ -157,8 +163,7 @@ export class DragToOrder {
 
     this.activeDrag = false;
 
-    // FIXME: Make the class name configurable!
-    // evt.target.classList.remove("currently-dragged");
+    (evt.target as HTMLElement).classList.remove(this.styleCurrentlyDragged);
   }
 
   private handlerDragOver(evt: DragEvent): void {
@@ -206,8 +211,8 @@ export class DragToOrder {
     // console.debug(`handlerDragDrop() of ${this.instanceId}`);
     // console.debug(evt);
 
-    // FIXME: Make the class name configurable!
-    // this.dropZone.classList.remove("drop-target-hover");
+    this.draggedItem?.classList.remove(this.styleCurrentlyDragged);
+    this.dropZone?.classList.remove(this.styleDropTargetHover);
 
     console.info(`oldIndex: ${this.oldIndex}, newIndex: ${this.newIndex}`);
 
@@ -233,8 +238,7 @@ export class DragToOrder {
     // console.debug(`handlerDragEnter() of ${this.instanceId}`);
     // console.debug(evt);
 
-    // FIXME: Make the class name configurable!
-    // evt.target.classList.add("drop-target-hover");
+    (evt.target as HTMLElement).classList.add(this.styleDropTargetHover);
   }
 
   private handlerDragLeave(evt: DragEvent): void {
@@ -252,8 +256,7 @@ export class DragToOrder {
     // console.debug(`handlerDragLeave() of ${this.instanceId}`);
     // console.debug(evt);
 
-    // FIXME: Make the class name configurable!
-    // this.dropZone.classList.remove("drop-target-hover");
+    this.dropZone?.classList.remove(this.styleDropTargetHover);
   }
 
   /**
