@@ -4,11 +4,9 @@
 
 import { getContrastValue, getWcagCat } from "./calculus";
 import { getDomElement, roundToPrecision, DragToOrder } from "../../../utility";
-import type {
-  ColorizerPaletteItem,
-  TMoveItemCallback,
-} from "../../engine/palette";
+import type { ColorizerPaletteItem } from "../../engine/palette";
 import type { IColorizerPaletteObserver } from "../../lib/types";
+import type { TDragToOrderDragResultCallback } from "../../../utility";
 
 export class ColorizerContrastGrid implements IColorizerPaletteObserver {
   private gridTable: HTMLTableElement;
@@ -17,14 +15,22 @@ export class ColorizerContrastGrid implements IColorizerPaletteObserver {
   // @ts-expect-error TS6133 value never read
   private dragToCol: DragToOrder;
 
-  public constructor(moveItemCallback: TMoveItemCallback) {
+  public constructor(moveItemCallback: TDragToOrderDragResultCallback) {
     // Get the required DOM elements
     this.gridTable = <HTMLTableElement>(
       getDomElement(null, "#contrast-grid table")
     );
 
-    this.dragToRow = new DragToOrder(this.gridTable, ".grid-row th");
-    this.dragToCol = new DragToOrder(this.gridTable, ".head-row th");
+    this.dragToRow = new DragToOrder(
+      this.gridTable,
+      ".grid-row th",
+      moveItemCallback
+    );
+    this.dragToCol = new DragToOrder(
+      this.gridTable,
+      ".head-row th",
+      moveItemCallback
+    );
 
     console.debug(moveItemCallback);
   }

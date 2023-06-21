@@ -2,6 +2,11 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
+export type TDragToOrderDragResultCallback = (
+  oldIndex: number,
+  newIndex: number
+) => void | Promise<void>;
+
 class ItemNotFoundError extends Error {
   constructor(message: string) {
     super(message);
@@ -14,6 +19,7 @@ export class DragToOrder {
   private container: HTMLElement;
   private containerMutationObserver;
   private draggedItem: HTMLElement | undefined;
+  private dragResultCallback: TDragToOrderDragResultCallback;
   private dropZone: HTMLElement | undefined;
   private instanceId;
   private itemQuery: string;
@@ -25,11 +31,13 @@ export class DragToOrder {
   constructor(
     container: HTMLElement,
     draggableItemQuery: string,
+    dragResultCallback: TDragToOrderDragResultCallback,
     styleCurrentlyDragged = "dragtoorder-currently-dragged",
     styleDropTargetHover = "dragtoorder-drop-target-hover"
   ) {
     this.container = container;
     this.itemQuery = draggableItemQuery;
+    this.dragResultCallback = dragResultCallback;
     this.styleCurrentlyDragged = styleCurrentlyDragged;
     this.styleDropTargetHover = styleDropTargetHover;
 
@@ -215,6 +223,7 @@ export class DragToOrder {
     this.dropZone?.classList.remove(this.styleDropTargetHover);
 
     console.info(`oldIndex: ${this.oldIndex}, newIndex: ${this.newIndex}`);
+    void this.dragResultCallback(this.oldIndex, this.newIndex);
 
     this.draggedItem = undefined;
     this.oldIndex = -1;
