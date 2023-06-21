@@ -3,7 +3,7 @@
 // SPDX-FileType: SOURCE
 
 import { getContrastValue, getWcagCat } from "./calculus";
-import { getDomElement, roundToPrecision } from "../../../utility";
+import { getDomElement, roundToPrecision, DragToOrder } from "../../../utility";
 import type {
   ColorizerPaletteItem,
   TMoveItemCallback,
@@ -12,12 +12,19 @@ import type { IColorizerPaletteObserver } from "../../lib/types";
 
 export class ColorizerContrastGrid implements IColorizerPaletteObserver {
   private gridTable: HTMLTableElement;
+  // @ts-expect-error TS6133 value never read
+  private dragToRow: DragToOrder;
+  // @ts-expect-error TS6133 value never read
+  private dragToCol: DragToOrder;
 
   public constructor(moveItemCallback: TMoveItemCallback) {
     // Get the required DOM elements
     this.gridTable = <HTMLTableElement>(
       getDomElement(null, "#contrast-grid table")
     );
+
+    this.dragToRow = new DragToOrder(this.gridTable, ".grid-row th");
+    this.dragToCol = new DragToOrder(this.gridTable, ".head-row th");
 
     console.debug(moveItemCallback);
   }
