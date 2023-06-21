@@ -11,10 +11,6 @@ import type {
   IColorizerPaletteObserver,
 } from "../lib/types";
 
-export type TMoveItemCallback = (
-  oldIndex: number | undefined,
-  newIndex: number | undefined
-) => void;
 export type TRemoveItemCallback = (paletteItemId: string) => void;
 
 export interface IColorizerPaletteItem {
