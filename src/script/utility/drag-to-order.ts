@@ -10,6 +10,7 @@ class ItemNotFoundError extends Error {
 }
 
 export class DragToOrder {
+  private activeDrag: boolean;
   private container: HTMLElement;
   private containerMutationObserver;
   // @ts-expect-error TS6133 value never read
@@ -28,6 +29,7 @@ export class DragToOrder {
     this.oldIndex = -1;
     this.dropZone = undefined;
     this.newIndex = -1;
+    this.activeDrag = false;
 
     // FIXME: Just for debugging/development
     this.instanceId = crypto.randomUUID();
@@ -138,19 +140,34 @@ export class DragToOrder {
 
     this.draggedItem = <HTMLElement>evt.target;
     this.oldIndex = tmpIndex;
+    this.activeDrag = true;
   }
 
   // @ts-expect-error TS6133 value never read
   private handlerDragEnd(evt: DragEvent): void {
+    // If multiple instances are attached to the same ``container``, this
+    // reduces the execution of (expensive) event handlers.
+    if (!this.activeDrag) {
+      return;
+    }
+
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     console.debug(`handlerDragEnd() of ${this.instanceId}`);
     // console.debug(evt);
+
+    this.activeDrag = false;
 
     // FIXME: Make the class name configurable!
     // evt.target.classList.remove("currently-dragged");
   }
 
   private handlerDragOver(evt: DragEvent): void {
+    // If multiple instances are attached to the same ``container``, this
+    // reduces the execution of (expensive) event handlers.
+    if (!this.activeDrag) {
+      return;
+    }
+
     const tmpIndex = this.getItemIndex(<HTMLElement>evt.target);
     if (tmpIndex === false) {
       return;
@@ -175,6 +192,12 @@ export class DragToOrder {
   }
 
   private handlerDragDrop(evt: DragEvent): void {
+    // If multiple instances are attached to the same ``container``, this
+    // reduces the execution of (expensive) event handlers.
+    if (!this.activeDrag) {
+      return;
+    }
+
     if (this.getItemIndex(<HTMLElement>evt.target) === false) {
       return;
     }
@@ -192,9 +215,16 @@ export class DragToOrder {
     this.oldIndex = -1;
     this.dropZone = undefined;
     this.newIndex = -1;
+    this.activeDrag = false;
   }
 
   private handlerDragEnter(evt: DragEvent): void {
+    // If multiple instances are attached to the same ``container``, this
+    // reduces the execution of (expensive) event handlers.
+    if (!this.activeDrag) {
+      return;
+    }
+
     if (this.getItemIndex(<HTMLElement>evt.target) === false) {
       return;
     }
@@ -208,6 +238,12 @@ export class DragToOrder {
   }
 
   private handlerDragLeave(evt: DragEvent): void {
+    // If multiple instances are attached to the same ``container``, this
+    // reduces the execution of (expensive) event handlers.
+    if (!this.activeDrag) {
+      return;
+    }
+
     if (this.getItemIndex(<HTMLElement>evt.target) === false) {
       return;
     }
