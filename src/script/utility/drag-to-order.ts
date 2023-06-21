@@ -129,7 +129,7 @@ export class DragToOrder {
     }
 
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.debug(`handlerDragStart() of ${this.instanceId}`);
+    // console.debug(`handlerDragStart() of ${this.instanceId}`);
     // console.debug(evt);
 
     // @ts-expect-error TS18047 Might be ``null``... Nope!
@@ -152,7 +152,7 @@ export class DragToOrder {
     }
 
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.debug(`handlerDragEnd() of ${this.instanceId}`);
+    // console.debug(`handlerDragEnd() of ${this.instanceId}`);
     // console.debug(evt);
 
     this.activeDrag = false;
@@ -174,7 +174,7 @@ export class DragToOrder {
     }
 
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.debug(`handlerDragOver() of ${this.instanceId}`);
+    // console.debug(`handlerDragOver() of ${this.instanceId}`);
     // console.debug(evt);
 
     if (this.dropZone !== evt.target) {
@@ -203,7 +203,7 @@ export class DragToOrder {
     }
 
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.debug(`handlerDragDrop() of ${this.instanceId}`);
+    // console.debug(`handlerDragDrop() of ${this.instanceId}`);
     // console.debug(evt);
 
     // FIXME: Make the class name configurable!
@@ -230,7 +230,7 @@ export class DragToOrder {
     }
 
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.debug(`handlerDragEnter() of ${this.instanceId}`);
+    // console.debug(`handlerDragEnter() of ${this.instanceId}`);
     // console.debug(evt);
 
     // FIXME: Make the class name configurable!
@@ -249,7 +249,7 @@ export class DragToOrder {
     }
 
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.debug(`handlerDragLeave() of ${this.instanceId}`);
+    // console.debug(`handlerDragLeave() of ${this.instanceId}`);
     // console.debug(evt);
 
     // FIXME: Make the class name configurable!
