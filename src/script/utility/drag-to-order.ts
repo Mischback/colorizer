@@ -74,7 +74,7 @@ export class DragToOrder {
     item.setAttribute("draggable", "true");
   }
 
-  private getItemIndex(item: HTMLElement): number {
+  private searchItemIndex(item: HTMLElement): number {
     if (item === this.container) {
       throw new ItemNotFoundError("Item not found in container");
     }
@@ -82,10 +82,30 @@ export class DragToOrder {
     const itemIndex = Array.prototype.indexOf.call(this.getItems(), item);
 
     if (itemIndex === -1) {
-      return this.getItemIndex(<HTMLElement>item.parentNode);
+      return this.searchItemIndex(<HTMLElement>item.parentNode);
     }
 
     return itemIndex;
+  }
+
+  private getItemIndex(item: HTMLElement): number | false {
+    let tmpIndex = -1;
+    try {
+      tmpIndex = this.searchItemIndex(item);
+    } catch (err) {
+      // @ts-expect-error TS18046 ``err`` is of type unknown
+      if (err.name === "ItemNotFoundError") {
+        return false;
+      } else {
+        throw err;
+      }
+    }
+
+    if (tmpIndex !== -1) {
+      return tmpIndex;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -103,7 +123,8 @@ export class DragToOrder {
     console.debug(`handlerDragStart() of ${this.instanceId}`);
     // console.debug(evt);
 
-    if (this.container.contains(evt.target as Node) === false) {
+    const tmpIndex = this.getItemIndex(<HTMLElement>evt.target);
+    if (tmpIndex === false) {
       return;
     }
 
@@ -114,7 +135,7 @@ export class DragToOrder {
     // evt.target.classList.add("currently-dragged");
 
     this.draggedItem = <HTMLElement>evt.target;
-    this.oldIndex = this.getItemIndex(<HTMLElement>evt.target);
+    this.oldIndex = tmpIndex;
   }
 
   // @ts-expect-error TS6133 value never read
@@ -132,12 +153,21 @@ export class DragToOrder {
     console.debug(`handlerDragOver() of ${this.instanceId}`);
     // console.debug(evt);
 
+    const tmpIndex = this.getItemIndex(<HTMLElement>evt.target);
+    if (tmpIndex === false) {
+      return;
+    }
+
     if (this.dropZone !== evt.target) {
-      this.newIndex = this.getItemIndex(<HTMLElement>evt.target);
+      this.newIndex = tmpIndex;
       this.dropZone = <HTMLElement>evt.target;
     }
 
-    if (this.newIndex !== -1 && this.newIndex !== this.oldIndex) {
+    if (
+      this.newIndex !== -1 &&
+      this.oldIndex !== -1 &&
+      this.newIndex !== this.oldIndex
+    ) {
       evt.preventDefault();
     }
   }
