@@ -77,7 +77,7 @@ export class DragToOrder {
     this.containerMutationObserver.observe(this.container, { childList: true });
 
     // Initial setup of the *draggable items*.
-    this.prepareItems(this.getItems());
+    this.prepareItems();
   }
 
   private searchItemIndex(item: HTMLElement): number {
@@ -258,11 +258,10 @@ export class DragToOrder {
 
   /**
    * Iterate a list of items that are meant to be *draggable*.
-   *
-   * @param itemList The list of items to process.
    */
-  private prepareItems(itemList: NodeListOf<HTMLElement>): void {
+  private prepareItems(): void {
     // console.debug("prepareItems()");
+    const itemList = this.getItems();
 
     itemList.forEach((item) => {
       // Make the item draggable without any further checks. If the attribute
@@ -299,11 +298,14 @@ export class DragToOrder {
       //       targets ``<th>`` elements, but the mutation list contains
       //       ``<tr>`` elements, because the table is created row by row.
       //
-      //       Calling the (internal) combination of ``prepareItems()`` with
-      //       ``getItems()`` ensures, that the setup is performed for the
-      //       actual desired elements.
+      //       Calling the (internal) ``prepareItems()`` will use ``getItems()``
+      //       to ensure, that the setup is performed for the actual desired
+      //       elements.
+      //
+      //       After verification, ``prepareItems()`` was modified to not
+      //       accept a list of items anymore!
       // this.prepareItems(<NodeListOf<HTMLElement>>mutation.addedNodes);
-      this.prepareItems(this.getItems());
+      this.prepareItems();
     }
   }
 }
