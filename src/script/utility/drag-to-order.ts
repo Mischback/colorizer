@@ -2,6 +2,14 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
+/**
+ * The required function signature for the callback function of drag operation.
+ *
+ * @param oldIndex The original index of the dragged element.
+ * @param newIndex The new index of the element after the drop event.
+ *
+ * The function should return ``void`` or a ``void Promise``.
+ */
 export type TDragToOrderDragResultCallback = (
   oldIndex: number,
   newIndex: number
@@ -14,6 +22,36 @@ class ItemNotFoundError extends Error {
   }
 }
 
+/**
+ * Provide a generic drag'n'drop functionality, based on HTML5's API.
+ *
+ * @param container An actual HTML element, the container to work on. Might be
+ *                  fetched i.e. using ``getElementById()``.
+ * @param draggableItemQuery A query string to identify the actual draggable
+ *                           items. Used with ``querySelectorAll()``.
+ * @param dragResultCallback The callback function to execute on a successful
+ *                           drag'n'drop operation.
+ * @param styleCurrentlyDragged The name of a CSS class to attach to the
+ *                              currently dragged item / element.
+ * @param styleDropTargetHover The name of a CSS class to attach to the
+ *                             currently hovered item / element, if it is a
+ *                             valid drop target.
+ *
+ * The class does provide the required setup to make items (child elements of
+ * ``container``) draggable. The corresponding event listeners are methods
+ * of this class and bound to the instance. They are attached to the
+ * ``container``, so they are provided only one time per instance.
+ *
+ * Internally, the draggable elements are identified by using
+ * ``querySelectorAll()`` with ``draggableItemQuery`` as its parameter.
+ * Dynamically added elements are noticed using a ``MutationObserver``.
+ *
+ * ``styleCurrentlyDragged`` and ``styleDropTargetHover`` are applied as CSS
+ * classes to the elements. No actual styles are provided!
+ *
+ * A successful drag'n'drop operation is assumed, when an element is *dropped*
+ * on a valid drop target and ``dragResultCallback`` is called.
+ */
 export class DragToOrder {
   private activeDrag: boolean;
   private container: HTMLElement;
@@ -80,6 +118,14 @@ export class DragToOrder {
     this.prepareItems();
   }
 
+  /**
+   * Determine the index of an item in this instance's list of items.
+   *
+   * This is the method which does the actual *search* / *determination* of
+   * the index, if possible. See the related ``getItemIndex()`` method, which
+   * wraps around this function for an easy to use interface. Code should
+   * preferable use ``getItemIndex()``!
+   */
   private searchItemIndex(item: HTMLElement): number {
     if (item === this.container) {
       throw new ItemNotFoundError("Item not found in container");
@@ -94,6 +140,12 @@ export class DragToOrder {
     return itemIndex;
   }
 
+  /**
+   * Return the index of the item in the instance's list of items or ``false``.
+   *
+   * This method wraps around ``searchItemIndex()`` to provide a nicer
+   * interface.
+   */
   private getItemIndex(item: HTMLElement): number | false {
     console.log(`getItemIndex() of ${this.instanceId}`);
     let tmpIndex = -1;
