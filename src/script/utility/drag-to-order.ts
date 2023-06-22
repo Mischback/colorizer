@@ -80,18 +80,6 @@ export class DragToOrder {
     this.prepareItems(this.getItems());
   }
 
-  private createItem(item: HTMLElement): void {
-    // console.debug("createItem()");
-
-    if (item.getAttribute("draggable") === "true") {
-      // console.debug("Item is already draggable");
-      return;
-    }
-
-    // console.debug("Item must be processed");
-    item.setAttribute("draggable", "true");
-  }
-
   private searchItemIndex(item: HTMLElement): number {
     if (item === this.container) {
       throw new ItemNotFoundError("Item not found in container");
@@ -272,14 +260,15 @@ export class DragToOrder {
    * Iterate a list of items that are meant to be *draggable*.
    *
    * @param itemList The list of items to process.
-   *
-   * Basically this makes sure to call ``createItem()`` an all items.
    */
   private prepareItems(itemList: NodeListOf<HTMLElement>): void {
     // console.debug("prepareItems()");
 
     itemList.forEach((item) => {
-      this.createItem(item);
+      // Make the item draggable without any further checks. If the attribute
+      // is already set, it is simply set again. This should not have side
+      // effects.
+      item.setAttribute("draggable", "true");
     });
   }
 
