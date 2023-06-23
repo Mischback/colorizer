@@ -34,7 +34,7 @@ export class ColorizerController {
     //
     // This is the *engine* that manages the palette internally. For the actual
     // visualization in the frontend, see ``this.paletteInterface`` below.
-    this.palette = new ColorizerPalette(this.db);
+    this.palette = new ColorizerPalette(this.db, this.notificationEngine);
 
     // Setup the ColorizerForm to add colors
     //

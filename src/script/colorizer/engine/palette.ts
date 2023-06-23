@@ -10,6 +10,7 @@ import type {
   IColorizerPaletteObservable,
   IColorizerPaletteObserver,
 } from "../lib/types";
+import type { NotificationEngine } from "../../utility";
 
 export type TRemoveItemCallback = (paletteItemId: string) => void;
 
@@ -107,13 +108,16 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
   private _palette: ColorizerPaletteItem[] = [];
   private db;
   private _nextSorting;
+  private notificationEngine: NotificationEngine;
 
   public constructor(
     dbInstance: ColorizerDatabase,
+    notificationEngine: NotificationEngine,
     sortingInitializer = "foobar"
   ) {
     // Store a reference to the database wrapper
     this.db = dbInstance;
+    this.notificationEngine = notificationEngine;
 
     // Initialize the lexicographical sorting
     this._nextSorting = new LexoRank(sortingInitializer);
@@ -152,7 +156,7 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
   public async addColorToPalette(color: ColorizerColor): Promise<void> {
     await this.add(color, this.nextSorting);
 
-    // TODO: [#42] Successfully added a color, show success message
+    this.notifyUserInfo("Color successfully added!");
 
     this.notifyPaletteObservers();
   }
@@ -180,7 +184,7 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     if (itemIndex === -1) return;
     this._palette.splice(itemIndex, 1);
 
-    // TODO: [#42] Successfully removed a color, show success message
+    this.notifyUserInfo("Color removed!");
 
     this.notifyPaletteObservers();
   }
@@ -200,15 +204,18 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     oldItemIndex: number | undefined,
     newItemIndex: number | undefined
   ) {
-    // TODO: [#42] Something went wrong, notify the user
-    if (oldItemIndex === undefined || oldItemIndex >= this._palette.length)
+    if (oldItemIndex === undefined || oldItemIndex >= this._palette.length) {
+      this.notifyUserError("Could not move color! Please try again!");
       return;
-    if (newItemIndex === undefined || newItemIndex >= this._palette.length)
+    }
+    if (newItemIndex === undefined || newItemIndex >= this._palette.length) {
+      this.notifyUserError("Could not move color! Please try again!");
       return;
+    }
 
     // console.debug(`old: ${oldItemIndex} / new: ${newItemIndex}`);
 
-    // Nothing to do... No notification required (see [#42])
+    // Nothing to do... No notification required...
     if (oldItemIndex === newItemIndex) return;
 
     // Get the item. This is safe at the spot of ``oldItemIndex``!
@@ -240,8 +247,10 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
       );
     }
 
-    // TODO: [#42] Something went wrong, notify the user
-    if (left === null && right === null) return;
+    if (left === null && right === null) {
+      this.notifyUserError("Could not move color! Please try again!");
+      return;
+    }
 
     // Only one of the parameters of ``between()`` may be ``null``, and in fact
     // the code does ensure that. TypeScript can not detect this, so the
@@ -252,6 +261,8 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
 
     // The paletteItem must be converted to *flat* JSON for IndexedDB.
     await this.update(theItem as ColorizerPaletteItem);
+
+    this.notifyUserInfo("Order of palette updated!");
 
     this.notifyPaletteObservers();
   }
@@ -400,5 +411,13 @@ export class ColorizerPalette implements IColorizerPaletteObservable {
     this.paletteObservers.forEach((obs) => {
       obs.update(this._palette);
     });
+  }
+
+  private notifyUserInfo(message: string): void {
+    this.notificationEngine.addInfo(message);
+  }
+
+  private notifyUserError(message: string): void {
+    this.notificationEngine.addError(message);
   }
 }
