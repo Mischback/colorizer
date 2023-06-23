@@ -12,6 +12,8 @@
     margin: 0.25em 0;
     padding: 0.25em 0.5em;
     transition: opacity 500ms ease-in-out;
+
+    // FIXME: [#32] Build an overall colorscheme
     border: 1px solid #000;
     border-radius: 5px;
 
@@ -27,14 +29,17 @@
 
     /* stylelint-disable selector-no-qualifying-type */
     &.message {
+      // FIXME: [#32] Build an overall colorscheme
       background-color: #9c9;
     }
 
     &.info {
+      // FIXME: [#32] Build an overall colorscheme
       background-color: rgb(255 220 0);
     }
 
     &.error {
+      // FIXME: [#32] Build an overall colorscheme
       background-color: rgb(196 0 0);
       color: #fff;
     }
