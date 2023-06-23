@@ -1,0 +1,37 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+nav {
+  /* This is the actual tab header, which allows switching tabs */
+  .tab {
+    display: inline-block;
+    margin: 0 2px;
+    padding: 10px 20px;
+    background-color: #c99;
+    cursor: pointer;
+  }
+}
+
+main {
+  /* The ``<input type="radio" ...>`` are controlling, which tab is visible. */
+  input[type="radio"] {
+    display: none;
+  }
+
+  /* Hide all panels by default. */
+  .panel {
+    display: none;
+  }
+
+  /* Show the tabs, if the corresponding ``<input type="radio" ...`` is
+   * activated.
+   */
+  /* stylelint-disable selector-max-id */
+  #ctrl-palette:checked ~ #color-palette,
+  #ctrl-color-form:checked ~ #panel-color-form,
+  #ctrl-grid:checked ~ #contrast-grid {
+    display: block;
+  }
+  /* stylelint-enable selector-max-id */
+}
