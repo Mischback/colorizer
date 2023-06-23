@@ -1,0 +1,30 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+#notifications {
+  // FIXME: Positioning required!
+
+  > section {
+    margin: 0.25em 0;
+    padding: 0.25em 0.5em;
+    border: 1px solid #000;
+    border-radius: 5px;
+
+    p {
+      display: inline-block;
+      margin: 0;
+      padding: 0;
+    }
+
+    button {
+      margin-left: 0.5em;
+    }
+
+    /* stylelint-disable selector-no-qualifying-type */
+    &.message {
+      background-color: #9c9;
+    }
+    /* stylelint-enable selector-no-qualifying-type */
+  }
+}

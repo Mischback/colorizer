@@ -14,6 +14,7 @@ export class NotificationEngine {
 
   public addMessage(message: string, timeout: number | false = 1000) {
     const notification = document.createElement("section");
+    notification.classList.add("message");
 
     const messageBody = document.createElement("p");
     messageBody.innerHTML = message;
@@ -30,7 +31,7 @@ export class NotificationEngine {
       // Create a button to close the notification!
       const dismiss = document.createElement("button");
       dismiss.setAttribute("type", "button");
-      dismiss.innerHTML = "close";
+      dismiss.innerHTML = "dismiss";
       dismiss.addEventListener("click", () => {
         this.removeMessage(notification);
       });
