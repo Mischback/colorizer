@@ -89,6 +89,7 @@ export class DragToOrder {
 
     // FIXME: Just for debugging/development
     this.instanceId = crypto.randomUUID();
+    console.debug(this.instanceId);
 
     this.container.addEventListener(
       "dragstart",
@@ -100,10 +101,10 @@ export class DragToOrder {
       this.handlerDragOver.bind(this)
     );
     this.container.addEventListener("drop", this.handlerDragDrop.bind(this));
-    this.container.addEventListener(
-      "dragenter",
-      this.handlerDragEnter.bind(this)
-    );
+    // this.container.addEventListener(
+    //   "dragenter",
+    //   this.handlerDragEnter.bind(this)
+    // );
     this.container.addEventListener(
       "dragleave",
       this.handlerDragLeave.bind(this)
@@ -139,7 +140,7 @@ export class DragToOrder {
    * interface.
    */
   private getItemIndex(item: HTMLElement): number | false {
-    console.log(`getItemIndex() of ${this.instanceId}`);
+    // console.log(`getItemIndex() of ${this.instanceId}`);
     let tmpItem;
     try {
       tmpItem = this.findClosestDropItem(item);
@@ -193,9 +194,9 @@ export class DragToOrder {
     // @ts-expect-error TS18047 Might be ``null``... Nope!
     evt.dataTransfer.effectAllowed = "move";
 
-    (evt.target as HTMLElement).classList.add(this.styleCurrentlyDragged);
+    this.itemList[tmpIndex]?.classList.add(this.styleCurrentlyDragged);
 
-    this.draggedItem = <HTMLElement>evt.target;
+    this.draggedItem = this.itemList[tmpIndex];
     this.oldIndex = tmpIndex;
     this.activeDrag = true;
   }
@@ -205,6 +206,8 @@ export class DragToOrder {
    *
    * The ``evt.target`` of this event is the *dragged item*.
    */
+  // @ts-expect-error TS6133 Unused variable
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private handlerDragEnd(evt: DragEvent): void {
     // If multiple instances are attached to the same ``container``, this
     // reduces the execution of (expensive) event handlers.
@@ -216,9 +219,14 @@ export class DragToOrder {
     // console.debug(`handlerDragEnd() of ${this.instanceId}`);
     // console.debug(evt);
 
-    this.activeDrag = false;
+    this.draggedItem?.classList.remove(this.styleCurrentlyDragged);
+    this.dropZone?.classList.remove(this.styleDropTargetHover);
 
-    (evt.target as HTMLElement).classList.remove(this.styleCurrentlyDragged);
+    this.draggedItem = undefined;
+    this.oldIndex = -1;
+    this.dropZone = undefined;
+    this.newIndex = -1;
+    this.activeDrag = false;
   }
 
   /** Event Handler for ``dragover``.
@@ -256,6 +264,7 @@ export class DragToOrder {
       this.oldIndex !== -1 &&
       this.newIndex !== this.oldIndex
     ) {
+      this.dropZone?.classList.add(this.styleDropTargetHover);
       evt.preventDefault();
     }
   }
@@ -291,24 +300,24 @@ export class DragToOrder {
   /** Event Handler for ``dragenter``.
    *
    * The ``evt.target`` of this event is any HTMLElement.
+   *
+   * CURRENTLY NOT IN USE!
    */
-  private handlerDragEnter(evt: DragEvent): void {
-    // If multiple instances are attached to the same ``container``, this
-    // reduces the execution of (expensive) event handlers.
-    if (!this.activeDrag) {
-      return;
-    }
+  // private handlerDragEnter(evt: DragEvent): void {
+  //   // If multiple instances are attached to the same ``container``, this
+  //   // reduces the execution of (expensive) event handlers.
+  //   if (!this.activeDrag) {
+  //     return;
+  //   }
 
-    if (this.getItemIndex(<HTMLElement>evt.target) === false) {
-      return;
-    }
+  //   if (this.getItemIndex(<HTMLElement>evt.target) === false) {
+  //     return;
+  //   }
 
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    // console.debug(`handlerDragEnter() of ${this.instanceId}`);
-    // console.debug(evt);
-
-    (evt.target as HTMLElement).classList.add(this.styleDropTargetHover);
-  }
+  //   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+  //   // console.debug(`handlerDragEnter() of ${this.instanceId}`);
+  //   // console.debug(evt);
+  // }
 
   /** Event Handler for ``dragleave``.
    *
