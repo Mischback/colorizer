@@ -12,9 +12,13 @@ export class NotificationEngine {
     this.container = container;
   }
 
-  public addMessage(message: string, timeout: number | false = 1000) {
+  public addMessage(
+    message: string,
+    cssClass = "message",
+    timeout: number | false = 1000
+  ) {
     const notification = document.createElement("section");
-    notification.classList.add("message");
+    notification.classList.add(cssClass);
 
     const messageBody = document.createElement("p");
     messageBody.innerHTML = message;
@@ -37,6 +41,14 @@ export class NotificationEngine {
       });
       notification.appendChild(dismiss);
     }
+  }
+
+  public addInfo(message: string, timeout: number | false = 1000) {
+    this.addMessage(message, "info", timeout);
+  }
+
+  public addError(message: string) {
+    this.addMessage(message, "error", false);
   }
 
   private removeMessage(notification: HTMLElement): void {

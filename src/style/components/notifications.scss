@@ -25,6 +25,15 @@
     &.message {
       background-color: #9c9;
     }
+
+    &.info {
+      background-color: rgb(255 220 0);
+    }
+
+    &.error {
+      background-color: rgb(196 0 0);
+      color: #fff;
+    }
     /* stylelint-enable selector-no-qualifying-type */
   }
 }
