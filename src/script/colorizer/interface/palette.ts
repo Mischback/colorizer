@@ -32,8 +32,6 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
       ".palette-item",
       moveItemCallback
     );
-
-    console.debug(moveItemCallback);
   }
 
   /**

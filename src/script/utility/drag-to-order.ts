@@ -59,7 +59,7 @@ export class DragToOrder {
   private draggedItem: HTMLElement | undefined;
   private dragResultCallback: TDragToOrderDragResultCallback;
   private dropZone: HTMLElement | undefined;
-  private instanceId;
+  // private instanceId;
   private itemList: NodeListOf<HTMLElement>;
   private itemQuery: string;
   private newIndex: number;
@@ -88,8 +88,8 @@ export class DragToOrder {
     this.itemList = this.getItems();
 
     // FIXME: Just for debugging/development
-    this.instanceId = crypto.randomUUID();
-    console.debug(this.instanceId);
+    // this.instanceId = crypto.randomUUID();
+    // console.debug(this.instanceId);
 
     this.container.addEventListener(
       "dragstart",
@@ -287,7 +287,7 @@ export class DragToOrder {
     this.draggedItem?.classList.remove(this.styleCurrentlyDragged);
     this.dropZone?.classList.remove(this.styleDropTargetHover);
 
-    console.info(`oldIndex: ${this.oldIndex}, newIndex: ${this.newIndex}`);
+    // console.info(`oldIndex: ${this.oldIndex}, newIndex: ${this.newIndex}`);
     void this.dragResultCallback(this.oldIndex, this.newIndex);
 
     this.draggedItem = undefined;

@@ -31,8 +31,6 @@ export class ColorizerContrastGrid implements IColorizerPaletteObserver {
       ".head-row th",
       moveItemCallback
     );
-
-    console.debug(moveItemCallback);
   }
 
   /**
