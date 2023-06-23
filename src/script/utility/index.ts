@@ -3,8 +3,9 @@
 // SPDX-FileType: SOURCE
 
 export { DragToOrder } from "./drag-to-order";
-export type { TDragToOrderDragResultCallback } from "./drag-to-order";
 export { mHash } from "./murmurhash";
+export { NotificationEngine } from "./notifications";
+export type { TDragToOrderDragResultCallback } from "./drag-to-order";
 
 /**
  * Get a DOM element by a given query.
