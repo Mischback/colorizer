@@ -55,9 +55,9 @@ export class NotificationEngine {
     // FIXME: Better add a CSS class here. Incorporate transition!
     // TODO: CSS class name should be configurable (with default value)
     // FIXME: Make the fade-out interval configurable!
-    notification.setAttribute("style", "opacity: 0.5");
+    notification.classList.add("notify-fade-out");
     setTimeout(() => {
       this.container.removeChild(notification);
-    }, 250);
+    }, 500);
   }
 }

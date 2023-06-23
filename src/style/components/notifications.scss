@@ -11,6 +11,7 @@
   > section {
     margin: 0.25em 0;
     padding: 0.25em 0.5em;
+    transition: opacity 500ms ease-in-out;
     border: 1px solid #000;
     border-radius: 5px;
 
@@ -36,6 +37,10 @@
     &.error {
       background-color: rgb(196 0 0);
       color: #fff;
+    }
+
+    &.notify-fade-out {
+      opacity: 0;
     }
     /* stylelint-enable selector-no-qualifying-type */
   }
