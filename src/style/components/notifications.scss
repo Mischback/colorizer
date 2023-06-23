@@ -3,7 +3,10 @@
 // SPDX-FileType: SOURCE
 
 #notifications {
-  // FIXME: Positioning required!
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  width: 25%;
 
   > section {
     margin: 0.25em 0;
