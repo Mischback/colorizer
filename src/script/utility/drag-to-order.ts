@@ -120,37 +120,15 @@ export class DragToOrder {
     this.prepareItems();
   }
 
-  /**
-   * Determine the index of an item in this instance's list of items.
-   *
-   * This is the method which does the actual *search* / *determination* of
-   * the index, if possible. See the related ``getItemIndex()`` method, which
-   * wraps around this function for an easy to use interface. Code should
-   * preferable use ``getItemIndex()``!
-   */
-  private searchItemIndex(item: HTMLElement): number {
-    if (item === this.container) {
-      throw new ItemNotFoundError("Item not found in container");
-    }
-
-    const itemIndex = Array.prototype.indexOf.call(this.itemList, item);
-
-    if (itemIndex === -1) {
-      return this.searchItemIndex(<HTMLElement>item.parentNode);
-    }
-
-    return itemIndex;
-  }
-
-  private findClosestDropTarget(item: HTMLElement): HTMLElement {
+  private findClosestDropItem(item: HTMLElement): HTMLElement {
     if (item === this.container) {
       throw new ItemNotFoundError("Could not find a drop target");
     }
 
-    if (item.hasAttribute("draggable")) {
+    if (item.nodeType === Node.ELEMENT_NODE && item.hasAttribute("draggable")) {
       return item;
     } else {
-      return this.findClosestDropTarget(<HTMLElement>item.parentNode);
+      return this.findClosestDropItem(<HTMLElement>item.parentNode);
     }
   }
 
@@ -162,9 +140,9 @@ export class DragToOrder {
    */
   private getItemIndex(item: HTMLElement): number | false {
     console.log(`getItemIndex() of ${this.instanceId}`);
-    let tmpIndex = -1;
+    let tmpItem;
     try {
-      tmpIndex = this.searchItemIndex(item);
+      tmpItem = this.findClosestDropItem(item);
     } catch (err) {
       // @ts-expect-error TS18046 ``err`` is of type unknown
       if (err.name === "ItemNotFoundError") {
@@ -174,6 +152,7 @@ export class DragToOrder {
       }
     }
 
+    const tmpIndex = Array.prototype.indexOf.call(this.itemList, tmpItem);
     if (tmpIndex !== -1) {
       return tmpIndex;
     } else {
@@ -264,21 +243,12 @@ export class DragToOrder {
 
     // evt.target is the actual HTMLElement, not necessarily the valid
     // drop target!
-    let dropTarget;
-    try {
-      dropTarget = this.findClosestDropTarget(<HTMLElement>evt.target);
-    } catch (err) {
-      // @ts-expect-error TS18046 ``err`` is of type unknown
-      if (err.name === "ItemNotFoundError") {
-        return;
-      } else {
-        throw err;
-      }
-    }
+    // However, at this point, ``tmpIndex`` hold the index of a valid drop
+    // target of this instance.
 
-    if (this.dropZone !== dropTarget) {
+    if (this.dropZone !== this.itemList[tmpIndex]) {
       this.newIndex = tmpIndex;
-      this.dropZone = dropTarget;
+      this.dropZone = this.itemList[tmpIndex];
     }
 
     if (
