@@ -60,6 +60,7 @@ export class DragToOrder {
   private dragResultCallback: TDragToOrderDragResultCallback;
   private dropZone: HTMLElement | undefined;
   private instanceId;
+  private itemList: NodeListOf<HTMLElement>;
   private itemQuery: string;
   private newIndex: number;
   private oldIndex: number;
@@ -84,6 +85,7 @@ export class DragToOrder {
     this.dropZone = undefined;
     this.newIndex = -1;
     this.activeDrag = false;
+    this.itemList = this.getItems();
 
     // FIXME: Just for debugging/development
     this.instanceId = crypto.randomUUID();
@@ -131,7 +133,7 @@ export class DragToOrder {
       throw new ItemNotFoundError("Item not found in container");
     }
 
-    const itemIndex = Array.prototype.indexOf.call(this.getItems(), item);
+    const itemIndex = Array.prototype.indexOf.call(this.itemList, item);
 
     if (itemIndex === -1) {
       return this.searchItemIndex(<HTMLElement>item.parentNode);
@@ -365,9 +367,7 @@ export class DragToOrder {
    */
   private prepareItems(): void {
     // console.debug("prepareItems()");
-    const itemList = this.getItems();
-
-    itemList.forEach((item) => {
+    this.itemList.forEach((item) => {
       // Make the item draggable without any further checks. If the attribute
       // is already set, it is simply set again. This should not have side
       // effects.
@@ -402,13 +402,10 @@ export class DragToOrder {
       //       targets ``<th>`` elements, but the mutation list contains
       //       ``<tr>`` elements, because the table is created row by row.
       //
-      //       Calling the (internal) ``prepareItems()`` will use ``getItems()``
-      //       to ensure, that the setup is performed for the actual desired
-      //       elements.
-      //
-      //       After verification, ``prepareItems()`` was modified to not
-      //       accept a list of items anymore!
-      // this.prepareItems(<NodeListOf<HTMLElement>>mutation.addedNodes);
+      //       Calling the (internal) ``prepareItems()`` will use the
+      //       ``itemList`` attribute. As this is a MutationObserver, the
+      //       ``itemList`` attribute **must be updated** here!
+      this.itemList = this.getItems();
       this.prepareItems();
     }
   }
