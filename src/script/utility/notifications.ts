@@ -21,12 +21,15 @@ export class NotificationEngine {
     if (container === null) {
       throw new Error("No container provided");
     }
+
     this.container = container;
     this.cssErrorClass = cssErrorClass;
     this.cssInfoClass = cssInfoClass;
     this.cssFadeClass = cssFadeClass;
     this.fadeDuration = fadeDuration;
     this.visibleTimeout = visibleTimeout;
+
+    this.addMessage("Notification engine ready!", "message", 250);
   }
 
   public addMessage(

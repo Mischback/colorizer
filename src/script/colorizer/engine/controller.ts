@@ -26,16 +26,6 @@ export class ColorizerController {
     this.notificationEngine = new NotificationEngine(
       document.getElementById("notifications")
     );
-    this.notificationEngine.addMessage("Notification engine ready!");
-    this.notificationEngine.addMessage("Info (manually created)", "info", 5000);
-    this.notificationEngine.addMessage(
-      "Error (manually created)",
-      "error",
-      false
-    );
-    this.notificationEngine.addInfo("Info (wrapper)");
-    this.notificationEngine.addInfo("Info (wrapper, custom timeout)", 3000);
-    this.notificationEngine.addError("Error (wrapper)");
 
     // Setup the app-specific IndexedDB wrapper
     this.db = new ColorizerDatabase();
