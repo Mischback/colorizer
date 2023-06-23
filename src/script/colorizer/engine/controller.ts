@@ -7,6 +7,7 @@ import { ColorizerDatabase } from "./database";
 import { ColorizerForm } from "../interface/color-form";
 import { ColorizerContrastGrid } from "../interface/contrast-grid/grid";
 import { ColorizerPaletteIO } from "../interface/palette";
+import { NotificationEngine } from "../../utility";
 import type { TColorizerFormInputMethod } from "../interface/color-form";
 
 export class ColorizerController {
@@ -14,12 +15,19 @@ export class ColorizerController {
   // @ts-expect-error TS6133 value never read
   private form: ColorizerForm;
   private grid: ColorizerContrastGrid;
+  // @ts-expect-error TS6133 value never read
+  private notificationEngine: NotificationEngine;
   private palette: ColorizerPalette;
   private paletteIO: ColorizerPaletteIO;
 
   public constructor(
     inputMethods: TColorizerFormInputMethod[] = ["rgb", "hsl", "hwb", "oklch"]
   ) {
+    // Setup the notification interface
+    this.notificationEngine = new NotificationEngine(
+      document.getElementById("notifications")
+    );
+
     // Setup the app-specific IndexedDB wrapper
     this.db = new ColorizerDatabase();
 
