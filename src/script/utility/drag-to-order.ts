@@ -140,6 +140,18 @@ export class DragToOrder {
     return itemIndex;
   }
 
+  private findClosestDropTarget(item: HTMLElement): HTMLElement {
+    if (item === this.container) {
+      throw new ItemNotFoundError("Could not find a drop target");
+    }
+
+    if (item.hasAttribute("draggable")) {
+      return item;
+    } else {
+      return this.findClosestDropTarget(<HTMLElement>item.parentNode);
+    }
+  }
+
   /**
    * Return the index of the item in the instance's list of items or ``false``.
    *
@@ -177,6 +189,15 @@ export class DragToOrder {
     return this.container.querySelectorAll(this.itemQuery);
   }
 
+  /**
+   * Event Handler for ``dragstart``.
+   *
+   * This event is triggered by a *draggable item*, which is provided as
+   * ``evt.target``.
+   *
+   * The method determines the *original index* of the element, which is
+   * used as ``oldIndex`` for the callback method.
+   */
   private handlerDragStart(evt: DragEvent): void {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     const tmpIndex = this.getItemIndex(<HTMLElement>evt.target);
@@ -198,6 +219,11 @@ export class DragToOrder {
     this.activeDrag = true;
   }
 
+  /**
+   * Event Handler for ``dragend``.
+   *
+   * The ``evt.target`` of this event is the *dragged item*.
+   */
   private handlerDragEnd(evt: DragEvent): void {
     // If multiple instances are attached to the same ``container``, this
     // reduces the execution of (expensive) event handlers.
@@ -214,6 +240,10 @@ export class DragToOrder {
     (evt.target as HTMLElement).classList.remove(this.styleCurrentlyDragged);
   }
 
+  /** Event Handler for ``dragover``.
+   *
+   * The ``evt.target``of this event is any HTMLElement of the DOM.
+   */
   private handlerDragOver(evt: DragEvent): void {
     // If multiple instances are attached to the same ``container``, this
     // reduces the execution of (expensive) event handlers.
@@ -230,9 +260,23 @@ export class DragToOrder {
     // console.debug(`handlerDragOver() of ${this.instanceId}`);
     // console.debug(evt);
 
-    if (this.dropZone !== evt.target) {
+    // evt.target is the actual HTMLElement, not necessarily the valid
+    // drop target!
+    let dropTarget;
+    try {
+      dropTarget = this.findClosestDropTarget(<HTMLElement>evt.target);
+    } catch (err) {
+      // @ts-expect-error TS18046 ``err`` is of type unknown
+      if (err.name === "ItemNotFoundError") {
+        return;
+      } else {
+        throw err;
+      }
+    }
+
+    if (this.dropZone !== dropTarget) {
       this.newIndex = tmpIndex;
-      this.dropZone = <HTMLElement>evt.target;
+      this.dropZone = dropTarget;
     }
 
     if (
@@ -272,6 +316,10 @@ export class DragToOrder {
     this.activeDrag = false;
   }
 
+  /** Event Handler for ``dragenter``.
+   *
+   * The ``evt.target`` of this event is any HTMLElement.
+   */
   private handlerDragEnter(evt: DragEvent): void {
     // If multiple instances are attached to the same ``container``, this
     // reduces the execution of (expensive) event handlers.
@@ -290,6 +338,10 @@ export class DragToOrder {
     (evt.target as HTMLElement).classList.add(this.styleDropTargetHover);
   }
 
+  /** Event Handler for ``dragleave``.
+   *
+   * The ``evt.target`` of this event is any HTMLElement.
+   */
   private handlerDragLeave(evt: DragEvent): void {
     // If multiple instances are attached to the same ``container``, this
     // reduces the execution of (expensive) event handlers.
