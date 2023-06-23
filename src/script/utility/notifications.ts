@@ -4,18 +4,35 @@
 
 export class NotificationEngine {
   container: HTMLElement;
+  cssErrorClass: string;
+  cssFadeClass: string;
+  cssInfoClass: string;
+  fadeDuration: number;
+  visibleTimeout: number;
 
-  constructor(container: HTMLElement | null) {
+  constructor(
+    container: HTMLElement | null,
+    visibleTimeout = 1000,
+    cssErrorClass = "error",
+    cssInfoClass = "info",
+    cssFadeClass = "notify-fade-out",
+    fadeDuration = 500
+  ) {
     if (container === null) {
       throw new Error("No container provided");
     }
     this.container = container;
+    this.cssErrorClass = cssErrorClass;
+    this.cssInfoClass = cssInfoClass;
+    this.cssFadeClass = cssFadeClass;
+    this.fadeDuration = fadeDuration;
+    this.visibleTimeout = visibleTimeout;
   }
 
   public addMessage(
     message: string,
     cssClass = "message",
-    timeout: number | false = 1000
+    timeout: number | false = this.visibleTimeout
   ) {
     const notification = document.createElement("section");
     notification.classList.add(cssClass);
@@ -44,20 +61,18 @@ export class NotificationEngine {
   }
 
   public addInfo(message: string, timeout: number | false = 1000) {
-    this.addMessage(message, "info", timeout);
+    this.addMessage(message, this.cssInfoClass, timeout);
   }
 
   public addError(message: string) {
-    this.addMessage(message, "error", false);
+    this.addMessage(message, this.cssErrorClass, false);
   }
 
   private removeMessage(notification: HTMLElement): void {
-    // FIXME: Better add a CSS class here. Incorporate transition!
-    // TODO: CSS class name should be configurable (with default value)
     // FIXME: Make the fade-out interval configurable!
-    notification.classList.add("notify-fade-out");
+    notification.classList.add(this.cssFadeClass);
     setTimeout(() => {
       this.container.removeChild(notification);
-    }, 500);
+    }, this.fadeDuration);
   }
 }
