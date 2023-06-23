@@ -3,35 +3,34 @@
 // SPDX-FileType: SOURCE
 
 import { getContrastValue, getWcagCat } from "./calculus";
-import { getDomElement, roundToPrecision } from "../../../utility";
-import Sortable from "sortablejs";
-import type {
-  ColorizerPaletteItem,
-  TMoveItemCallback,
-} from "../../engine/palette";
+import { getDomElement, roundToPrecision, DragToOrder } from "../../../utility";
+import type { ColorizerPaletteItem } from "../../engine/palette";
 import type { IColorizerPaletteObserver } from "../../lib/types";
+import type { TDragToOrderDragResultCallback } from "../../../utility";
 
 export class ColorizerContrastGrid implements IColorizerPaletteObserver {
   private gridTable: HTMLTableElement;
   // @ts-expect-error TS6133 value never read
-  private sortable: Sortable;
+  private dragToRow: DragToOrder;
+  // @ts-expect-error TS6133 value never read
+  private dragToCol: DragToOrder;
 
-  public constructor(moveItemCallback: TMoveItemCallback) {
+  public constructor(moveItemCallback: TDragToOrderDragResultCallback) {
     // Get the required DOM elements
     this.gridTable = <HTMLTableElement>(
       getDomElement(null, "#contrast-grid table")
     );
 
-    this.sortable = Sortable.create(this.gridTable, {
-      draggable: ".grid-row",
-      onEnd: (evt) => {
-        // The indexes are decremented by ``1``, because there is one additional
-        // table row and one additional column per row (the captions).
-        //
-        // @ts-expect-error TS18048 Might be undefined
-        void moveItemCallback(evt.oldIndex - 1, evt.newIndex - 1);
-      },
-    });
+    this.dragToRow = new DragToOrder(
+      this.gridTable,
+      ".grid-row th",
+      moveItemCallback
+    );
+    this.dragToCol = new DragToOrder(
+      this.gridTable,
+      ".head-row th",
+      moveItemCallback
+    );
   }
 
   /**

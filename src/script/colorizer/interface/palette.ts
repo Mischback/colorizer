@@ -2,23 +2,22 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import { getDomElement } from "../../utility";
-import Sortable from "sortablejs";
+import { getDomElement, DragToOrder } from "../../utility";
 import type {
   ColorizerPaletteItem,
-  TMoveItemCallback,
   TRemoveItemCallback,
 } from "../engine/palette";
 import type { IColorizerPaletteObserver } from "../lib/types";
+import type { TDragToOrderDragResultCallback } from "../../utility";
 
 export class ColorizerPaletteIO implements IColorizerPaletteObserver {
   private paletteList: HTMLUListElement;
   private removeItemCallback: TRemoveItemCallback;
   // @ts-expect-error TS6133 value never read
-  private sortable: Sortable;
+  private dragToOrder: DragToOrder;
 
   public constructor(
-    moveItemCallback: TMoveItemCallback,
+    moveItemCallback: TDragToOrderDragResultCallback,
     removeItemCallback: TRemoveItemCallback
   ) {
     this.removeItemCallback = removeItemCallback;
@@ -28,12 +27,11 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
       getDomElement(null, "#color-palette ul")
     );
 
-    this.sortable = Sortable.create(this.paletteList, {
-      draggable: ".sortable-item",
-      onEnd: (evt) => {
-        void moveItemCallback(evt.oldIndex, evt.newIndex);
-      },
-    });
+    this.dragToOrder = new DragToOrder(
+      this.paletteList,
+      ".palette-item",
+      moveItemCallback
+    );
   }
 
   /**
