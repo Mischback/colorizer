@@ -87,7 +87,7 @@ export class DragToOrder {
     this.activeDrag = false;
     this.itemList = this.getItems();
 
-    // FIXME: Just for debugging/development
+    // Note: Just for debugging/development
     // this.instanceId = crypto.randomUUID();
     // console.debug(this.instanceId);
 
