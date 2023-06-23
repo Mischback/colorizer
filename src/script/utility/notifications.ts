@@ -46,7 +46,7 @@ export class NotificationEngine {
     if (timeout !== false) {
       // Trigger automatic removal of the notification with a timeout
       setTimeout(() => {
-        this.removeMessage(notification);
+        this.removeMessageAutomatically(notification);
       }, timeout);
     } else {
       // Create a button to close the notification!
@@ -54,7 +54,7 @@ export class NotificationEngine {
       dismiss.setAttribute("type", "button");
       dismiss.innerHTML = "dismiss";
       dismiss.addEventListener("click", () => {
-        this.removeMessage(notification);
+        this.removeMessageManually(notification);
       });
       notification.appendChild(dismiss);
     }
@@ -68,11 +68,18 @@ export class NotificationEngine {
     this.addMessage(message, this.cssErrorClass, false);
   }
 
-  private removeMessage(notification: HTMLElement): void {
-    // FIXME: Make the fade-out interval configurable!
+  private removeMessageManually(notification: HTMLElement) {
+    this.removeMessage(notification, 250);
+  }
+
+  private removeMessageAutomatically(notification: HTMLElement) {
+    this.removeMessage(notification, this.fadeDuration);
+  }
+
+  private removeMessage(notification: HTMLElement, fadeDuration: number): void {
     notification.classList.add(this.cssFadeClass);
     setTimeout(() => {
       this.container.removeChild(notification);
-    }, this.fadeDuration);
+    }, fadeDuration);
   }
 }
