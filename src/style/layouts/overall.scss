@@ -93,15 +93,26 @@ nav {
 
 main {
   margin: 0 2 * $overall-drop-shadow-size;
-  padding: 0.25em 1em;
+  padding: 1em 2em;
   border-radius: 0.5rem;
   background-color: $color-content-bg;
   box-shadow: $overall-box-shadow;
   color: $color-content-fg;
 
-  /* Hide all panels by default. */
   .panel {
+    /* Hide all panels by default. */
     display: none;
+
+    > header {
+      margin: 0;
+      padding: 0;
+
+      /* stylelint-disable selector-max-compound-selectors */
+      > h2 {
+        margin-top: 0.5em;
+      }
+      /* stylelint-enable selector-max-compound-selectors */
+    }
   }
 }
 
