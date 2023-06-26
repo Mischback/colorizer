@@ -17,19 +17,52 @@
     margin: 0;
     padding: 0;
     list-style: none;
+
+    > li {
+      border-radius: $border-radius-fraction;
+      background-color: $color-content-bg-light;
+
+      // FIXME: [#32] Build an overall colorscheme
+      box-shadow: 0 0 2px 2px rgb(0 0 0 / 60%);
+
+      /* stylelint-disable selector-max-compound-selectors */
+      .preview {
+        background-color: color(
+          xyz var(--palette-item-color-x) var(--palette-item-color-y)
+            var(--palette-item-color-z)
+        );
+      }
+
+      .label {
+        font-weight: bold;
+      }
+      /* stylelint-enable selector-max-compound-selectors */
+    }
   }
 }
-
-// #ctrl-palette-expanded-view:checked ~ header nav ul li #palette-view-expanded {
-// font-weight: bold;
-// }
 
 #ctrl-palette-expanded-view:checked {
   ~ .item-list {
     > li {
       display: block;
+      position: relative;
+      margin: 0 0 1em;
+      padding: 0.5em 0.25em 0.5em 3.5em;
 
       /* stylelint-disable selector-max-compound-selectors */
+      .preview {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 3em;
+        height: 100%;
+        border-radius: $border-radius-fraction;
+      }
+
+      .label {
+        font-size: 1.25em;
+      }
+
       .notations {
         // FIXME: not yet styled!
         margin: 1em 0.5em;
@@ -52,11 +85,6 @@
     > li {
       display: inline-block;
       margin: 0.25em 0.5em;
-      border-radius: $border-radius-fraction;
-      background-color: $color-content-bg-light;
-
-      // FIXME: [#32] Build an overall colorscheme
-      box-shadow: 0 0 2px 2px rgb(0 0 0 / 60%);
 
       /* stylelint-disable selector-max-compound-selectors */
       * {
@@ -67,15 +95,10 @@
         height: 2em;
         margin: 0 0 1em;
         border-radius: $border-radius-fraction $border-radius-fraction 0 0;
-        background-color: color(
-          xyz var(--palette-item-color-x) var(--palette-item-color-y)
-            var(--palette-item-color-z)
-        );
       }
 
       .label {
         margin: 0 0.5em 0.5em;
-        font-weight: bold;
         text-align: center;
       }
 
