@@ -6,3 +6,14 @@
   // FIXME: [#32] Build an overall colorscheme
   box-shadow: 0 0 2px 2px rgb(0 0 0), inset 0 0 1px 1px rgb(255 255 255);
 }
+
+@mixin content-element-shadow {
+  box-shadow: (-$content-element-shadow-as-border-width)
+      (-$content-element-shadow-as-border-width) $color-box-shadow-color,
+    $content-element-shadow-as-border-width
+      (-$content-element-shadow-as-border-width) $color-box-shadow-color,
+    (-$content-element-shadow-as-border-width)
+      $content-element-shadow-as-border-width $color-box-shadow-color,
+    $content-element-drop-shadow-size $content-element-drop-shadow-size
+      $color-box-shadow-color;
+}

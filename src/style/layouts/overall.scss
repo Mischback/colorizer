@@ -2,16 +2,6 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-$overall-shadow-as-border-width: 1px;
-$overall-drop-shadow-size: 3px;
-$overall-box-shadow: (-$overall-shadow-as-border-width)
-    (-$overall-shadow-as-border-width) $color-box-shadow-color,
-  $overall-shadow-as-border-width (-$overall-shadow-as-border-width)
-    $color-box-shadow-color,
-  (-$overall-shadow-as-border-width) $overall-shadow-as-border-width
-    $color-box-shadow-color,
-  $overall-drop-shadow-size $overall-drop-shadow-size $color-box-shadow-color;
-
 /* The ``<input type="radio" ...>`` are controlling, which tab is visible. */
 .ctrl-tab-radio {
   display: none;
@@ -37,7 +27,7 @@ body > header {
 }
 
 nav {
-  margin: 0 0 $overall-shadow-as-border-width 2em;
+  margin: 0 0 $content-element-shadow-as-border-width 2em;
 
   ul {
     margin: 0;
@@ -51,6 +41,8 @@ nav {
       /* This is the actual tab header, which allows switching tabs */
       /* stylelint-disable selector-max-compound-selectors */
       .tab {
+        @include content-element-shadow;
+
         display: inline-block;
         position: relative;
         margin: 0;
@@ -58,7 +50,6 @@ nav {
         border-radius: 2 * $border-radius-fraction 2 * $border-radius-fraction 0
           0;
         background-color: $color-content-bg-dim;
-        box-shadow: $overall-box-shadow;
         color: $color-content-fg;
         font-weight: bold;
         cursor: pointer;
@@ -76,13 +67,16 @@ nav {
           display: block;
           position: absolute;
           bottom: (
-            -$overall-drop-shadow-size - $overall-shadow-as-border-width
+            -$content-element-drop-shadow-size - $content-element-shadow-as-border-width
           );
-          left: (-$overall-shadow-as-border-width);
+          left: (-$content-element-shadow-as-border-width);
+          /* stylelint-disable scss/operator-no-newline-after */
           width: calc(
-            100% + $overall-shadow-as-border-width + $overall-drop-shadow-size
+            100% + $content-element-shadow-as-border-width +
+              $content-element-drop-shadow-size
           );
-          height: $overall-drop-shadow-size;
+          /* stylelint-enable scss/operator-no-newline-after */
+          height: $content-element-drop-shadow-size;
           background-color: $color-content-bg;
         }
         /* stylelint-enable max-nesting-depth */
@@ -93,11 +87,12 @@ nav {
 }
 
 main {
-  margin: 0 2 * $overall-drop-shadow-size;
+  @include content-element-shadow;
+
+  margin: 0 2 * $content-element-drop-shadow-size;
   padding: 1em 2em;
   border-radius: 3 * $border-radius-fraction;
   background-color: $color-content-bg;
-  box-shadow: $overall-box-shadow;
   color: $color-content-fg;
 
   .panel {
@@ -140,10 +135,10 @@ main {
     content: "";
     display: block;
     position: absolute;
-    bottom: (-$overall-drop-shadow-size);
+    bottom: (-$content-element-drop-shadow-size);
     left: 0;
     width: 100%;
-    height: $overall-drop-shadow-size;
+    height: $content-element-drop-shadow-size;
     background-color: $color-content-bg;
   }
 }

@@ -9,12 +9,11 @@
   width: 25%;
 
   > section {
+    @include content-element-shadow;
+
     margin: 0.25em 0;
     padding: 0.25em 0.5em;
     transition: opacity 500ms ease-in-out;
-
-    // FIXME: [#32] Build an overall colorscheme
-    border: 1px solid #000;
     border-radius: 2 * $border-radius-fraction;
 
     p {
