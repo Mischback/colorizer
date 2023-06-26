@@ -15,7 +15,7 @@
 
     // FIXME: [#32] Build an overall colorscheme
     border: 1px solid #000;
-    border-radius: 5px;
+    border-radius: 2 * $border-radius-fraction;
 
     p {
       display: inline-block;

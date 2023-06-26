@@ -5,7 +5,7 @@
 button {
   padding: 0.25em 0.5em;
   border: 0;
-  border-radius: 5px;
+  border-radius: $border-radius-fraction;
 
   // FIXME: [#32] Build an overall colorscheme
   background: linear-gradient(

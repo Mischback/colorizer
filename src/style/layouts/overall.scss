@@ -55,7 +55,8 @@ nav {
         position: relative;
         margin: 0;
         padding: 0.75em 1em 0.5em;
-        border-radius: 0.5rem 0.5rem 0 0;
+        border-radius: 2 * $border-radius-fraction 2 * $border-radius-fraction 0
+          0;
         background-color: $color-content-bg-dim;
         box-shadow: $overall-box-shadow;
         color: $color-content-fg;
@@ -94,7 +95,7 @@ nav {
 main {
   margin: 0 2 * $overall-drop-shadow-size;
   padding: 1em 2em;
-  border-radius: 0.5rem;
+  border-radius: 3 * $border-radius-fraction;
   background-color: $color-content-bg;
   box-shadow: $overall-box-shadow;
   color: $color-content-fg;
