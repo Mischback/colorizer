@@ -23,31 +23,48 @@ $overall-box-shadow: (-$overall-shadow-as-border-width)
 nav {
   margin: 0 0 $overall-shadow-as-border-width 2em;
 
-  /* This is the actual tab header, which allows switching tabs */
-  .tab {
-    display: inline-block;
-    position: relative;
-    margin: 0 2px;
-    padding: 10px 20px;
-    border-radius: 0.5rem 0.5rem 0 0;
-    background-color: #ccc;
-    box-shadow: $overall-box-shadow;
-    cursor: pointer;
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
 
-    /* This pseudo-element is used to cover the ``box-shadow`` falling to the
-     * ``<main>``container.
-     */
-    &::after {
-      content: "";
-      display: block;
-      position: absolute;
-      bottom: (-$overall-drop-shadow-size - $overall-shadow-as-border-width);
-      left: (-$overall-shadow-as-border-width);
-      width: calc(
-        100% + $overall-shadow-as-border-width + $overall-drop-shadow-size
-      );
-      height: $overall-drop-shadow-size;
-      background-color: $overall-content-bg;
+    li {
+      display: inline-block;
+      margin: 0 0.75em 0 0;
+
+      /* This is the actual tab header, which allows switching tabs */
+      /* stylelint-disable selector-max-compound-selectors */
+      .tab {
+        display: inline-block;
+        position: relative;
+        margin: 0;
+        padding: 10px 20px;
+        border-radius: 0.5rem 0.5rem 0 0;
+        background-color: #ccc;
+        box-shadow: $overall-box-shadow;
+        cursor: pointer;
+
+        /* This pseudo-element is used to cover the ``box-shadow`` falling to the
+         * ``<main>``container.
+         */
+        /* stylelint-disable max-nesting-depth */
+        &::after {
+          content: "";
+          display: block;
+          position: absolute;
+          bottom: (
+            -$overall-drop-shadow-size - $overall-shadow-as-border-width
+          );
+          left: (-$overall-shadow-as-border-width);
+          width: calc(
+            100% + $overall-shadow-as-border-width + $overall-drop-shadow-size
+          );
+          height: $overall-drop-shadow-size;
+          background-color: $overall-content-bg;
+        }
+        /* stylelint-enable max-nesting-depth */
+      }
+      /* stylelint-enable selector-max-compound-selectors */
     }
   }
 }
