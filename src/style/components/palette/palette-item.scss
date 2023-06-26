@@ -10,6 +10,20 @@
       position: absolute;
       top: 0;
       right: 0;
+
+      /* stylelint-disable selector-max-compound-selectors */
+      label {
+        margin: 0;
+        padding: 0.5em 0.5em 0.25em;
+        border-radius: 999em;
+
+        /* stylelint-disable max-nesting-depth */
+        &:hover {
+          background-color: $color-clickable-hover-bg;
+        }
+        /* stylelint-enable max-nesting-depth */
+      }
+      /* stylelint-enable selector-max-compound-selectors */
     }
   }
 
@@ -79,7 +93,15 @@
 
   /* stylelint-disable selector-max-compound-selectors, selector-max-id */
   ~ header nav ul li #palette-view-expanded {
+
+    // FIXME: [#32] Build an overall colorscheme
+    background-color: rgb(79 213 255);
     font-weight: bold;
+
+    &::before {
+      content: "> ";
+      font-weight: bold;
+    }
   }
   /* stylelint-enable selector-max-compound-selectors, selector-max-id */
 }
@@ -138,7 +160,15 @@
 
   /* stylelint-disable selector-max-compound-selectors, selector-max-id */
   ~ header nav ul li #palette-view-reduced {
+
+    // FIXME: [#32] Build an overall colorscheme
+    background-color: rgb(79 213 255);
     font-weight: bold;
+
+    &::before {
+      content: "> ";
+      font-weight: bold;
+    }
   }
   /* stylelint-enable selector-max-compound-selectors, selector-max-id */
 }
