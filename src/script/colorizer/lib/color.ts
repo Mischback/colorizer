@@ -101,7 +101,7 @@ export class ColorizerColor {
   }
 
   /**
-   * Get the color in gamma-corrected sRGB mode.
+   * Get the color in gamma-corrected sRGB mode (normalized to 255).
    *
    * @returns An ``object`` literal with ``r``, ``g`` and ``b`` attributes,
    *          provided in range [0..255].
@@ -117,6 +117,23 @@ export class ColorizerColor {
       g: roundToPrecision(tmp.g * 255, 0),
       b: roundToPrecision(tmp.b * 255, 0),
     };
+  }
+
+  /** Get the color in gamma-corrected sRGB mode (hex-notation).
+   *
+   * @returns The color in hex-based string notation, including the leading
+   *          ``#`` character.
+   *
+   * Please note: Internally the color is converted from CIE XYZ to
+   * (gamma-corrected) sRGB **and** the values are **rounded** to *integers*.
+   */
+  public toRgbHex(): string {
+    const tmp = this.toRgb255();
+
+    return (
+      "#" +
+      ((1 << 24) | (tmp.r << 16) | (tmp.g << 8) | tmp.b).toString(16).slice(1)
+    );
   }
 
   /**

@@ -138,6 +138,11 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     notationRgb.innerHTML = `<strong>RGB</strong> r: ${itemRgb.r}, g: ${itemRgb.g}, b: ${itemRgb.b}`;
     notations.appendChild(notationRgb);
 
+    const itemRgbHex = item.color.toRgbHex();
+    const notationRgbHex = document.createElement("li");
+    notationRgbHex.innerHTML = itemRgbHex;
+    notations.appendChild(notationRgbHex);
+
     // Attach Event Listeners
     const removeButton = <HTMLButtonElement>(
       getDomElement(paletteItem, ".button-remove")
