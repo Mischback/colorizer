@@ -116,7 +116,7 @@ main {
  * activated.
  */
 /* stylelint-disable selector-max-id */
-#ctrl-palette:checked ~ main #color-palette,
+#ctrl-palette:checked ~ main #panel-color-palette,
 #ctrl-color-form:checked ~ main #panel-color-form,
 #ctrl-grid:checked ~ main #contrast-grid {
   display: block;
