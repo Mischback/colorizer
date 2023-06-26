@@ -12,7 +12,7 @@
     @include content-element-shadow;
 
     margin: 0.25em 0;
-    padding: 0.25em 0.5em;
+    padding: 0.5em 0.5em 0.25em;
     transition: opacity 500ms ease-in-out;
     border-radius: 2 * $border-radius-fraction;
     color: $color-content-fg;
