@@ -27,6 +27,21 @@ body {
   background-color: $overall-body-bg;
 }
 
+body > header {
+  margin: 0 0 1.5em;
+  padding: 0 1em 0 0;
+  color: $overall-content-bg;
+  text-align: right;
+
+  h1 {
+    margin: 0;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
 nav {
   margin: 0 0 $overall-shadow-as-border-width 2em;
 
