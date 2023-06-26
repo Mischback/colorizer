@@ -2,13 +2,26 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
+// FIXME: [#32] Build an overall colorscheme
+$overall-content-bg: rgb(222 222 222);
+$overall-box-shadow-color: rgb(0 0 0);
+$overall-shadow-as-border-width: 1px;
+$overall-drop-shadow-size: 3px;
+$overall-box-shadow: (-$overall-shadow-as-border-width)
+    (-$overall-shadow-as-border-width) $overall-box-shadow-color,
+  $overall-shadow-as-border-width (-$overall-shadow-as-border-width)
+    $overall-box-shadow-color,
+  (-$overall-shadow-as-border-width) $overall-shadow-as-border-width
+    $overall-box-shadow-color,
+  $overall-drop-shadow-size $overall-drop-shadow-size $overall-box-shadow-color;
+
 /* The ``<input type="radio" ...>`` are controlling, which tab is visible. */
 .ctrl-tab-radio {
   display: none;
 }
 
 nav {
-  margin: 0;
+  margin: 0 0 $overall-shadow-as-border-width 2em;
 
   /* This is the actual tab header, which allows switching tabs */
   .tab {
@@ -16,8 +29,9 @@ nav {
     position: relative;
     margin: 0 2px;
     padding: 10px 20px;
-    background-color: #ddd;
-    box-shadow: 2px 2px #000;
+    border-radius: 0.5rem 0.5rem 0 0;
+    background-color: #ccc;
+    box-shadow: $overall-box-shadow;
     cursor: pointer;
 
     /* This pseudo-element is used to cover the ``box-shadow`` falling to the
@@ -27,20 +41,23 @@ nav {
       content: "";
       display: block;
       position: absolute;
-      bottom: -3px;
-      left: 0;
-      width: calc(100% + 2px);
-      height: 2px;
-      background-color: #ddd;
+      bottom: (-$overall-drop-shadow-size - $overall-shadow-as-border-width);
+      left: (-$overall-shadow-as-border-width);
+      width: calc(
+        100% + $overall-shadow-as-border-width + $overall-drop-shadow-size
+      );
+      height: $overall-drop-shadow-size;
+      background-color: $overall-content-bg;
     }
   }
 }
 
 main {
-  margin: 0;
+  margin: 0 2 * $overall-drop-shadow-size;
   padding: 0.25em 1em;
-  border: 1px solid #000;
-  background-color: #ddd;
+  border-radius: 0.5rem;
+  background-color: $overall-content-bg;
+  box-shadow: $overall-box-shadow;
 
   /* Hide all panels by default. */
   .panel {
@@ -62,7 +79,7 @@ main {
 #ctrl-color-form:checked ~ nav #tab-color-form,
 #ctrl-grid:checked ~ nav #tab-grid {
   position: relative;
-  background-color: #0f0;
+  background-color: $overall-content-bg;
 
   /* This pseudo-element is used to break the border of the ``<main>`` element.
    * This should visualize an active tab.
@@ -71,11 +88,11 @@ main {
     content: "";
     display: block;
     position: absolute;
-    bottom: -2px;
+    bottom: (-$overall-drop-shadow-size);
     left: 0;
     width: 100%;
-    height: 2px;
-    background-color: #ddd;
+    height: $overall-drop-shadow-size;
+    background-color: $overall-content-bg;
   }
 }
 /* stylelint-enable selector-max-id */
