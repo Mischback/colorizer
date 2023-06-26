@@ -2,16 +2,16 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-#color-palette ul {
-  margin: 0 1em;
+#color-palette > ul {
+  margin: 0;
   padding: 0;
   list-style: none;
 
-  li {
+  > li {
     display: inline-block;
     margin: 0.25em 0.5em;
-    padding: 0.5em 1em;
     border-radius: $border-radius-fraction;
+    background-color: $color-content-bg-light;
 
     // FIXME: [#32] Build an overall colorscheme
     box-shadow: 0 0 2px 2px rgb(0 0 0 / 60%);
@@ -21,20 +21,31 @@
       vertical-align: middle;
     }
 
-    div {
-      display: inline-block;
-    }
-
     .preview {
-      @include color-preview-shadow;
-
-      width: 1.5em;
-      height: 1.5em;
-      border-radius: 999px;
+      height: 2em;
+      margin: 0 0 1em;
+      border-radius: $border-radius-fraction $border-radius-fraction 0 0;
       background-color: color(
         xyz var(--palette-item-color-x) var(--palette-item-color-y)
           var(--palette-item-color-z)
       );
+    }
+
+    .label {
+      margin: 0 0.5em 0.5em;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .actions {
+      margin: 1.5em 0.5em 0.5em;
+      padding: 0;
+      list-style: none;
+      text-align: right;
+
+      > li {
+        margin: 0 0 0.75em;
+      }
     }
     /* stylelint-enable selector-max-compound-selectors */
   }
