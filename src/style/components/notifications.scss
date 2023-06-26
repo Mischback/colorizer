@@ -15,6 +15,7 @@
     padding: 0.25em 0.5em;
     transition: opacity 500ms ease-in-out;
     border-radius: 2 * $border-radius-fraction;
+    color: $color-content-fg;
 
     p {
       display: inline-block;
@@ -28,19 +29,16 @@
 
     /* stylelint-disable selector-no-qualifying-type */
     &.message {
-      // FIXME: [#32] Build an overall colorscheme
-      background-color: #9c9;
+      background-color: $color-notification-message;
     }
 
     &.info {
-      // FIXME: [#32] Build an overall colorscheme
-      background-color: rgb(255 220 0);
+      background-color: $color-notification-info;
     }
 
     &.error {
-      // FIXME: [#32] Build an overall colorscheme
-      background-color: rgb(196 0 0);
-      color: #fff;
+      background-color: $color-notification-error-bg;
+      color: $color-notification-error-fg;
     }
 
     &.notify-fade-out {

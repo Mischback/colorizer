@@ -8,7 +8,11 @@ $color-content-bg: $color-src-light-grey;
 $color-content-bg-dim: $color-src-light-grey-darker;
 $color-content-fg: $color-src-dark-grey;
 $color-box-shadow-color: $color-src-black;
-$color-clickable-hover-bg: $color-bright-orange;
+$color-clickable-hover-bg: $color-src-bright-orange;
+$color-notification-info: $color-src-yellow;
+$color-notification-message: $color-src-bright-green;
+$color-notification-error-bg: $color-src-red;
+$color-notification-error-fg: $color-src-black;
 
 /* Other overall settings */
 $border-radius-fraction: 0.25rem;
