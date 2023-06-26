@@ -62,10 +62,14 @@ nav {
         font-weight: bold;
         cursor: pointer;
 
+        /* stylelint-disable max-nesting-depth */
+        &:hover {
+          background-color: $color-clickable-hover-bg;
+        }
+
         /* This pseudo-element is used to cover the ``box-shadow`` falling to the
          * ``<main>``container.
          */
-        /* stylelint-disable max-nesting-depth */
         &::after {
           content: "";
           display: block;
