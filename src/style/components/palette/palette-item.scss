@@ -2,57 +2,114 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-#color-palette .item-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+#color-palette {
+  > header {
+    position: relative;
 
-  > li {
-    display: inline-block;
-    margin: 0.25em 0.5em;
-    border-radius: $border-radius-fraction;
-    background-color: $color-content-bg-light;
-
-    // FIXME: [#32] Build an overall colorscheme
-    box-shadow: 0 0 2px 2px rgb(0 0 0 / 60%);
-
-    /* stylelint-disable selector-max-compound-selectors */
-    * {
-      vertical-align: middle;
+    nav {
+      position: absolute;
+      top: 0;
+      right: 0;
     }
-
-    .preview {
-      height: 2em;
-      margin: 0 0 1em;
-      border-radius: $border-radius-fraction $border-radius-fraction 0 0;
-      background-color: color(
-        xyz var(--palette-item-color-x) var(--palette-item-color-y)
-          var(--palette-item-color-z)
-      );
-    }
-
-    .label {
-      margin: 0 0.5em 0.5em;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .notations {
-      margin: 1em 0.5em;
-      padding: 0;
-      list-style: none;
-    }
-
-    .actions {
-      margin: 1.5em 0.5em 0.5em;
-      padding: 0;
-      list-style: none;
-      text-align: right;
-
-      > li {
-        margin: 0 0 0.75em;
-      }
-    }
-    /* stylelint-enable selector-max-compound-selectors */
   }
+
+  > .item-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
+// #ctrl-palette-expanded-view:checked ~ header nav ul li #palette-view-expanded {
+// font-weight: bold;
+// }
+
+#ctrl-palette-expanded-view:checked {
+  ~ .item-list {
+    > li {
+      display: block;
+
+      /* stylelint-disable selector-max-compound-selectors */
+      .notations {
+        // FIXME: not yet styled!
+        margin: 1em 0.5em;
+        padding: 0;
+        list-style: none;
+      }
+      /* stylelint-enable selector-max-compound-selectors */
+    }
+  }
+
+  /* stylelint-disable selector-max-compound-selectors, selector-max-id */
+  ~ header nav ul li #palette-view-expanded {
+    font-weight: bold;
+  }
+  /* stylelint-enable selector-max-compound-selectors, selector-max-id */
+}
+
+#ctrl-palette-reduced-view:checked {
+  ~ .item-list {
+    > li {
+      display: inline-block;
+      margin: 0.25em 0.5em;
+      border-radius: $border-radius-fraction;
+      background-color: $color-content-bg-light;
+
+      // FIXME: [#32] Build an overall colorscheme
+      box-shadow: 0 0 2px 2px rgb(0 0 0 / 60%);
+
+      /* stylelint-disable selector-max-compound-selectors */
+      * {
+        vertical-align: middle;
+      }
+
+      .preview {
+        height: 2em;
+        margin: 0 0 1em;
+        border-radius: $border-radius-fraction $border-radius-fraction 0 0;
+        background-color: color(
+          xyz var(--palette-item-color-x) var(--palette-item-color-y)
+            var(--palette-item-color-z)
+        );
+      }
+
+      .label {
+        margin: 0 0.5em 0.5em;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      /* stylelint-disable max-nesting-depth */
+      .notations {
+        display: none;
+      }
+
+      .actions {
+        margin: 1.5em 0.5em 0.5em;
+        padding: 0;
+        list-style: none;
+        text-align: right;
+
+        > li {
+          margin: 0 0 0.75em;
+
+          button {
+            display: none;
+          }
+
+          .button-remove {
+            display: inline-block;
+          }
+        }
+      }
+      /* stylelint-enable max-nesting-depth */
+      /* stylelint-enable selector-max-compound-selectors */
+    }
+  }
+
+  /* stylelint-disable selector-max-compound-selectors, selector-max-id */
+  ~ header nav ul li #palette-view-reduced {
+    font-weight: bold;
+  }
+  /* stylelint-enable selector-max-compound-selectors, selector-max-id */
 }

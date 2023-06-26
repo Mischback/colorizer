@@ -30,10 +30,18 @@
 
 <main>
   <section id="color-palette" class="panel">
+    <input id="ctrl-palette-expanded-view" class="ctrl-tab-radio" type="radio" name="ctrl-palette-view" checked="checked">
+    <input id="ctrl-palette-reduced-view" class="ctrl-tab-radio" type="radio" name="ctrl-palette-view">
     <header>
       <h2>Color Palette</h2>
+      <nav>
+        <ul>
+          <li><label id="palette-view-expanded" for="ctrl-palette-expanded-view">expanded view</label></li>
+          <li><label id="palette-view-reduced" for="ctrl-palette-reduced-view">reduced view</label></li>
+        </ul>
+      </nav>
     </header>
-    <ul>
+    <ul class="item-list">
     </ul>
   </section>
 
@@ -204,6 +212,8 @@
   <li class="palette-item">
     <div class="preview"></div>
     <div class="label">foo</div>
+    <ul class="notations">
+    </ul>
     <ul class="actions">
       <li><button type="button" class="button-remove">remove</button></li>
     </ul>
