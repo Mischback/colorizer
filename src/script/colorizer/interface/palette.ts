@@ -24,7 +24,7 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
 
     // Get the required DOM elements
     this.paletteList = <HTMLUListElement>(
-      getDomElement(null, "#color-palette .item-list")
+      getDomElement(null, "#color-palette-list")
     );
 
     this.dragToOrder = new DragToOrder(
