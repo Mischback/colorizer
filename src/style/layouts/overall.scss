@@ -3,7 +3,10 @@
 // SPDX-FileType: SOURCE
 
 // FIXME: [#32] Build an overall colorscheme
-$overall-content-bg: rgb(222 222 222);
+$overall-body-bg: rgb(75 75 75);
+$overall-content-bg: rgb(200 200 200);
+$overall-content-bg-darker: rgb(155 155 155);
+$overall-content-fg: rgb(50 50 50);
 $overall-box-shadow-color: rgb(0 0 0);
 $overall-shadow-as-border-width: 1px;
 $overall-drop-shadow-size: 3px;
@@ -18,6 +21,10 @@ $overall-box-shadow: (-$overall-shadow-as-border-width)
 /* The ``<input type="radio" ...>`` are controlling, which tab is visible. */
 .ctrl-tab-radio {
   display: none;
+}
+
+body {
+  background-color: $overall-body-bg;
 }
 
 nav {
@@ -40,8 +47,10 @@ nav {
         margin: 0;
         padding: 10px 20px;
         border-radius: 0.5rem 0.5rem 0 0;
-        background-color: #ccc;
+        background-color: $overall-content-bg-darker;
         box-shadow: $overall-box-shadow;
+        color: $overall-content-fg;
+        font-weight: bold;
         cursor: pointer;
 
         /* This pseudo-element is used to cover the ``box-shadow`` falling to the
@@ -75,6 +84,7 @@ main {
   border-radius: 0.5rem;
   background-color: $overall-content-bg;
   box-shadow: $overall-box-shadow;
+  color: $overall-content-fg;
 
   /* Hide all panels by default. */
   .panel {
