@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-import { getDomElement, DragToOrder } from "../../utility";
+import { getDomElement, DragToOrder, roundToPrecision } from "../../utility";
 import type {
   ColorizerPaletteItem,
   TRemoveItemCallback,
@@ -24,7 +24,7 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
 
     // Get the required DOM elements
     this.paletteList = <HTMLUListElement>(
-      getDomElement(null, "#color-palette ul")
+      getDomElement(null, "#color-palette .item-list")
     );
 
     this.dragToOrder = new DragToOrder(
@@ -118,6 +118,25 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     //       allow the user to provide a *semantic name* for the color.
     const label = <HTMLDivElement>getDomElement(paletteItem, ".label");
     label.innerHTML = `${item.paletteItemId}`;
+
+    const notations = <HTMLUListElement>(
+      getDomElement(paletteItem, ".notations")
+    );
+
+    const notationXyz = document.createElement("li");
+    notationXyz.innerHTML = `<strong>XYZ</strong> x: ${roundToPrecision(
+      paletteItemColor.x,
+      3
+    )}, y: ${roundToPrecision(paletteItemColor.y, 3)}, z: ${roundToPrecision(
+      paletteItemColor.z,
+      3
+    )}`;
+    notations.appendChild(notationXyz);
+
+    const itemRgb = item.color.toRgb255();
+    const notationRgb = document.createElement("li");
+    notationRgb.innerHTML = `<strong>RGB</strong> r: ${itemRgb.r}, g: ${itemRgb.g}, b: ${itemRgb.b}`;
+    notations.appendChild(notationRgb);
 
     // Attach Event Listeners
     const removeButton = <HTMLButtonElement>(

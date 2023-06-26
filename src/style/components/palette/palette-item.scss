@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-#color-palette > ul {
+#color-palette .item-list {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -35,6 +35,12 @@
       margin: 0 0.5em 0.5em;
       font-weight: bold;
       text-align: center;
+    }
+
+    .notations {
+      margin: 1em 0.5em;
+      padding: 0;
+      list-style: none;
     }
 
     .actions {
