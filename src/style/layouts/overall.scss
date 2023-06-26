@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
+$font-stack-sans-serif: -apple-system, blinkmacsystemfont, "Segoe UI",
+  "Noto Sans", helvetica, arial, sans-serif;
+
 // FIXME: [#32] Build an overall colorscheme
 $overall-body-bg: rgb(75 75 75);
 $overall-content-bg: rgb(200 200 200);
@@ -25,6 +28,7 @@ $overall-box-shadow: (-$overall-shadow-as-border-width)
 
 body {
   background-color: $overall-body-bg;
+  font-family: $font-stack-sans-serif;
 }
 
 body > header {
@@ -60,7 +64,7 @@ nav {
         display: inline-block;
         position: relative;
         margin: 0;
-        padding: 10px 20px;
+        padding: 0.75em 1em 0.5em;
         border-radius: 0.5rem 0.5rem 0 0;
         background-color: $overall-content-bg-darker;
         box-shadow: $overall-box-shadow;
