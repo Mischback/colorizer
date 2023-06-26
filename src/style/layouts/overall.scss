@@ -2,36 +2,80 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
+/* The ``<input type="radio" ...>`` are controlling, which tab is visible. */
+.ctrl-tab-radio {
+  display: none;
+}
+
 nav {
+  margin: 0;
+
   /* This is the actual tab header, which allows switching tabs */
   .tab {
     display: inline-block;
+    position: relative;
     margin: 0 2px;
     padding: 10px 20px;
-    background-color: #c99;
+    background-color: #ddd;
+    box-shadow: 2px 2px #000;
     cursor: pointer;
+
+    /* This pseudo-element is used to cover the ``box-shadow`` falling to the
+     * ``<main>``container.
+     */
+    &::after {
+      content: "";
+      display: block;
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      width: calc(100% + 2px);
+      height: 2px;
+      background-color: #ddd;
+    }
   }
 }
 
 main {
-  /* The ``<input type="radio" ...>`` are controlling, which tab is visible. */
-  input[type="radio"] {
-    display: none;
-  }
+  margin: 0;
+  padding: 0.25em 1em;
+  border: 1px solid #000;
+  background-color: #ddd;
 
   /* Hide all panels by default. */
   .panel {
     display: none;
   }
-
-  /* Show the tabs, if the corresponding ``<input type="radio" ...`` is
-   * activated.
-   */
-  /* stylelint-disable selector-max-id */
-  #ctrl-palette:checked ~ #color-palette,
-  #ctrl-color-form:checked ~ #panel-color-form,
-  #ctrl-grid:checked ~ #contrast-grid {
-    display: block;
-  }
-  /* stylelint-enable selector-max-id */
 }
+
+/* Show the tabs, if the corresponding ``<input type="radio" ...`` is
+ * activated.
+ */
+/* stylelint-disable selector-max-id */
+#ctrl-palette:checked ~ main #color-palette,
+#ctrl-color-form:checked ~ main #panel-color-form,
+#ctrl-grid:checked ~ main #contrast-grid {
+  display: block;
+}
+
+#ctrl-palette:checked ~ nav #tab-palette,
+#ctrl-color-form:checked ~ nav #tab-color-form,
+#ctrl-grid:checked ~ nav #tab-grid {
+  position: relative;
+  background-color: #0f0;
+
+  /* This pseudo-element is used to break the border of the ``<main>`` element.
+   * This should visualize an active tab.
+   */
+  &::before {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #ddd;
+  }
+}
+/* stylelint-enable selector-max-id */
