@@ -12,6 +12,13 @@
  *
  * This is only the script part of this element, styling (including hiding and
  * revealing panels) **must be done** in a corresponding stylesheet.
+ *
+ * References:
+ * - https://dev.to/link2twenty/accessibility-first-tabs-ken
+ * - https://blog.logrocket.com/build-accessible-user-interface-tabs-javascript/
+ * - https://www.w3.org/WAI/ARIA/apg/patterns/tabs/examples/tabs-automatic/
+ * - https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles
+ * - https://www.smashingmagazine.com/2021/03/complete-guide-accessible-front-end-components/
  */
 export class TabbedInterface {
   private tabContainer: HTMLElement;
@@ -31,8 +38,6 @@ export class TabbedInterface {
    * @param forcePanelFocus Should the associated panels be made focussable?
    */
   constructor(tabContainer: HTMLElement, forcePanelFocus = false) {
-    console.debug("TabbedInterface");
-
     this.tabContainer = tabContainer;
     this.forcePanelFocus = forcePanelFocus;
 
