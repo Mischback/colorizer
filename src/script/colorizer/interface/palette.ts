@@ -172,6 +172,55 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
       true
     ) as HTMLLIElement;
 
+    const caption = <HTMLSpanElement>getDomElement(li, ".caption");
+    const value = <HTMLSpanElement>getDomElement(li, ".value");
+
+    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-member-access */
+    let tmp: any;
+    switch (notation) {
+      case "xyz":
+        tmp = color.toJSON();
+        li.classList.add("xyz");
+        li.style.cssText += `--color-component-a: ${tmp.x}; --color-component-b: ${tmp.y}; --color-component-c: ${tmp.z}`;
+        tmp = color.toXyzString();
+        caption.innerHTML = "XYZ";
+        value.innerHTML = `(${tmp.x}, ${tmp.y}, ${tmp.z})`;
+        break;
+      case "rgb":
+        tmp = color.toRgb255();
+        li.classList.add("rgb");
+        li.style.cssText += `--color-component-a: ${tmp.r}; --color-component-b: ${tmp.g}; --color-component-c: ${tmp.b}`;
+        caption.innerHTML = "RGB";
+        value.innerHTML = `(${tmp.r}, ${tmp.g}, ${tmp.b})`;
+        break;
+      case "hwb":
+        tmp = color.toHwb();
+        li.classList.add("hwb");
+        li.style.cssText += `--color-component-a: ${tmp.h}; --color-component-b: ${tmp.w}; --color-component-c: ${tmp.b}`;
+        tmp = color.toHwbString();
+        caption.innerHTML = "RGB (HWB)";
+        value.innerHTML = `(${tmp.h}, ${tmp.w}%, ${tmp.b}%)`;
+        break;
+      case "hsl":
+        tmp = color.toHsl();
+        li.classList.add("hsl");
+        li.style.cssText += `--color-component-a: ${tmp.h}; --color-component-b: ${tmp.s}; --color-component-c: ${tmp.l}`;
+        tmp = color.toHslString();
+        caption.innerHTML = "RGB (HSL)";
+        value.innerHTML = `(${tmp.h}, ${tmp.s}%, ${tmp.l}%)`;
+        break;
+      case "oklch":
+        tmp = color.toOklch();
+        li.classList.add("oklch");
+        li.style.cssText += `--color-component-a: ${tmp.l}; --color-component-b: ${tmp.c}; --color-component-c: ${tmp.h}`;
+        tmp = color.toOklchString();
+        caption.innerHTML = "OkLCH";
+        value.innerHTML = `(${tmp.l}%, ${tmp.c}%, ${tmp.h})`;
+        break;
+      default:
+        break;
+    }
+
     return li;
   }
 }
