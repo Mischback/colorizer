@@ -63,7 +63,7 @@ export class TabbedInterface {
    * required to operate on this attributes (e.g ``[aria-controls=true]`` as
    * selector).
    */
-  private activateTab(thisTab: HTMLElement): void {
+  private activateTab(thisTab: HTMLElement, setFocus = true): void {
     const panelId = thisTab.getAttribute("aria-controls");
 
     // Iterate panels
@@ -75,11 +75,26 @@ export class TabbedInterface {
       }
     });
 
+    // Iterate tabs
     this.tabs.forEach((tab) => {
       tab.setAttribute("aria-selected", "false");
+      // Only the currently active tab should be part of the document's tabbing
+      // order, so use ``tabIndex = -1`` here.
+      tab.tabIndex = -1;
 
       if (tab === thisTab) {
         tab.setAttribute("aria-selected", "true");
+        // This is the currently active tab, include it in the document's
+        // tabbing order (don't interfere with the document's structure here!)
+        tab.tabIndex = 0;
+
+        // Move the focus to this tab.
+        //
+        // There are only very few scenarios, where we don't want to do this
+        // (e.g. during class instantiation).
+        if (setFocus !== false) {
+          tab.focus();
+        }
       }
     });
   }
