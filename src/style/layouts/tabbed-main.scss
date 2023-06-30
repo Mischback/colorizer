@@ -18,10 +18,13 @@ body {
     $active-tab-top-border-width: 3px;
     $active-tab-top-border-color: #f00;
     $active-tab-color-bg: $color-content-bg;
+    $active-tab-color-fg: #444;
     $focus-tab-color: #f00;
     $focus-tab-width: 2px;
+    $hover-tab-color-bg: #fc0;
     $tab-border-radius: $border-radius-fraction;
     $tab-color-bg: #aaa;
+    $tab-color-fg: #444;
 
     @include horizontal-list;
 
@@ -41,13 +44,15 @@ body {
       z-index: $main-z-index - 10;
       margin: 0;
       margin-top: $active-tab-top-border-width;
-      padding: 0.5em;
+      padding: 0.5em 0.5em 0.35em;
       border: 0 solid transparent;
       border-radius: $tab-border-radius $tab-border-radius 0 0;
       outline: none;
       background: none; // reset the default button background!
       background-color: $tab-color-bg;
+      color: $tab-color-fg;
       font-size: 1.2em;
+      font-weight: bold;
       cursor: pointer;
 
       &::after {
@@ -83,6 +88,11 @@ body {
         border-top-width: $active-tab-top-border-width;
         border-top-color: $active-tab-top-border-color;
         background-color: $active-tab-color-bg;
+        color: $active-tab-color-fg;
+      }
+
+      &:hover {
+        background-color: $hover-tab-color-bg;
       }
 
       /* stylelint-disable selector-max-compound-selectors */
