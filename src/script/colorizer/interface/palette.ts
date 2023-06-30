@@ -194,26 +194,23 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
         value.innerHTML = `(${tmp.r}, ${tmp.g}, ${tmp.b})`;
         break;
       case "hwb":
-        tmp = color.toHwb();
-        li.classList.add("hwb");
-        li.style.cssText += `--color-component-a: ${tmp.h}; --color-component-b: ${tmp.w}; --color-component-c: ${tmp.b}`;
         tmp = color.toHwbString();
+        li.classList.add("hwb");
+        li.style.cssText += `--color-component-a: ${tmp.h}; --color-component-b: ${tmp.w}%; --color-component-c: ${tmp.b}%`;
         caption.innerHTML = "RGB (HWB)";
         value.innerHTML = `(${tmp.h}, ${tmp.w}%, ${tmp.b}%)`;
         break;
       case "hsl":
-        tmp = color.toHsl();
-        li.classList.add("hsl");
-        li.style.cssText += `--color-component-a: ${tmp.h}; --color-component-b: ${tmp.s}; --color-component-c: ${tmp.l}`;
         tmp = color.toHslString();
+        li.classList.add("hsl");
+        li.style.cssText += `--color-component-a: ${tmp.h}; --color-component-b: ${tmp.s}%; --color-component-c: ${tmp.l}%`;
         caption.innerHTML = "RGB (HSL)";
         value.innerHTML = `(${tmp.h}, ${tmp.s}%, ${tmp.l}%)`;
         break;
       case "oklch":
-        tmp = color.toOklch();
-        li.classList.add("oklch");
-        li.style.cssText += `--color-component-a: ${tmp.l}; --color-component-b: ${tmp.c}; --color-component-c: ${tmp.h}`;
         tmp = color.toOklchString();
+        li.classList.add("oklch");
+        li.style.cssText += `--color-component-a: ${tmp.l}%; --color-component-b: ${tmp.c}%; --color-component-c: ${tmp.h}`;
         caption.innerHTML = "OkLCH";
         value.innerHTML = `(${tmp.l}%, ${tmp.c}%, ${tmp.h})`;
         break;
