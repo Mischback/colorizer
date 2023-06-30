@@ -72,10 +72,20 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     evt.preventDefault();
     evt.stopPropagation();
 
-    const paletteItemId = (
-      (evt.target as HTMLElement).parentNode as HTMLElement
-    ).getAttribute("palette-item-id");
-    if (paletteItemId === null) {
+    // Find the nearest ``palette-item-id``
+    //
+    // As the markup of palette items may be modified in ``src/index.html``,
+    // this is a more generic approach. The only assumption is, that the
+    // button is the child of the overall palette item. Should be reasonable
+    // enough.
+    let paletteItemId: string | null | undefined = null;
+    let elem: HTMLElement | null = <HTMLElement>evt.target;
+    while (elem != null && paletteItemId === null) {
+      elem = elem.parentNode as HTMLElement;
+      paletteItemId = elem?.getAttribute("palette-item-id");
+    }
+
+    if (paletteItemId === null || paletteItemId === undefined) {
       throw new Error("Could not determine ID of PaletteItem");
     }
 
