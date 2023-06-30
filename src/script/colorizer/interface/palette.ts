@@ -8,20 +8,28 @@ import type {
   TRemoveItemCallback,
 } from "../engine/palette";
 import type { ColorizerColor } from "../lib/color";
-import type { IColorizerPaletteObserver } from "../lib/types";
+import type {
+  IColorizerPaletteObserver,
+  TColorizerColorNotation,
+} from "../lib/types";
 import type { TDragToOrderDragResultCallback } from "../../utility";
+
+export type TColorizerPaletteItemNotation = TColorizerColorNotation;
 
 export class ColorizerPaletteIO implements IColorizerPaletteObserver {
   private paletteList: HTMLUListElement;
   private removeItemCallback: TRemoveItemCallback;
+  private notations: TColorizerPaletteItemNotation[];
   // @ts-expect-error TS6133 value never read
   private dragToOrder: DragToOrder;
 
   public constructor(
     moveItemCallback: TDragToOrderDragResultCallback,
-    removeItemCallback: TRemoveItemCallback
+    removeItemCallback: TRemoveItemCallback,
+    notations: TColorizerPaletteItemNotation[]
   ) {
     this.removeItemCallback = removeItemCallback;
+    this.notations = notations;
 
     // Get the required DOM elements
     this.paletteList = <HTMLUListElement>(
@@ -131,10 +139,14 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     label.innerHTML = `${item.paletteItemId}`;
 
     // Notations
-    const notations = <HTMLUListElement>(
+    const notationList = <HTMLUListElement>(
       getDomElement(paletteItem, ".notations")
     );
-    notations.appendChild(this.generateColorNotation(item.color));
+    this.notations.forEach((notation) => {
+      notationList.appendChild(
+        this.generateColorNotation(item.color, notation)
+      );
+    });
 
     // Attach Event Listeners
     const removeButton = <HTMLButtonElement>(
@@ -148,15 +160,18 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     return paletteItem;
   }
 
-  private generateColorNotation(color: ColorizerColor): HTMLLIElement {
+  private generateColorNotation(
+    color: ColorizerColor,
+    notation: TColorizerPaletteItemNotation
+  ): HTMLLIElement {
     const template = <HTMLTemplateElement>(
       getDomElement(null, "#tpl-palette-item-notation")
     );
 
-    const notation = (
-      template.content.firstElementChild as HTMLLIElement
-    ).cloneNode(true) as HTMLLIElement;
+    const li = (template.content.firstElementChild as HTMLLIElement).cloneNode(
+      true
+    ) as HTMLLIElement;
 
-    return notation;
+    return li;
   }
 }

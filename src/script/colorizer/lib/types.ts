@@ -6,6 +6,11 @@ import type { ColorizerColor } from "./color";
 import type { ColorizerPaletteItem } from "../engine/palette";
 
 /**
+ * A type for all supported color notations.
+ */
+export type TColorizerColorNotation = "rgb" | "hsl" | "hwb" | "oklch" | "xyz";
+
+/**
  * Type for a Subject that will propagate its (internal) ``color``.
  *
  * This is part of the implementation of the Observer pattern.

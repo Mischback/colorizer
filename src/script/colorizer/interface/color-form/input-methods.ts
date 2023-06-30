@@ -5,12 +5,15 @@
 import { ColorizerColor } from "../../lib/color";
 import { getDomElement, roundToPrecision } from "../../../utility";
 import type { TColorizerFormReceiverCallback } from "./form";
-import type { IColorizerColorObserver } from "../../lib/types";
+import type {
+  IColorizerColorObserver,
+  TColorizerColorNotation,
+} from "../../lib/types";
 
 /**
  * Dedicated typing for the available input methods.
  */
-export type TColorizerFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
+export type TColorizerFormInputMethod = Omit<TColorizerColorNotation, "xyz">;
 
 /**
  * The generic prototype of a function that acts a a callback / event handler
