@@ -87,6 +87,14 @@ export class ColorizerColor {
     };
   }
 
+  public toXyzString() {
+    return {
+      x: roundToPrecision(this.x, 3).toString(),
+      y: roundToPrecision(this.y, 3).toString(),
+      z: roundToPrecision(this.z, 3).toString(),
+    };
+  }
+
   /**
    * Get the color in gamma-corrected sRGB mode.
    *
@@ -133,6 +141,16 @@ export class ColorizerColor {
     return convertXyzToOklch(this.toJSON());
   }
 
+  public toOklchString() {
+    const tmp = this.toOklch();
+
+    return {
+      l: roundToPrecision(tmp.l * 100, 2).toString(),
+      c: roundToPrecision((tmp.c / 0.4) * 100, 2).toString(),
+      h: roundToPrecision(tmp.h, 2).toString(),
+    };
+  }
+
   /**
    * Get the color in HSL notation of sRGB.
    *
@@ -146,6 +164,16 @@ export class ColorizerColor {
     return convertXyzToHsl(this.toJSON());
   }
 
+  public toHslString() {
+    const tmp = this.toHsl();
+
+    return {
+      h: roundToPrecision(tmp.h, 2).toString(),
+      s: roundToPrecision(tmp.s * 100, 2).toString(),
+      l: roundToPrecision(tmp.l * 100, 2).toString(),
+    };
+  }
+
   /**
    * Get the color in HWB notation of sRGB.
    *
@@ -157,6 +185,16 @@ export class ColorizerColor {
    */
   public toHwb(): THwb {
     return convertXyzToHwb(this.toJSON());
+  }
+
+  public toHwbString() {
+    const tmp = this.toHwb();
+
+    return {
+      h: roundToPrecision(tmp.h, 2).toString(),
+      w: roundToPrecision(tmp.w * 100, 2).toString(),
+      b: roundToPrecision(tmp.b * 100, 2).toString(),
+    };
   }
 
   /**
