@@ -7,6 +7,7 @@ import type {
   ColorizerPaletteItem,
   TRemoveItemCallback,
 } from "../engine/palette";
+import type { ColorizerColor } from "../lib/color";
 import type { IColorizerPaletteObserver } from "../lib/types";
 import type { TDragToOrderDragResultCallback } from "../../utility";
 
@@ -129,6 +130,12 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     const label = <HTMLDivElement>getDomElement(paletteItem, ".label");
     label.innerHTML = `${item.paletteItemId}`;
 
+    // Notations
+    const notations = <HTMLUListElement>(
+      getDomElement(paletteItem, ".notations")
+    );
+    notations.appendChild(this.generateColorNotation(item.color));
+
     // Attach Event Listeners
     const removeButton = <HTMLButtonElement>(
       getDomElement(paletteItem, ".button-remove")
@@ -139,5 +146,17 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     );
 
     return paletteItem;
+  }
+
+  private generateColorNotation(color: ColorizerColor): HTMLLIElement {
+    const template = <HTMLTemplateElement>(
+      getDomElement(null, "#tpl-palette-item-notation")
+    );
+
+    const notation = (
+      template.content.firstElementChild as HTMLLIElement
+    ).cloneNode(true) as HTMLLIElement;
+
+    return notation;
   }
 }
