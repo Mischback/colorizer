@@ -33,6 +33,8 @@ body {
     [role="tab"] {
       // Using a ``<button>`` here, so the styles from ``base/button.scss`` do
       // apply and might/will be needed to be overwritten!
+      @include root-element-shadow;
+
       margin: 0;
       margin-top: $active-tab-top-border-width;
       padding: 0.5em;
@@ -70,6 +72,8 @@ body {
   }
 
   main {
+    @include root-element-shadow;
+
     margin: 0;
     padding: 1px;
     border-radius: $border-radius-fraction * 2;
