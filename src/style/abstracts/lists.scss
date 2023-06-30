@@ -1,0 +1,22 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+@mixin reset-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/**
+ * Make a list horizontal.
+ *
+ * And yes, this is directly from sass-lang.com
+ */
+@mixin horizontal-list {
+  @include reset-list;
+
+  li {
+    display: inline-block;
+  }
+}

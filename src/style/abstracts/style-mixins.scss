@@ -3,6 +3,18 @@
 // SPDX-FileType: SOURCE
 
 @mixin color-preview-shadow {
-  // FIXME: [#32] Build an overall colorscheme
+  // FIXME: [#32] Define coherent colors
   box-shadow: 0 0 2px 2px rgb(0 0 0), inset 0 0 1px 1px rgb(255 255 255);
+}
+
+@mixin root-element-shadow {
+  $a: $root-element-shadow-as-border-width;
+  $b: $root-element-drop-shadow-width;
+
+  // FIXME: [#32] Define coherent colors
+  $shadow-color: #000;
+  $glow-color: #fff;
+
+  box-shadow: 0 0 ($a * 2) $a $shadow-color, $b $b 0 0 $shadow-color,
+    0 0 ($b * 2 + $a) $a $glow-color;
 }

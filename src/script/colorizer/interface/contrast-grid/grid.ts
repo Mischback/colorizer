@@ -18,7 +18,7 @@ export class ColorizerContrastGrid implements IColorizerPaletteObserver {
   public constructor(moveItemCallback: TDragToOrderDragResultCallback) {
     // Get the required DOM elements
     this.gridTable = <HTMLTableElement>(
-      getDomElement(null, "#contrast-grid table")
+      getDomElement(null, "#contrast-grid-table")
     );
 
     this.dragToRow = new DragToOrder(

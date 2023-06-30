@@ -1,0 +1,129 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+body {
+  $main-z-index: 100;
+
+  padding: 0 10px;
+  background-color: $color-body-bg;
+
+  nav {
+    margin: 0;
+    padding: 0;
+  }
+
+  // This is the list inside of <nav>!
+  #tabs-root {
+    $active-tab-top-border-width: 3px;
+    $active-tab-top-border-color: #f00; // FIXME: [#32] Define coherent colors
+    $active-tab-color-bg: $color-content-bg;
+    $active-tab-color-fg: #444; // FIXME: [#32] Define coherent colors
+    $focus-tab-color: #f00; // FIXME: [#32] Define coherent colors
+    $focus-tab-width: 2px;
+    $hover-tab-color-bg: #fc0; // FIXME: [#32] Define coherent colors
+    $tab-border-radius: $border-radius-fraction;
+    $tab-color-bg: #aaa; // FIXME: [#32] Define coherent colors
+    $tab-color-fg: #444; // FIXME: [#32] Define coherent colors
+
+    @include horizontal-list;
+
+    margin-left: $border-radius-fraction * 4;
+
+    > li {
+      margin-right: 1em;
+    }
+
+    /* These are the actual *tabs* */
+    [role="tab"] {
+      // Using a ``<button>`` here, so the styles from ``base/button.scss`` do
+      // apply and might/will be needed to be overwritten!
+      @include root-element-shadow;
+
+      position: relative;
+      z-index: $main-z-index - 10;
+      margin: 0;
+      margin-top: $active-tab-top-border-width;
+      padding: 0.5em 0.5em 0.35em;
+      border: 0 solid transparent;
+      border-radius: $tab-border-radius $tab-border-radius 0 0;
+      outline: none;
+      background: none; // reset the default button background!
+      background-color: $tab-color-bg;
+      color: $tab-color-fg;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+
+      &::after {
+        /* stylelint-disable scss/operator-no-newline-after */
+        $glow-size: (
+          $root-element-drop-shadow-width * 2 +
+            $root-element-shadow-as-border-width
+        );
+        /* stylelint-enable scss/operator-no-newline-after */
+
+        content: "";
+        display: block;
+        position: absolute;
+        bottom: -$glow-size;
+        left: -$glow-size;
+        width: calc(100% + $glow-size * 2);
+        height: $glow-size;
+        background-color: $color-content-bg;
+      }
+
+      /* stylelint-disable selector-max-compound-selectors */
+      .focus {
+        margin: 0;
+        padding: 2px;
+        border-radius: $tab-border-radius;
+      }
+      /* stylelint-enable selector-max-compound-selectors */
+
+      /* The currently active tab */
+      &[aria-selected="true"] {
+        z-index: $main-z-index + 10;
+        margin-top: 0;
+        border-top-width: $active-tab-top-border-width;
+        border-top-color: $active-tab-top-border-color;
+        background-color: $active-tab-color-bg;
+        color: $active-tab-color-fg;
+      }
+
+      &:hover {
+        background-color: $hover-tab-color-bg;
+      }
+
+      /* stylelint-disable selector-max-compound-selectors */
+      &:focus .focus {
+        outline: $focus-tab-color solid $focus-tab-width;
+        outline-offset: 0;
+      }
+      /* stylelint-enable selector-max-compound-selectors */
+    }
+  }
+
+  main {
+    @include root-element-shadow;
+
+    position: relative;
+    z-index: $main-z-index;
+    margin: 0;
+    padding: 1px;
+    border-radius: $border-radius-fraction * 2;
+    background-color: $color-content-bg;
+
+    > * {
+      margin: 0 1em;
+    }
+
+    > [role="tabpanel"] {
+      display: none;
+
+      &[aria-expanded="true"] {
+        display: block;
+      }
+    }
+  }
+}

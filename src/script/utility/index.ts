@@ -5,6 +5,7 @@
 export { DragToOrder } from "./drag-to-order";
 export { mHash } from "./murmurhash";
 export { NotificationEngine } from "./notifications";
+export { TabbedInterface } from "./tabbed-interface";
 export type { TDragToOrderDragResultCallback } from "./drag-to-order";
 
 /**
