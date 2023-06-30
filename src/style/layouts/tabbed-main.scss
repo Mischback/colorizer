@@ -16,15 +16,15 @@ body {
   // This is the list inside of <nav>!
   #tabs-root {
     $active-tab-top-border-width: 3px;
-    $active-tab-top-border-color: #f00;
+    $active-tab-top-border-color: #f00; // FIXME: [#32] Define coherent colors
     $active-tab-color-bg: $color-content-bg;
-    $active-tab-color-fg: #444;
-    $focus-tab-color: #f00;
+    $active-tab-color-fg: #444; // FIXME: [#32] Define coherent colors
+    $focus-tab-color: #f00; // FIXME: [#32] Define coherent colors
     $focus-tab-width: 2px;
-    $hover-tab-color-bg: #fc0;
+    $hover-tab-color-bg: #fc0; // FIXME: [#32] Define coherent colors
     $tab-border-radius: $border-radius-fraction;
-    $tab-color-bg: #aaa;
-    $tab-color-fg: #444;
+    $tab-color-bg: #aaa; // FIXME: [#32] Define coherent colors
+    $tab-color-fg: #444; // FIXME: [#32] Define coherent colors
 
     @include horizontal-list;
 

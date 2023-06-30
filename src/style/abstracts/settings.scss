@@ -7,8 +7,8 @@
  * These are meant to be *semantic colors*. In the final code base the actual
  * color definitions should be moved into a dedicated module.
  */
-$color-body-bg: rgb(30 30 30);
-$color-content-bg: rgb(220 220 220);
+$color-body-bg: rgb(30 30 30); // FIXME: [#32] Define coherent colors
+$color-content-bg: rgb(220 220 220); // FIXME: [#32] Define coherent colors
 
 /* Overall settings to create a coherent look'n'feel */
 $border-radius-fraction: 0.25rem;
