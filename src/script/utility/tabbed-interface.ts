@@ -21,11 +21,20 @@ export class TabbedInterface {
   // @ts-expect-error TS2564 Has no initializer => NOPE!
   private lastTab: HTMLElement;
   private isVertical = false;
+  private forcePanelFocus: boolean;
 
-  constructor(tabContainer: HTMLElement) {
+  /**
+   * Constructor
+   *
+   * @param tabContainer The parent element of the tabs (*should* have
+   *                     ``role=tab`` applied).
+   * @param forcePanelFocus Should the associated panels be made focussable?
+   */
+  constructor(tabContainer: HTMLElement, forcePanelFocus = false) {
     console.debug("TabbedInterface");
 
     this.tabContainer = tabContainer;
+    this.forcePanelFocus = forcePanelFocus;
 
     // Determine if we're dealing with vertical tabs (by default horizontal
     // tabs are assumed)
@@ -86,9 +95,15 @@ export class TabbedInterface {
     // Iterate panels
     this.panels.forEach((panel) => {
       panel.setAttribute("aria-expanded", "false");
+      if (this.forcePanelFocus === true) {
+        panel.tabIndex = -1;
+      }
 
       if (panel.getAttribute("id") === panelId) {
         panel.setAttribute("aria-expanded", "true");
+        if (this.forcePanelFocus === true) {
+          panel.tabIndex = 0;
+        }
       }
     });
 
