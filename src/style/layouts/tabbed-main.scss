@@ -2,7 +2,69 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
+nav {
+  margin: 0;
+  padding: 0;
+}
+
+// This is the list inside of <nav>!
+#tabs-root {
+  $active-tab-top-border-width: 3px;
+  $active-tab-top-border-color: #f00;
+  $active-tab-color-bg: #ff0;
+  $focus-tab-color: #f00;
+  $focus-tab-width: 2px;
+  $tab-border-radius: 5px;
+  $tab-color-bg: #ddd;
+
+  @include horizontal-list;
+
+  > li {
+    margin-right: 1em;
+  }
+
+  /* These are the actual *tabs* */
+  [role="tab"] {
+    // Using a ``<button>`` here, so the styles from ``base/button.scss`` do
+    // apply and might/will be needed to be overwritten!
+    margin: 0;
+    margin-top: $active-tab-top-border-width;
+    padding: 0.5em;
+    border: 0 solid transparent;
+    border-radius: $tab-border-radius $tab-border-radius 0 0;
+    outline: none;
+    background: none; // reset the default button background!
+    background-color: $tab-color-bg;
+    font-size: 1.2em;
+    cursor: pointer;
+
+    .focus {
+      margin: 0;
+      padding: 2px;
+      border-radius: $tab-border-radius;
+    }
+
+    /* The currently active tab */
+    &[aria-selected="true"] {
+      margin-top: 0;
+      border-top-width: $active-tab-top-border-width;
+      border-top-color: $active-tab-top-border-color;
+      background-color: $active-tab-color-bg;
+    }
+
+    &:focus {
+      .focus {
+        outline: $focus-tab-color solid $focus-tab-width;
+        outline-offset: 0;
+      }
+    }
+  }
+}
+
 main {
+  margin: 0;
+  padding: 1px;
+
   > [role="tabpanel"] {
     display: none;
 
