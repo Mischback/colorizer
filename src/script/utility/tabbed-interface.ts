@@ -17,6 +17,9 @@ export class TabbedInterface {
   private tabContainer: HTMLElement;
   private tabs: HTMLElement[];
   private panels: HTMLElement[] = [];
+  private firstTab: HTMLElement | null = null;
+  // @ts-expect-error TS2564 Has no initializer => NOPE!
+  private lastTab: HTMLElement;
 
   constructor(tabContainer: HTMLElement) {
     console.debug("TabbedInterface");
@@ -47,10 +50,15 @@ export class TabbedInterface {
       // At this point a valid tab/panel combination is identified
       tab.addEventListener("click", this.onTabClick.bind(this));
       this.panels.push(panel);
+
+      if (this.firstTab === null) {
+        this.firstTab = tab;
+      }
+      this.lastTab = tab;
     });
 
-    console.debug(this.tabs);
-    console.debug(this.panels);
+    // @ts-expect-error TS2345 firstTab might be null => NOPE!
+    this.activateTab(this.firstTab, false);
   }
 
   /**
