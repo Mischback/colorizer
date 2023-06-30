@@ -20,11 +20,18 @@ export class TabbedInterface {
   private firstTab: HTMLElement | null = null;
   // @ts-expect-error TS2564 Has no initializer => NOPE!
   private lastTab: HTMLElement;
+  private isVertical = false;
 
   constructor(tabContainer: HTMLElement) {
     console.debug("TabbedInterface");
 
     this.tabContainer = tabContainer;
+
+    // Determine if we're dealing with vertical tabs (by default horizontal
+    // tabs are assumed)
+    if (this.tabContainer.getAttribute("aria-orientation") === "vertical") {
+      this.isVertical = true;
+    }
 
     // Identify the actual tabs.
     //
@@ -49,6 +56,8 @@ export class TabbedInterface {
 
       // At this point a valid tab/panel combination is identified
       tab.addEventListener("click", this.onTabClick.bind(this));
+      tab.addEventListener("keydown", this.onTabKeydown.bind(this));
+
       this.panels.push(panel);
 
       if (this.firstTab === null) {
@@ -107,15 +116,95 @@ export class TabbedInterface {
     });
   }
 
+  private activateNextTab(currentTab: HTMLElement): void {
+    if (currentTab === this.lastTab) {
+      this.activateTab(this.firstTab as HTMLElement);
+    } else {
+      const index = this.tabs.indexOf(currentTab);
+      this.activateTab(this.tabs[index + 1] as HTMLElement);
+    }
+  }
+
+  private activatePreviousTab(currentTab: HTMLElement): void {
+    if (currentTab === this.firstTab) {
+      this.activateTab(this.lastTab);
+    } else {
+      const index = this.tabs.indexOf(currentTab);
+      this.activateTab(this.tabs[index - 1] as HTMLElement);
+    }
+  }
+
   /**
    * Handle clicks on the tab elements.
    *
    * This method is attached to the *tabs* in the constructor.
    */
-  private onTabClick(evt: Event): void {
+  private onTabClick(evt: MouseEvent): void {
     evt.stopPropagation();
     evt.preventDefault();
 
     this.activateTab(evt.currentTarget as HTMLElement);
+  }
+
+  /**
+   * Handle keyboard input while a tab has focus.
+   *
+   * This method is attached to the *tabs* in the constructor.
+   *
+   * The method intercepts the following keyboard inputs and prevents further
+   * propagation in the DOM. All other inputs are bubbled further.
+   *
+   * - End key (keyCode 35): activate the last tab
+   * - Home key (keyCode 36): activate the first tab
+   * - arrow keys (keyCodes 37 - 40): activate the next/previous tab (please
+   *   note: up/down and left/right are mutually exclusive and dependent on
+   *   the ``isVertical`` attribute. The inputs are bubbled further, if they
+   *   are not matching semantically (e.g. "up arrow" is bubbled if the tabs
+   *   are horizontal).
+   */
+  private onTabKeydown(evt: KeyboardEvent): void {
+    let handledFinally = false;
+
+    switch (evt.keyCode) {
+      case 35: // end key
+        this.activateTab(this.lastTab);
+        handledFinally = true;
+        break;
+      case 36: // home key
+        this.activateTab(this.firstTab as HTMLElement);
+        handledFinally = true;
+        break;
+      case 37: // left arrow
+        if (this.isVertical === false) {
+          this.activatePreviousTab(evt.currentTarget as HTMLElement);
+          handledFinally = true;
+        }
+        break;
+      case 38: // up arrow
+        if (this.isVertical === true) {
+          this.activatePreviousTab(evt.currentTarget as HTMLElement);
+          handledFinally = true;
+        }
+        break;
+      case 39: // right arrow
+        if (this.isVertical === false) {
+          this.activateNextTab(evt.currentTarget as HTMLElement);
+          handledFinally = true;
+        }
+        break;
+      case 40: // down arrow
+        if (this.isVertical === true) {
+          this.activateNextTab(evt.currentTarget as HTMLElement);
+          handledFinally = true;
+        }
+        break;
+      default:
+        break;
+    }
+
+    if (handledFinally !== false) {
+      evt.preventDefault();
+      evt.stopPropagation();
+    }
   }
 }
