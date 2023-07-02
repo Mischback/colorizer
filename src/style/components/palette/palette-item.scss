@@ -50,6 +50,11 @@
       margin: 0 0 0.5em 0.5em;
 
       /* stylelint-disable selector-max-compound-selectors */
+      > .hide-notation {
+        /* purgecss ignore current */
+        display: none;
+      }
+
       .preview {
         display: inline-block;
         width: 1em;

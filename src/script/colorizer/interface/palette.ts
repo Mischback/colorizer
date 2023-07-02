@@ -17,6 +17,7 @@ import type { TDragToOrderDragResultCallback } from "../../utility";
 export type TColorizerPaletteItemNotation = TColorizerColorNotation;
 
 export class ColorizerPaletteIO implements IColorizerPaletteObserver {
+  private paletteContainer: HTMLElement;
   private paletteList: HTMLUListElement;
   private removeItemCallback: TRemoveItemCallback;
   private notations: TColorizerPaletteItemNotation[];
@@ -32,6 +33,9 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     this.notations = notations;
 
     // Get the required DOM elements
+    this.paletteContainer = <HTMLElement>(
+      getDomElement(null, "#panel-root-palette")
+    );
     this.paletteList = <HTMLUListElement>(
       getDomElement(null, "#color-palette-list")
     );
@@ -41,6 +45,26 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
       ".palette-item",
       moveItemCallback
     );
+
+    const notationsToggleContainer = <HTMLUListElement>(
+      getDomElement(this.paletteContainer, ".notations-toggles")
+    );
+    this.notations.forEach((notation) => {
+      const tmpButton = document.createElement("button");
+      tmpButton.setAttribute("type", "button");
+      tmpButton.setAttribute("aria-pressed", "true");
+      tmpButton.setAttribute("colorizer-notation", notation);
+      tmpButton.innerHTML = notation;
+      tmpButton.addEventListener(
+        "click",
+        this.toggleNotationButtonEventHandler.bind(this)
+      );
+
+      const tmpLi = document.createElement("li");
+      tmpLi.appendChild(tmpButton);
+
+      notationsToggleContainer.appendChild(tmpLi);
+    });
   }
 
   /**
@@ -65,6 +89,42 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
       this.paletteList.appendChild(
         this.generatePaletteItem(<ColorizerPaletteItem>palette[i])
       );
+    }
+  }
+
+  private toggleNotationButtonEventHandler(evt: Event): void {
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    const notation = (evt.target as HTMLElement).getAttribute(
+      "colorizer-notation"
+    );
+    if (notation === null) {
+      return;
+    }
+
+    const currentStatus = (evt.target as HTMLButtonElement).getAttribute(
+      "aria-pressed"
+    );
+    if (currentStatus === null) {
+      return;
+    }
+
+    const elements = this.paletteList.querySelectorAll(
+      `.palette-item .notations .${notation}`
+    );
+    elements.forEach((elem) => {
+      if (currentStatus === "false") {
+        (elem as HTMLElement).classList.remove("hide-notation");
+      } else {
+        (elem as HTMLElement).classList.add("hide-notation");
+      }
+    });
+
+    if (currentStatus === "false") {
+      (evt.target as HTMLButtonElement).setAttribute("aria-pressed", "true");
+    } else {
+      (evt.target as HTMLButtonElement).setAttribute("aria-pressed", "false");
     }
   }
 
