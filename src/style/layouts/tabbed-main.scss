@@ -16,12 +16,13 @@ body {
   // This is the list inside of <nav>!
   #tabs-root {
     $active-tab-top-border-width: 3px;
-    $active-tab-top-border-color: #f00; // FIXME: [#32] Define coherent colors
+    $active-tab-top-border-color: $color-red-light;
     $active-tab-color-bg: $color-content-bg;
     $active-tab-color-fg: $color-content-fg;
     $focus-tab-color: #f00; // FIXME: [#32] Define coherent colors
     $focus-tab-width: 2px;
-    $hover-tab-color-bg: #fc0; // FIXME: [#32] Define coherent colors
+    $hover-tab-color-bg: $color-red-light;
+    $hover-tab-color-fg: $color-teal-dark;
     $tab-border-radius: $border-radius-fraction;
     $tab-color-bg: $color-content-bg-dim;
     $tab-color-fg: $color-content-bg;
@@ -93,6 +94,7 @@ body {
 
       &:hover {
         background-color: $hover-tab-color-bg;
+        color: $hover-tab-color-fg;
       }
 
       /* stylelint-disable selector-max-compound-selectors */

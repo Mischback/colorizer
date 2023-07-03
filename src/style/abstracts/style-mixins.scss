@@ -10,10 +10,8 @@
 @mixin root-element-shadow {
   $a: $root-element-shadow-as-border-width;
   $b: $root-element-drop-shadow-width;
-
-  // FIXME: [#32] Define coherent colors
-  $shadow-color: #000;
-  $glow-color: #fff;
+  $shadow-color: $color-black;
+  $glow-color: $color-teal-light;
 
   box-shadow: 0 0 ($a * 2) $a $shadow-color, $b $b 0 0 $shadow-color,
     0 0 ($b * 2 + $a) $a $glow-color;
