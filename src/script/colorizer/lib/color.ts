@@ -133,7 +133,7 @@ export class ColorizerColor {
    *
    * Please note: Internally this relies on ``toRgb255()``.
    *
-   * FIXME: Create a corresponding ``fromRgbHex()`` method!
+   * FIXME: [#35] Create a corresponding ``fromRgbHex()`` method!
    */
   public toRgbHex(): string {
     const tmp = this.toRgb255();

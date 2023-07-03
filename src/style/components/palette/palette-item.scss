@@ -10,7 +10,7 @@
     margin-bottom: 1em;
     padding: 0.5em 0.25em 0.5em 3.5em;
     border-radius: $border-radius-fraction;
-    box-shadow: 0 0 2px 1px #000; // FIXME: Define coherent colors!
+    box-shadow: 0 0 2px 1px #000; // FIXME: [#32] Define coherent colors!
 
     > * {
       margin: 0;

@@ -3,7 +3,7 @@
 // SPDX-FileType: SOURCE
 
 #panel-root-palette {
-  .display-mode,  // FIXME: Probably these will require dedicated blocks!
+  .display-mode,  // FIXME: [#32] Probably these will require dedicated blocks!
   .notations-toggles {
     @include horizontal-list;
 
@@ -15,8 +15,8 @@
 
       /* stylelint-disable selector-max-compound-selectors */
       > button {
-        // FIXME: This is just temporary. The goal is to provide an overall
-        //        ``toggle-button`` class!
+        // FIXME: [#32] This is just temporary. The goal is to provide an
+        //        overall ``toggle-button`` class!
         background: none;
         box-shadow: none;
         font-weight: normal;
