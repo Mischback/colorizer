@@ -1,0 +1,49 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+#panel-root-palette {
+  .display-mode,  // FIXME: [#32] Probably these will require dedicated blocks!
+  .notations-toggles {
+    @include horizontal-list;
+
+    margin: 0.5em 0 1em;
+    text-align: right;
+
+    > li {
+      margin: 0 0 0 1em;
+
+      /* stylelint-disable selector-max-compound-selectors */
+      > button {
+        // FIXME: [#32] This is just temporary. The goal is to provide an
+        //        overall ``toggle-button`` class!
+        background: none;
+        box-shadow: none;
+        font-weight: normal;
+        cursor: pointer;
+
+        /* stylelint-disable max-nesting-depth */
+        &:hover {
+          text-decoration: underline;
+        }
+
+        &[aria-pressed="true"] {
+          /* purgecss ignore current */
+          font-weight: bold;
+
+          &::before {
+            /* purgecss ignore current */
+            content: "> ";
+          }
+
+          &::after {
+            /* purgecss ignore current */
+            content: " <";
+          }
+        }
+        /* stylelint-enable max-nesting-depth */
+      }
+      /* stylelint-enable selector-max-compound-selectors */
+    }
+  }
+}

@@ -9,6 +9,7 @@ import { ColorizerContrastGrid } from "../interface/contrast-grid/grid";
 import { ColorizerPaletteIO } from "../interface/palette";
 import { NotificationEngine } from "../../utility";
 import type { TColorizerFormInputMethod } from "../interface/color-form";
+import type { TColorizerPaletteItemNotation } from "../interface/palette";
 
 export class ColorizerController {
   private db: ColorizerDatabase;
@@ -20,7 +21,15 @@ export class ColorizerController {
   private paletteIO: ColorizerPaletteIO;
 
   public constructor(
-    inputMethods: TColorizerFormInputMethod[] = ["rgb", "hsl", "hwb", "oklch"]
+    inputMethods: TColorizerFormInputMethod[] = ["rgb", "hsl", "hwb", "oklch"],
+    outputNotations: TColorizerPaletteItemNotation[] = [
+      "rgb",
+      "rgb-hex",
+      "hsl",
+      "hwb",
+      "oklch",
+      "xyz",
+    ]
   ) {
     // Setup the notification interface
     this.notificationEngine = new NotificationEngine(
@@ -54,7 +63,8 @@ export class ColorizerController {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       this.palette.moveItemInPalette.bind(this.palette),
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      this.palette.removePaletteItemById.bind(this.palette)
+      this.palette.removePaletteItemById.bind(this.palette),
+      outputNotations
     );
     this.palette.addPaletteObserver(this.paletteIO);
 

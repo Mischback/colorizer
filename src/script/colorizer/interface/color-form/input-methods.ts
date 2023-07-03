@@ -3,14 +3,17 @@
 // SPDX-FileType: SOURCE
 
 import { ColorizerColor } from "../../lib/color";
-import { getDomElement, roundToPrecision } from "../../../utility";
+import { getDomElement } from "../../../utility";
 import type { TColorizerFormReceiverCallback } from "./form";
-import type { IColorizerColorObserver } from "../../lib/types";
+import type {
+  IColorizerColorObserver,
+  TColorizerColorNotation,
+} from "../../lib/types";
 
 /**
  * Dedicated typing for the available input methods.
  */
-export type TColorizerFormInputMethod = "rgb" | "hsl" | "hwb" | "oklch";
+export type TColorizerFormInputMethod = Omit<TColorizerColorNotation, "xyz">;
 
 /**
  * The generic prototype of a function that acts a a callback / event handler
@@ -552,25 +555,19 @@ class ColorizerFormInputOklch
    * @param color An instance of ``ColorizerColor``.
    */
   public setColor(color: ColorizerColor): void {
-    const colorOklch = color.toOklch();
+    const colorOklch = color.toOklchString();
 
-    // TODO: [#23] Expose precision!
-    let tmp = roundToPrecision(colorOklch.l * 100, 2).toString();
-    this.cAText.value = tmp;
-    this.cASlider.value = tmp;
-    this.updateCoordinateInStyleProperty(this.cAProperty, tmp);
+    this.cAText.value = colorOklch.l;
+    this.cASlider.value = colorOklch.l;
+    this.updateCoordinateInStyleProperty(this.cAProperty, colorOklch.l);
 
-    // TODO: [#23] Expose precision!
-    tmp = roundToPrecision((colorOklch.c / 0.4) * 100, 2).toString();
-    this.cBText.value = tmp;
-    this.cBSlider.value = tmp;
-    this.updateCoordinateInStyleProperty(this.cBProperty, tmp);
+    this.cBText.value = colorOklch.c;
+    this.cBSlider.value = colorOklch.c;
+    this.updateCoordinateInStyleProperty(this.cBProperty, colorOklch.c);
 
-    // TODO: [#23] Expose precision!
-    tmp = roundToPrecision(colorOklch.h, 2).toString();
-    this.cCText.value = tmp;
-    this.cCSlider.value = tmp;
-    this.updateCoordinateInStyleProperty(this.cCProperty, tmp);
+    this.cCText.value = colorOklch.h;
+    this.cCSlider.value = colorOklch.h;
+    this.updateCoordinateInStyleProperty(this.cCProperty, colorOklch.h);
   }
 }
 
@@ -634,25 +631,19 @@ class ColorizerFormInputHsl
    * @param color An instance of ``ColorizerColor``.
    */
   public setColor(color: ColorizerColor): void {
-    const colorHsl = color.toHsl();
+    const colorHsl = color.toHslString();
 
-    // TODO: [#23] Expose precision!
-    let tmp = roundToPrecision(colorHsl.h, 2).toString();
-    this.cAText.value = tmp;
-    this.cASlider.value = tmp;
-    this.updateCoordinateInStyleProperty(this.cAProperty, tmp);
+    this.cAText.value = colorHsl.h;
+    this.cASlider.value = colorHsl.h;
+    this.updateCoordinateInStyleProperty(this.cAProperty, colorHsl.h);
 
-    // TODO: [#23] Expose precision!
-    tmp = roundToPrecision(colorHsl.s * 100, 2).toString();
-    this.cBText.value = tmp;
-    this.cBSlider.value = tmp;
-    this.updateCoordinateInStyleProperty(this.cBProperty, tmp);
+    this.cBText.value = colorHsl.s;
+    this.cBSlider.value = colorHsl.s;
+    this.updateCoordinateInStyleProperty(this.cBProperty, colorHsl.s);
 
-    // TODO: [#23] Expose precision!
-    tmp = roundToPrecision(colorHsl.l * 100, 2).toString();
-    this.cCText.value = tmp;
-    this.cCSlider.value = tmp;
-    this.updateCoordinateInStyleProperty(this.cCProperty, tmp);
+    this.cCText.value = colorHsl.l;
+    this.cCSlider.value = colorHsl.l;
+    this.updateCoordinateInStyleProperty(this.cCProperty, colorHsl.l);
   }
 }
 
@@ -716,24 +707,18 @@ class ColorizerFormInputHwb
    * @param color An instance of ``ColorizerColor``.
    */
   public setColor(color: ColorizerColor): void {
-    const colorHwb = color.toHwb();
+    const colorHwb = color.toHwbString();
 
-    // TODO: [#23] Expose precision!
-    let tmp = roundToPrecision(colorHwb.h, 2).toString();
-    this.cAText.value = tmp;
-    this.cASlider.value = tmp;
-    this.updateCoordinateInStyleProperty(this.cAProperty, tmp);
+    this.cAText.value = colorHwb.h;
+    this.cASlider.value = colorHwb.h;
+    this.updateCoordinateInStyleProperty(this.cAProperty, colorHwb.h);
 
-    // TODO: [#23] Expose precision!
-    tmp = roundToPrecision(colorHwb.w * 100, 2).toString();
-    this.cBText.value = tmp;
-    this.cBSlider.value = tmp;
-    this.updateCoordinateInStyleProperty(this.cBProperty, tmp);
+    this.cBText.value = colorHwb.w;
+    this.cBSlider.value = colorHwb.w;
+    this.updateCoordinateInStyleProperty(this.cBProperty, colorHwb.w);
 
-    // TODO: [#23] Expose precision!
-    tmp = roundToPrecision(colorHwb.b * 100, 2).toString();
-    this.cCText.value = tmp;
-    this.cCSlider.value = tmp;
-    this.updateCoordinateInStyleProperty(this.cCProperty, tmp);
+    this.cCText.value = colorHwb.b;
+    this.cCSlider.value = colorHwb.b;
+    this.updateCoordinateInStyleProperty(this.cCProperty, colorHwb.b);
   }
 }

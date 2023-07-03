@@ -47,8 +47,11 @@
     <header>
       <h2>Color Palette</h2>
     </header>
-    <ul id="color-palette-list">
+    <ul class="display-mode">
+      <li><button id="palette-button-compact" type="button" aria-pressed="false">compact mode</button></li>
     </ul>
+    <ul class="notations-toggles"></ul>
+    <ul id="color-palette-list"></ul>
   </section>
 
   <section id="panel-root-color-form" aria-expanded="false" aria-labelledby="tab-root-color-form" role="tabpanel">
@@ -207,15 +210,29 @@
   </section>
 
   <section id="panel-root-contrast-grid" aria-expanded="false" aria-labelledby="tab-root-contrast-grid" role="tabpanel">
+    <header>
+      <h2>Contrast Grid</h2>
+    </header>
     <table id="contrast-grid-table"></table>
   </section>
 </main>
 
 <template id="tpl-palette-item">
   <li class="palette-item">
-    <div class="label">foo</div>
     <div class="preview"></div>
-    <button type="button" class="button-remove">remove</button>
+    <div class="label">foo</div>
+    <ul class="notations"></ul>
+    <ul class="actions">
+      <li><button type="button" class="button-remove">remove</button></li>
+    </ul>
+  </li>
+</template>
+
+<template id="tpl-palette-item-notation">
+  <li>
+    <div class="preview"></div>
+    <span class="caption">FOO</span>
+    <span class="value">bar</span>
   </li>
 </template>
 

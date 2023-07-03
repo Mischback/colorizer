@@ -3,39 +3,180 @@
 // SPDX-FileType: SOURCE
 
 #color-palette-list {
-  margin: 0 1em;
-  padding: 0;
-  list-style: none;
+  @include reset-list;
 
-  li {
-    display: inline-block;
-    margin: 0.25em 0.5em;
-    padding: 0.5em 1em;
-    border-radius: 5px;
+  > li {
+    position: relative;
+    margin-bottom: 1em;
+    padding: 0.5em 0.25em 0.5em 3.5em;
+    border-radius: $border-radius-fraction;
+    box-shadow: 0 0 2px 1px #000; // FIXME: [#32] Define coherent colors!
 
-    // FIXME: [#32] Build an overall colorscheme
-    box-shadow: 0 0 2px 2px rgb(0 0 0 / 60%);
-
-    /* stylelint-disable selector-max-compound-selectors */
-    * {
-      vertical-align: middle;
+    > * {
+      margin: 0;
     }
 
-    div {
-      display: inline-block;
-    }
-
-    .preview {
-      @include color-preview-shadow;
-
-      width: 1.5em;
-      height: 1.5em;
-      border-radius: 999px;
+    > .preview {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3em;
+      height: 100%;
+      border-radius: $border-radius-fraction 0 0 $border-radius-fraction;
       background-color: color(
         xyz var(--palette-item-color-x) var(--palette-item-color-y)
           var(--palette-item-color-z)
       );
     }
+
+    > .label {
+      margin-bottom: 0.5em;
+      font-weight: bold;
+    }
+
+    > .actions {
+      @include horizontal-list;
+
+      /* stylelint-disable selector-max-compound-selectors */
+      > li {
+        margin: 0 0.75em 0 0;
+      }
+      /* stylelint-enable selector-max-compound-selectors */
+    }
+
+    > .notations {
+      @include reset-list;
+
+      margin: 0 0 0.5em 0.5em;
+
+      /* stylelint-disable selector-max-compound-selectors */
+      > .hide-notation {
+        /* purgecss ignore current */
+        display: none;
+      }
+
+      .preview {
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+      }
+
+      .caption {
+        font-weight: bold;
+
+        /* stylelint-disable max-nesting-depth */
+        &::after {
+          content: ": ";
+        }
+        /* stylelint-enable max-nesting-depth */
+      }
+
+      > .rgb .preview {
+        /* purgecss ignore current */
+        background-color: rgb(
+          var(--color-component-a) var(--color-component-b)
+            var(--color-component-c)
+        );
+      }
+
+      > .rgb-hex .preview {
+        /* purgecss ignore current */
+        background-color: var(--color-component-rgb-hex);
+      }
+
+      > .hsl .preview {
+        /* purgecss ignore current */
+        background-color: hsl(
+          var(--color-component-a) var(--color-component-b)
+            var(--color-component-c)
+        );
+      }
+
+      > .hwb .preview {
+        /* purgecss ignore current */
+        background-color: hwb(
+          var(--color-component-a) var(--color-component-b)
+            var(--color-component-c)
+        );
+      }
+
+      > .oklch .preview {
+        /* purgecss ignore current */
+        background-color: oklch(
+          var(--color-component-a) var(--color-component-b)
+            var(--color-component-c)
+        );
+      }
+
+      > .xyz .preview {
+        /* purgecss ignore current */
+        background-color: color(
+          xyz var(--color-component-a) var(--color-component-b)
+            var(--color-component-c)
+        );
+      }
+      /* stylelint-enable selector-max-compound-selectors */
+    }
+  }
+}
+
+/**
+ * This is the styling of the palette / palette items in *compact mode*. The
+ * ``compact-mode`` CSS class is attached in TypeScript (ColorizerPaletteIO
+ * class) in the corresponding button event listener.
+ *
+ * It hides most of the available information and just keeps a very minimal
+ * block per palette item.
+ * The list is formatted horizontally to provide a quick overview over the
+ * whole palette, sacrificing the notations.
+ */
+
+/* purgecss start ignore */
+/* stylelint-disable selector-max-id */
+#panel-root-palette.compact-mode #color-palette-list {
+  @include horizontal-list;
+
+  > li {
+    margin: 0 1em 1em 0;
+    padding: 3.5em 0.25em 0.5em;
+
+    /* stylelint-disable selector-max-compound-selectors */
+    > .preview {
+      width: 100%;
+      height: 3em;
+      border-radius: $border-radius-fraction $border-radius-fraction 0 0;
+    }
+
+    > .actions {
+      @include reset-list;
+    }
+
+    > .notations {
+      > li {
+        display: none;
+      }
+
+      > .rgb-hex {
+        display: block;
+        margin: 0;
+        padding: 0;
+
+        /* stylelint-disable max-nesting-depth */
+        > * {
+          display: none;
+        }
+
+        > .value {
+          display: block;
+          margin: 0;
+          padding: 0;
+        }
+        /* stylelint-enable max-nesting-depth */
+      }
+    }
     /* stylelint-enable selector-max-compound-selectors */
   }
 }
+/* stylelint-enable selector-max-id */
+
+/* purgecss end ignore */
