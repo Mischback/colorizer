@@ -12,7 +12,6 @@
     margin-bottom: 1em;
     padding: 0.5em 0.25em 0.5em 3.5em;
     border-radius: $border-radius-fraction;
-    box-shadow: 0 0 2px 1px #000; // FIXME: [#32] Define coherent colors!
 
     > * {
       margin: 0;
@@ -29,6 +28,7 @@
         xyz var(--palette-item-color-x) var(--palette-item-color-y)
           var(--palette-item-color-z)
       );
+      box-shadow: $color-preview-inner-shadow;
     }
 
     > .label {
@@ -61,6 +61,8 @@
         display: inline-block;
         width: 1em;
         height: 1em;
+        border-radius: $border-radius-fraction;
+        box-shadow: $color-preview-inner-shadow;
       }
 
       .caption {

@@ -2,10 +2,19 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-@mixin color-preview-shadow {
-  // FIXME: [#32] Define coherent colors
-  box-shadow: 0 0 2px 2px rgb(0 0 0), inset 0 0 1px 1px rgb(255 255 255);
-}
+// FIXME: [#32] Define coherent colors
+//        Thing is, this simulates a slight bevel. Black / white are probably
+//        ok for this purpose!
+$color-preview-inner-shadow: inset 1px 1px 1px 0 rgb(255 255 255 / 50%),
+  inset -1px -1px 1px 0 rgb(0 0 0 / 70%);
+
+/**
+ * This defines a slight dark glow, acting as ouline against bright background.
+ *
+ * See ``content-box-shadow`` for a simple mixin. See
+ * ``color-preview-inner-shadow``, which might be applied together with this.
+ */
+$element-shadow-as-outline: 0 0 2px 1px $color-teal-dark;
 
 /**
  * Coherent shadow of elements that are children of the ``<body>``.
@@ -24,5 +33,5 @@
  * Coherent shadow of elements that are placed in the actual content container.
  */
 @mixin content-box-shadow {
-  box-shadow: 0 0 2px 1px $color-teal-dark;
+  box-shadow: $element-shadow-as-outline;
 }
