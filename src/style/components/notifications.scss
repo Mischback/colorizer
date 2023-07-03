@@ -27,26 +27,27 @@
       margin-left: 0.5em;
     }
 
+    /* purgecss start ignore */
     /* stylelint-disable selector-no-qualifying-type */
     &.message {
-      // FIXME: [#32] Build an overall colorscheme
-      background-color: #9c9;
+      background-color: $color-teal;
+      color: $color-light-grey;
     }
 
     &.info {
-      // FIXME: [#32] Build an overall colorscheme
-      background-color: rgb(255 220 0);
+      background-color: $color-yellow;
     }
 
     &.error {
-      // FIXME: [#32] Build an overall colorscheme
-      background-color: rgb(196 0 0);
-      color: #fff;
+      background-color: $color-red;
+      color: $color-light-grey;
     }
 
     &.notify-fade-out {
       opacity: 0;
     }
     /* stylelint-enable selector-no-qualifying-type */
+
+    /* purgecss start ignore */
   }
 }
