@@ -8,32 +8,29 @@ button {
   padding: 0.25em 0.5em;
   border: 0 solid transparent;
   border-radius: $border-radius-fraction;
+
+  /* prettier-ignore */
   background: linear-gradient(
     to bottom,
-    rgb(0 150 144) 5%,
-    /* not part of the overall palette; oklch (60% 30% 190)*/
-    $color-teal 15% 40%,
-    rgb(0 90 86) 50% 90%,
-    /* not part of the overall palette; oklch (40% 30% 190)*/
-    rgb(0 62 59) 95% /* not part of the overall palette; oklch (30% 30% 190)*/
+    rgb(0 150 144) 5%,  /* not part of the palette; oklch(60% 30% 190)*/
+    $color-content-button-bg 15% 40%,  /* $color-teal*/
+    rgb(0 90 86) 50% 90%,  /* not part of the palette; oklch(40% 30% 190)*/
+    rgb(0 62 59) 95%  /* not part of the overall palette; oklch(30% 30% 190)*/
   );
-  color: $color-teal-light;
+  color: $color-content-button-fg;
   font-weight: bold;
   cursor: pointer;
 
   &:hover,
   &:focus {
-    // FIXME: [#32] Build an overall colorscheme
+    /* prettier-ignore */
     background: linear-gradient(
       to bottom,
-      rgb(255 232 0) 5%,
-      /* oklch (95% 45% 90)*/
-      $color-yellow 15% 40%,
-      /* oklch (85% 45% 90)*/
-      rgb(218 166 0) 50% 90%,
-      /* (75% 45% 90)*/
-      rgb(186 134 0) 95% /* (65% 45% 90)*/
+      rgb(255 232 0) 5%,  /* not part of the palette; oklch(95% 45% 90)*/
+      $color-content-button-bg-hover 15% 40%,  /* $color-yellow!*/
+      rgb(218 166 0) 50% 90%,  /* not part of the palette; oklch(75% 45% 90)*/
+      rgb(186 134 0) 95%  /* not part of the palette; oklch(65% 45% 90)*/
     );
-    color: $color-teal-dim-dark;
+    color: $color-content-button-fg-hover;
   }
 }

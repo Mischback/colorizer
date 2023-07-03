@@ -55,6 +55,7 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
       tmpButton.setAttribute("type", "button");
       tmpButton.setAttribute("aria-pressed", "true");
       tmpButton.setAttribute("colorizer-notation", notation);
+      tmpButton.classList.add("toggle-button");
       tmpButton.innerHTML = notation;
       tmpButton.addEventListener(
         "click",
