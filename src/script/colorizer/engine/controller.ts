@@ -24,6 +24,7 @@ export class ColorizerController {
     inputMethods: TColorizerFormInputMethod[] = ["rgb", "hsl", "hwb", "oklch"],
     outputNotations: TColorizerPaletteItemNotation[] = [
       "rgb",
+      "rgb-hex",
       "hsl",
       "hwb",
       "oklch",

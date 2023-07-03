@@ -127,6 +127,23 @@ export class ColorizerColor {
     };
   }
 
+  /** Get the color in gamma-corrected sRGB mode in hex-based notation.
+   *
+   * @returns A ``string`` in hex-based notation, including the leading ``#``.
+   *
+   * Please note: Internally this relies on ``toRgb255()``.
+   *
+   * FIXME: Create a corresponding ``fromRgbHex()`` method!
+   */
+  public toRgbHex(): string {
+    const tmp = this.toRgb255();
+
+    return (
+      "#" +
+      ((1 << 24) | (tmp.r << 16) | (tmp.g << 8) | tmp.b).toString(16).slice(1)
+    );
+  }
+
   /**
    * Get the color in Oklch mode.
    *

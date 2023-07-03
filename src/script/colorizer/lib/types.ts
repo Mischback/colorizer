@@ -8,7 +8,13 @@ import type { ColorizerPaletteItem } from "../engine/palette";
 /**
  * A type for all supported color notations.
  */
-export type TColorizerColorNotation = "rgb" | "hsl" | "hwb" | "oklch" | "xyz";
+export type TColorizerColorNotation =
+  | "rgb"
+  | "rgb-hex"
+  | "hsl"
+  | "hwb"
+  | "oklch"
+  | "xyz";
 
 /**
  * Type for a Subject that will propagate its (internal) ``color``.

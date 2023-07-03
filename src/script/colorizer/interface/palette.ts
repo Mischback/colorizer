@@ -301,6 +301,13 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
         caption.innerHTML = "RGB";
         value.innerHTML = `(${tmp.r}, ${tmp.g}, ${tmp.b})`;
         break;
+      case "rgb-hex":
+        tmp = color.toRgbHex();
+        li.classList.add("rgb-hex");
+        li.style.cssText += `--color-component-rgb-hex: ${tmp};`;
+        caption.innerHTML = "RGB (hex)";
+        value.innerHTML = tmp as string;
+        break;
       case "hwb":
         tmp = color.toHwbString();
         li.classList.add("hwb");

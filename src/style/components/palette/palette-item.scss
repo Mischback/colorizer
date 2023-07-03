@@ -79,6 +79,11 @@
         );
       }
 
+      > .rgb-hex .preview {
+        /* purgecss ignore current */
+        background-color: var(--color-component-rgb-hex);
+      }
+
       > .hsl .preview {
         /* purgecss ignore current */
         background-color: hsl(
@@ -151,8 +156,7 @@
         display: none;
       }
 
-      > .rgb {
-        // FIXME: This should be RGB hex!
+      > .rgb-hex {
         display: block;
         margin: 0;
         padding: 0;
