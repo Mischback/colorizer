@@ -3,11 +3,15 @@
 // SPDX-FileType: SOURCE
 
 button {
+  $button-focus-width: 2px;
+  $button-focus-color: $color-focus-primary;
+
   @include content-box-shadow;
 
-  padding: 0.25em 0.5em;
+  padding: calc(0.25em + $button-focus-width) calc(0.5em + $button-focus-width);
   border: 0 solid transparent;
   border-radius: $border-radius-fraction;
+  outline: none;
 
   /* prettier-ignore */
   background: linear-gradient(
@@ -20,6 +24,12 @@ button {
   color: $color-content-button-fg;
   font-weight: bold;
   cursor: pointer;
+
+  .focus {
+    margin: 0;
+    padding: 2px;
+    border-radius: $border-radius-fraction;
+  }
 
   /* stylelint-disable selector-no-qualifying-type */
   &.danger {
@@ -35,8 +45,7 @@ button {
   }
   /* stylelint-enable selector-no-qualifying-type */
 
-  &:hover,
-  &:focus {
+  &:hover {
     /* prettier-ignore */
     background: linear-gradient(
       to bottom,
@@ -46,5 +55,10 @@ button {
       rgb(186 134 0) 95%  /* not part of the palette; oklch(65% 45% 90)*/
     );
     color: $color-content-button-fg-hover;
+  }
+
+  &:focus .focus {
+    outline: $button-focus-color solid $button-focus-width;
+    outline-offset: 0;
   }
 }

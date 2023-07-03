@@ -48,7 +48,13 @@
       <h2>Color Palette</h2>
     </header>
     <ul class="display-mode">
-      <li><button id="palette-button-compact" type="button" aria-pressed="false" class="toggle-button">compact mode</button></li>
+      <li>
+        <button id="palette-button-compact" type="button" aria-pressed="false" class="toggle-button">
+          <span class="focus">
+            compact mode
+          </span>
+        </button>
+      </li>
     </ul>
     <ul class="notations-toggles"></ul>
     <ul id="color-palette-list"></ul>
@@ -59,7 +65,11 @@
       <h2>Add a new Color</h2>
     </header>
     <form id="color-form">
-      <button type="submit">Add Color</button>
+      <button type="submit">
+        <span class="focus">
+          Add Color
+        </span>
+      </button>
 
       <fieldset id="color-form-rgb" class="color-form-input-method">
         <legend>
@@ -205,7 +215,11 @@
         </div>
       </fieldset>
 
-      <button type="submit">Add Color</button>
+      <button type="submit">
+        <span class="focus">
+          Add Color
+        </span>
+      </button>
     </form>
   </section>
 
@@ -223,7 +237,13 @@
     <div class="label">foo</div>
     <ul class="notations"></ul>
     <ul class="actions">
-      <li><button type="button" class="button-remove danger">remove</button></li>
+      <li>
+        <button type="button" class="button-remove danger">
+          <span class="focus">
+            remove
+          </span>
+        </button>
+      </li>
     </ul>
   </li>
 </template>
