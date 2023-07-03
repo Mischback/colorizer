@@ -18,13 +18,13 @@ body {
     $active-tab-top-border-width: 3px;
     $active-tab-top-border-color: #f00; // FIXME: [#32] Define coherent colors
     $active-tab-color-bg: $color-content-bg;
-    $active-tab-color-fg: #444; // FIXME: [#32] Define coherent colors
+    $active-tab-color-fg: $color-content-fg;
     $focus-tab-color: #f00; // FIXME: [#32] Define coherent colors
     $focus-tab-width: 2px;
     $hover-tab-color-bg: #fc0; // FIXME: [#32] Define coherent colors
     $tab-border-radius: $border-radius-fraction;
-    $tab-color-bg: #aaa; // FIXME: [#32] Define coherent colors
-    $tab-color-fg: #444; // FIXME: [#32] Define coherent colors
+    $tab-color-bg: $color-content-bg-dim;
+    $tab-color-fg: $color-content-bg;
 
     @include horizontal-list;
 
@@ -113,6 +113,7 @@ body {
     padding: 1px;
     border-radius: $border-radius-fraction * 2;
     background-color: $color-content-bg;
+    color: $color-content-fg;
 
     > * {
       margin: 0 1em;
