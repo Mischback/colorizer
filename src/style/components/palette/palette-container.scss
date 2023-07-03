@@ -3,6 +3,7 @@
 // SPDX-FileType: SOURCE
 
 #panel-root-palette {
+  .display-mode,  // FIXME: Probably these will require dedicated blocks!
   .notations-toggles {
     @include horizontal-list;
 

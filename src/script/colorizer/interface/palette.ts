@@ -68,6 +68,15 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
 
       this.notationToggles.set(notation, true);
     });
+
+    // Attach an event listener to the *compact mode toggle*.
+    const compactModeButton = <HTMLButtonElement>(
+      getDomElement(this.paletteContainer, "#palette-button-compact")
+    );
+    compactModeButton.addEventListener(
+      "click",
+      this.toggleCompactMode.bind(this)
+    );
   }
 
   /**
@@ -92,6 +101,37 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
       this.paletteList.appendChild(
         this.generatePaletteItem(<ColorizerPaletteItem>palette[i])
       );
+    }
+  }
+
+  /**
+   * Toggle the display mode of the palette between *expanded* and *compact*.
+   *
+   * The display mode is implemented purely in CSS. The *expanded mode* is the
+   * default, *compact mode* is activated by adding the ``compact-mode`` class
+   * to the ``paletteContainer``. See
+   * ``src/style/components/palette/palette-item.scss`` for the styling.
+   *
+   * The button's ``aria-pressed`` attribute is set accordingly. The button is
+   * meant to be a simple toggle semantically.
+   *
+   * FIXME: [#23] persistent user settings
+   */
+  private toggleCompactMode(evt: Event): void {
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    let mode = (evt.target as HTMLButtonElement).getAttribute("aria-pressed");
+    if (mode === null) {
+      mode = "false";
+    }
+
+    if (mode === "false") {
+      this.paletteContainer.classList.add("compact-mode");
+      (evt.target as HTMLButtonElement).setAttribute("aria-pressed", "true");
+    } else {
+      this.paletteContainer.classList.remove("compact-mode");
+      (evt.target as HTMLButtonElement).setAttribute("aria-pressed", "false");
     }
   }
 

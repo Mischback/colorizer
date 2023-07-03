@@ -114,3 +114,65 @@
     }
   }
 }
+
+/**
+ * This is the styling of the palette / palette items in *compact mode*. The
+ * ``compact-mode`` CSS class is attached in TypeScript (ColorizerPaletteIO
+ * class) in the corresponding button event listener.
+ *
+ * It hides most of the available information and just keeps a very minimal
+ * block per palette item.
+ * The list is formatted horizontally to provide a quick overview over the
+ * whole palette, sacrificing the notations.
+ */
+
+/* purgecss start ignore */
+/* stylelint-disable selector-max-id */
+#panel-root-palette.compact-mode #color-palette-list {
+  @include horizontal-list;
+
+  > li {
+    margin: 0 1em 1em 0;
+    padding: 3.5em 0.25em 0.5em;
+
+    /* stylelint-disable selector-max-compound-selectors */
+    > .preview {
+      width: 100%;
+      height: 3em;
+      border-radius: $border-radius-fraction $border-radius-fraction 0 0;
+    }
+
+    > .actions {
+      @include reset-list;
+    }
+
+    > .notations {
+      > li {
+        display: none;
+      }
+
+      > .rgb {
+        // FIXME: This should be RGB hex!
+        display: block;
+        margin: 0;
+        padding: 0;
+
+        /* stylelint-disable max-nesting-depth */
+        > * {
+          display: none;
+        }
+
+        > .value {
+          display: block;
+          margin: 0;
+          padding: 0;
+        }
+        /* stylelint-enable max-nesting-depth */
+      }
+    }
+    /* stylelint-enable selector-max-compound-selectors */
+  }
+}
+/* stylelint-enable selector-max-id */
+
+/* purgecss end ignore */
