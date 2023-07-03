@@ -1,0 +1,13 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+/* A Sans-serif font-stack, based on system fonts.
+ *
+ * This is the font-stack of github.com as of 26 Jun 2023.
+ *
+ * It's grabbed directly from the source, but there is a nice article about it
+ * aswell: https://markdotto.com/2018/02/07/github-system-fonts/
+ */
+$font-stack-sans-serif: -apple-system, blinkmacsystemfont, "Segoe UI",
+  "Noto Sans", helvetica, arial, sans-serif;
