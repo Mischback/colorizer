@@ -21,6 +21,7 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
   private paletteList: HTMLUListElement;
   private removeItemCallback: TRemoveItemCallback;
   private notations: TColorizerPaletteItemNotation[];
+  private notationToggles = new Map<TColorizerPaletteItemNotation, boolean>();
   // @ts-expect-error TS6133 value never read
   private dragToOrder: DragToOrder;
 
@@ -64,6 +65,8 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
       tmpLi.appendChild(tmpButton);
 
       notationsToggleContainer.appendChild(tmpLi);
+
+      this.notationToggles.set(notation, true);
     });
   }
 
@@ -122,8 +125,13 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     });
 
     if (currentStatus === "false") {
+      this.notationToggles.set(notation as TColorizerPaletteItemNotation, true);
       (evt.target as HTMLButtonElement).setAttribute("aria-pressed", "true");
     } else {
+      this.notationToggles.set(
+        notation as TColorizerPaletteItemNotation,
+        false
+      );
       (evt.target as HTMLButtonElement).setAttribute("aria-pressed", "false");
     }
   }
@@ -276,6 +284,10 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
         break;
       default:
         break;
+    }
+
+    if (this.notationToggles.get(notation) === false) {
+      li.classList.add("hide-notation");
     }
 
     return li;
