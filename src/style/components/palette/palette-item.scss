@@ -6,6 +6,8 @@
   @include reset-list;
 
   > li {
+    @include content-box-shadow;
+
     position: relative;
     margin-bottom: 1em;
     padding: 0.5em 0.25em 0.5em 3.5em;
