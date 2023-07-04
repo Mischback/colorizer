@@ -25,7 +25,14 @@ button {
   font-weight: bold;
   cursor: pointer;
 
+  .button-text {
+    margin: 0;
+    padding: 0;
+  }
+
   .focus {
+    display: inline-flex;
+    align-items: center;
     margin: 0;
     padding: 2px;
     border-radius: $border-radius-fraction;
@@ -60,5 +67,51 @@ button {
   &:focus .focus {
     outline: $button-focus-color solid $button-focus-width;
     outline-offset: 0;
+  }
+}
+
+.toggle-button {
+  background: none;
+
+  .toggle-base {
+    @include content-box-shadow;
+
+    display: inline-block;
+    position: relative;
+    width: 2em;
+    height: 1em;
+    margin: 0 0.5em 0 0.1em;
+    padding: 0;
+    border-radius: $border-radius-fraction;
+    background-color: rgb(222 222 222);
+
+    > .toggle-thumb {
+      @include content-box-shadow;
+
+      display: inline-block;
+      position: absolute;
+      top: -0.05em;
+      left: calc(50% - 0.55em);
+      width: 1.1em;
+      height: 1.1em;
+      border-radius: 999px;
+      background-color: #999;
+    }
+  }
+
+  &[aria-pressed="true"] .toggle-base {
+    background-color: #0f0;
+
+    > .toggle-thumb {
+      left: calc(100% - 1em);
+    }
+  }
+
+  &[aria-pressed="false"] .toggle-base {
+    background-color: #f00;
+
+    > .toggle-thumb {
+      left: -0.1em;
+    }
   }
 }
