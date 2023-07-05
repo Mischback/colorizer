@@ -113,17 +113,25 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     evt.preventDefault();
     evt.stopPropagation();
 
-    let mode = (evt.target as HTMLButtonElement).getAttribute("aria-pressed");
+    let mode = (evt.currentTarget as HTMLButtonElement).getAttribute(
+      "aria-pressed"
+    );
     if (mode === null) {
       mode = "false";
     }
 
     if (mode === "false") {
       this.paletteContainer.classList.add("compact-mode");
-      (evt.target as HTMLButtonElement).setAttribute("aria-pressed", "true");
+      (evt.currentTarget as HTMLButtonElement).setAttribute(
+        "aria-pressed",
+        "true"
+      );
     } else {
       this.paletteContainer.classList.remove("compact-mode");
-      (evt.target as HTMLButtonElement).setAttribute("aria-pressed", "false");
+      (evt.currentTarget as HTMLButtonElement).setAttribute(
+        "aria-pressed",
+        "false"
+      );
     }
   }
 
