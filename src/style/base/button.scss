@@ -2,16 +2,72 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-button {
-  $button-focus-width: 2px;
-  $button-focus-color: $color-focus-primary;
-
-  @include content-box-shadow;
-
-  padding: calc(0.25em + $button-focus-width) calc(0.5em + $button-focus-width);
+/**
+ * Provide the basic formatting for all buttons.
+ *
+ * This mixin provides the basic formatting, especially for handling of ``:focus`` of the button.
+ *
+ * The actual visual appearance must be provided by the actual button classes.
+ *
+ * The following HTML structure is assumed:
+ *
+ *  <button>
+ *    <span class="focus">
+ *      <!-- This would be the place for a button-specific icon -->
+ *      <span class="text-wrapper">Button Text</span>
+ *    </span>
+ *  </button>
+ */
+@mixin button-base(
+  $focus-color,
+  $focus-width: 2px,
+  $button-border-radius: $border-radius-fraction
+) {
+  padding: calc(0.25em + $focus-width) calc(0.5em + $focus-width);
   border: 0 solid transparent;
-  border-radius: $border-radius-fraction;
+  border-radius: $button-border-radius;
   outline: none;
+  background: transparent;
+  font-weight: bold;
+  cursor: pointer;
+
+  .focus {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+    padding: $focus-width;
+    border-radius: $button-border-radius;
+    outline: transparent solid $focus-width;
+    outline-offset: 0;
+
+    /* transition: outline-color 150ms cubic-bezier(0.37, 0, 0.63, 1); */
+  }
+
+  &:focus .focus {
+    outline-color: $focus-color;
+  }
+
+  .text-wrapper {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/**
+ * The default button appearance, placed on a light background.
+ *
+ * The following HTML structure is assumed:
+ *
+ *  <button class="content-button" type="button">
+ *    <span class="focus">
+ *      <!-- This would be the place for a button-specific icon -->
+ *      <span class="text-wrapper">Toggle Me!</span>
+ *    </span>
+ *  </button>
+ */
+.content-button {
+  @include button-base($color-focus-primary);
+  @include content-box-shadow;
 
   /* prettier-ignore */
   background: linear-gradient(
@@ -22,35 +78,6 @@ button {
     rgb(0 62 59) 95%  /* not part of the overall palette; oklch(30% 30% 190)*/
   );
   color: $color-content-button-fg;
-  font-weight: bold;
-  cursor: pointer;
-
-  .button-text {
-    margin: 0;
-    padding: 0;
-  }
-
-  .focus {
-    display: inline-flex;
-    align-items: center;
-    margin: 0;
-    padding: 2px;
-    border-radius: $border-radius-fraction;
-  }
-
-  /* stylelint-disable selector-no-qualifying-type */
-  &.danger {
-    /* prettier-ignore */
-    background: linear-gradient(
-      to bottom,
-      rgb(249 0 0) 5%,  /* not part of the palette; oklch(60% 80% 60)*/
-      $color-red 15% 40%,  /* $color-red*/
-      rgb(175 0 0) 50% 90%,  /* not part of the palette; oklch(40% 80% 60)*/
-      rgb(136 0 0) 95%  /* not part of the overall palette; oklch(30% 80% 60)*/
-    );
-    color: $color-light-grey;
-  }
-  /* stylelint-enable selector-no-qualifying-type */
 
   &:hover {
     /* prettier-ignore */
@@ -63,15 +90,24 @@ button {
     );
     color: $color-content-button-fg-hover;
   }
-
-  &:focus .focus {
-    outline: $button-focus-color solid $button-focus-width;
-    outline-offset: 0;
-  }
 }
 
+/**
+ * Create a button to *toggle* a setting.
+ *
+ * The following HTML structure is assumed / provided as template in ``src/index.html``:
+ *
+ *  <button aria-pressed="true" class="toggle-button" type="button">
+ *    <span class="focus">
+ *      <span class="toggle-base"><span class="toggle-thumb"></span></span>
+ *      <span class="text-wrapper">Toggle Me!</span>
+ *    </span>
+ *  </button>
+ */
 .toggle-button {
-  background: none;
+  @include button-base($color-focus-primary);
+
+  color: $color-content-fg;
 
   .toggle-base {
     @include content-box-shadow;
@@ -82,8 +118,14 @@ button {
     height: 1em;
     margin: 0 0.5em 0 0.1em;
     padding: 0;
-    border-radius: $border-radius-fraction;
-    background-color: rgb(222 222 222);
+    border-radius: 0.5em;
+
+    // FIXME: [#32] Define coherent colors!
+    background: rgb(222 222 222);
+
+    // TODO: Transition timings have to be synchronized with ``toggle-thumb``!
+
+    /* transition: background 100ms cubic-bezier(0.37, 0, 0.63, 1) 150ms; */
 
     > .toggle-thumb {
       @include content-box-shadow;
@@ -94,24 +136,37 @@ button {
       left: calc(50% - 0.55em);
       width: 1.1em;
       height: 1.1em;
-      border-radius: 999px;
-      background-color: #999;
-    }
-  }
+      border-radius: 5em;
 
-  &[aria-pressed="true"] .toggle-base {
-    background-color: #0f0;
+      // FIXME: [#32] Define coherent colors!
+      background: radial-gradient(
+        circle farthest-corner at right bottom,
+        #333 0%,
+        #fff 100%
+      );
 
-    > .toggle-thumb {
-      left: calc(100% - 1em);
+      // TODO: Transition timings have to be synchronized with ``toggle-base``!
+
+      /* transition: left 200ms cubic-bezier(0.2, 0.1, 0.6, 2.0); */
     }
   }
 
   &[aria-pressed="false"] .toggle-base {
-    background-color: #f00;
+    // FIXME: [#32] Define coherent colors!
+    background: #f00;
 
     > .toggle-thumb {
       left: -0.1em;
+    }
+  }
+
+  &[aria-pressed="true"] .toggle-base {
+    // FIXME: [#32] Define coherent colors!
+    background: #0f0;
+
+    > .toggle-thumb {
+      // Note: Actually this is ``100% - [width of thumb] + [offset]``
+      left: calc(100% - 1em);
     }
   }
 }
