@@ -66,7 +66,7 @@
  *  </button>
  */
 .content-button {
-  @include button-base($color-focus-primary);
+  @include button-base($color-focus-on-dark-bg);
   @include content-box-shadow;
 
   /* prettier-ignore */
@@ -105,7 +105,7 @@
  *  </button>
  */
 .toggle-button {
-  @include button-base($color-focus-primary);
+  @include button-base($color-focus-on-light-bg);
 
   color: $color-content-fg;
 
