@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
+@use "sass:color";
+
 // FIXME: [#32] Define coherent colors
 //        Thing is, this simulates a slight bevel. Black / white are probably
 //        ok for this purpose!
@@ -34,4 +36,36 @@ $element-shadow-as-outline: 0 0 2px 1px $color-teal-dark;
  */
 @mixin content-box-shadow {
   box-shadow: $element-shadow-as-outline;
+}
+
+/**
+ * Coherent background gradient, intended for buttons.
+ *
+ * The colors might be controlled by the dedicated arguments. A general
+ * guideline is as the following:
+ * - let ``color`` be the base color
+ * - ``darkest``: the base color with -10% in OkLCH's ``L``
+ * - ``dark``: the base color with -5% in OkLCH's ``L``
+ * - ``light``: the base color with +5% in OkLCH's ``L``
+ * - ``lightest``: the base color with +15% in OkLCH's ``L``
+ *
+ * If this manual approach seems overdone, see ``bg-gradient-auto``mixin below.
+ */
+@mixin bg-gradient($darkest, $dark, $light, $lightest) {
+  background: linear-gradient(
+    to bottom,
+    $lightest 0% 4%,
+    $light 5% 48%,
+    $dark 52% 95%,
+    $darkest 96% 100%
+  );
+}
+
+@mixin bg-gradient-auto($color) {
+  @include bg-gradient(
+    color.scale($color, $lightness: -15%),
+    color.scale($color, $lightness: -8%),
+    color.scale($color, $lightness: 7%),
+    color.scale($color, $lightness: 15%)
+  );
 }
