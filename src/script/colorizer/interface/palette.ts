@@ -352,7 +352,7 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
       this.toggleNotationButtonEventHandler.bind(this)
     );
 
-    const label = <HTMLSpanElement>getDomElement(toggleButton, ".button-text");
+    const label = <HTMLSpanElement>getDomElement(toggleButton, ".text-wrapper");
     label.innerHTML = notation;
 
     return toggleButton;
