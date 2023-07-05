@@ -93,6 +93,23 @@
 }
 
 /**
+ * A *dangerous* button, intended for removal operations.
+ *
+ * Note the high specificity selector!
+ */
+.danger.danger {
+  /* prettier-ignore */
+  background: linear-gradient(
+    to bottom,
+    rgb(249 0 0) 5%,  /* not part of the palette; oklch(60% 80% 60)*/
+    $color-danger 15% 40%,  /* $color-red*/
+    rgb(175 0 0) 50% 90%,  /* not part of the palette; oklch(40% 80% 60)*/
+    rgb(136 0 0) 95%  /* not part of the overall palette; oklch(30% 80% 60)*/
+  );
+  color: $color-light-grey;
+}
+
+/**
  * Create a button to *toggle* a setting.
  *
  * The following HTML structure is assumed / provided as template in ``src/index.html``:
