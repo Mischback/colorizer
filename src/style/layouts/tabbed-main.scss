@@ -37,8 +37,7 @@ body {
 
     /* These are the actual *tabs* */
     [role="tab"] {
-      // Using a ``<button>`` here, so the styles from ``base/button.scss`` do
-      // apply and might/will be needed to be overwritten!
+      @include button-base($color-focus-on-light-bg);
       @include root-element-shadow;
 
       position: relative;
@@ -46,15 +45,10 @@ body {
       margin: 0;
       margin-top: $active-tab-top-border-width;
       padding: 0.5em 0.5em 0.35em;
-      border: 0 solid transparent;
       border-radius: $tab-border-radius $tab-border-radius 0 0;
-      outline: none;
-      background: none; // reset the default button background!
-      background-color: $tab-color-bg;
+      background: $tab-color-bg;
       color: $tab-color-fg;
       font-size: 1.2em;
-      font-weight: bold;
-      cursor: pointer;
 
       &::after {
         /* stylelint-disable scss/operator-no-newline-after */
@@ -76,8 +70,6 @@ body {
 
       /* stylelint-disable selector-max-compound-selectors */
       .focus {
-        margin: 0;
-        padding: 2px;
         border-radius: $tab-border-radius;
       }
       /* stylelint-enable selector-max-compound-selectors */
@@ -96,13 +88,6 @@ body {
         background-color: $hover-tab-color-bg;
         color: $hover-tab-color-fg;
       }
-
-      /* stylelint-disable selector-max-compound-selectors */
-      &:focus .focus {
-        outline: $focus-tab-color solid $focus-tab-width;
-        outline-offset: 0;
-      }
-      /* stylelint-enable selector-max-compound-selectors */
     }
   }
 
