@@ -15,7 +15,7 @@ const purgecss = require("@fullhuman/postcss-purgecss")({
   fontFace: true,
   keyFrames: true,
   variables: true,
-  safelist: ["message", "info", "error", "notify-fade-out"],
+  safelist: [],
   blocklist: [],
 });
 

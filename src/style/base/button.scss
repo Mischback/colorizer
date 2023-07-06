@@ -2,36 +2,211 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-button {
-  padding: 0.25em 0.5em;
-  border: 0;
-  border-radius: 5px;
-
-  // FIXME: [#32] Build an overall colorscheme
-  background: linear-gradient(
-    to bottom,
-    #e2e2e2 5%,
-    #c3c3c3 15% 40%,
-    #a0a0a0 50% 90%,
-    #666 95%
-  );
-
-  // FIXME: [#32] Build an overall colorscheme
-  box-shadow: 0 0 2px 2px rgb(0 0 0 / 60%);
-
-  // FIXME: [#32] Build an overall colorscheme
-  color: #444;
+/**
+ * Provide the basic formatting for all buttons.
+ *
+ * This mixin provides the basic formatting, especially for handling of ``:focus`` of the button.
+ *
+ * The actual visual appearance must be provided by the actual button classes.
+ *
+ * The following HTML structure is assumed:
+ *
+ *  <button>
+ *    <span class="focus">
+ *      <!-- This would be the place for a button-specific icon -->
+ *      <span class="text-wrapper">Button Text</span>
+ *    </span>
+ *  </button>
+ */
+@mixin button-base(
+  $focus-color,
+  $focus-width: 2px,
+  $button-border-radius: $border-radius-fraction
+) {
+  padding: calc(0.25em + $focus-width) calc(0.5em + $focus-width);
+  border: 0 solid transparent;
+  border-radius: $button-border-radius;
+  outline: none;
+  background: transparent;
   font-weight: bold;
+  cursor: pointer;
 
-  &:hover,
-  &:focus {
-    // FIXME: [#32] Build an overall colorscheme
+  .focus {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+    padding: $focus-width;
+    border-radius: $button-border-radius;
+    outline: transparent solid $focus-width;
+    outline-offset: 0;
+
+    /* transition: outline-color 150ms cubic-bezier(0.37, 0, 0.63, 1); */
+  }
+
+  &:focus .focus {
+    outline-color: $focus-color;
+  }
+
+  .text-wrapper {
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid transparent;
+  }
+}
+
+/**
+ * The default button appearance, placed on a light background.
+ *
+ * The following HTML structure is assumed:
+ *
+ *  <button class="content-button" type="button">
+ *    <span class="focus">
+ *      <!-- This would be the place for a button-specific icon -->
+ *      <span class="text-wrapper">Toggle Me!</span>
+ *    </span>
+ *  </button>
+ */
+.content-button {
+  @include button-base($color-focus-on-dark-bg);
+  @include content-box-shadow;
+
+  // @include bg-gradient(
+  //   rgb(0 62 59),
+  //   rgb(0 90 50),
+  //   $color-content-button-bg,
+  //   rgb(0 150 155)
+  // );
+  @include bg-gradient-auto($color-content-button-bg);
+
+  /* prettier-ignore */
+  // background: linear-gradient(
+  //   to bottom,
+  //   rgb(0 150 144) 5%,  /* not part of the palette; oklch(60% 30% 190)*/
+  //   $color-content-button-bg 15% 40%,  /* $color-teal*/
+  //   rgb(0 90 86) 50% 90%,  /* not part of the palette; oklch(40% 30% 190)*/
+  //   rgb(0 62 59) 95%  /* not part of the overall palette; oklch(30% 30% 190)*/
+  // );
+  color: $color-content-button-fg;
+
+  &:hover {
+    /* prettier-ignore */
     background: linear-gradient(
       to bottom,
-      #ed9 5%,
-      #fc0 15% 40%,
-      #ea0 50% 90%,
-      #666 95%
+      rgb(255 232 0) 5%,  /* not part of the palette; oklch(95% 45% 90)*/
+      $color-content-button-bg-hover 15% 40%,  /* $color-yellow!*/
+      rgb(218 166 0) 50% 90%,  /* not part of the palette; oklch(75% 45% 90)*/
+      rgb(186 134 0) 95%  /* not part of the palette; oklch(65% 45% 90)*/
     );
+    color: $color-content-button-fg-hover;
+  }
+}
+
+/**
+ * A *dangerous* button, intended for removal operations.
+ *
+ * Note the high specificity selector!
+ */
+.danger.danger {
+  /* prettier-ignore */
+  background: linear-gradient(
+    to bottom,
+    rgb(249 0 0) 5%,  /* not part of the palette; oklch(60% 80% 60)*/
+    $color-danger 15% 40%,  /* $color-red*/
+    rgb(175 0 0) 50% 90%,  /* not part of the palette; oklch(40% 80% 60)*/
+    rgb(136 0 0) 95%  /* not part of the overall palette; oklch(30% 80% 60)*/
+  );
+  color: $color-light-grey;
+
+  &:hover {
+    /* prettier-ignore */
+    background: linear-gradient(
+      to bottom,
+      rgb(255 232 0) 5%,  /* not part of the palette; oklch(95% 45% 90)*/
+      $color-content-button-bg-hover 15% 40%,  /* $color-yellow!*/
+      rgb(218 166 0) 50% 90%,  /* not part of the palette; oklch(75% 45% 90)*/
+      rgb(186 134 0) 95%  /* not part of the palette; oklch(65% 45% 90)*/
+    );
+    color: $color-content-button-fg-hover;
+  }
+}
+
+/**
+ * Create a button to *toggle* a setting.
+ *
+ * The following HTML structure is assumed / provided as template in ``src/index.html``:
+ *
+ *  <button aria-pressed="true" class="toggle-button" type="button">
+ *    <span class="focus">
+ *      <span class="toggle-base"><span class="toggle-thumb"></span></span>
+ *      <span class="text-wrapper">Toggle Me!</span>
+ *    </span>
+ *  </button>
+ */
+.toggle-button {
+  @include button-base($color-focus-on-light-bg);
+
+  color: $color-content-fg;
+
+  .toggle-base {
+    @include content-box-shadow;
+    @include bg-gradient-auto($color-light-grey);
+
+    display: inline-block;
+    position: relative;
+    width: 2em;
+    height: 1em;
+    margin: 0 0.5em 0 0.1em;
+    padding: 0;
+    border-radius: 0.5em;
+
+    // Note: Transition timings have to be synchronized with ``toggle-thumb``!
+
+    /* transition: background 100ms cubic-bezier(0.37, 0, 0.63, 1) 150ms; */
+
+    > .toggle-thumb {
+      @include content-box-shadow;
+
+      display: inline-block;
+      position: absolute;
+      top: -0.05em;
+      left: calc(50% - 0.55em);
+      width: 1.1em;
+      height: 1.1em;
+      border-radius: 5em;
+
+      // The colors in this gradient are not derived from
+      // ``abstracts/colors.scss`` because they are independent from the actual
+      // colorscheme
+      background: radial-gradient(
+        circle farthest-corner at right bottom,
+        #333 0%,
+        #fff 100%
+      );
+
+      // Note: Transition timings have to be synchronized with ``toggle-base``!
+
+      /* transition: left 200ms cubic-bezier(0.2, 0.1, 0.6, 2.0); */
+    }
+  }
+
+  &:hover .text-wrapper {
+    border-bottom-color: $color-content-fg;
+  }
+
+  &[aria-pressed="false"] .toggle-base {
+    @include bg-gradient-auto($color-off);
+
+    > .toggle-thumb {
+      left: -0.1em;
+    }
+  }
+
+  &[aria-pressed="true"] .toggle-base {
+    @include bg-gradient-auto($color-on);
+
+    > .toggle-thumb {
+      // Note: Actually this is ``100% - [width of thumb] + [offset]``
+      left: calc(100% - 1em);
+    }
   }
 }

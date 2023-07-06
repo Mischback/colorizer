@@ -16,15 +16,16 @@ body {
   // This is the list inside of <nav>!
   #tabs-root {
     $active-tab-top-border-width: 3px;
-    $active-tab-top-border-color: #f00; // FIXME: [#32] Define coherent colors
+    $active-tab-top-border-color: $color-red-light;
     $active-tab-color-bg: $color-content-bg;
-    $active-tab-color-fg: #444; // FIXME: [#32] Define coherent colors
-    $focus-tab-color: #f00; // FIXME: [#32] Define coherent colors
+    $active-tab-color-fg: $color-content-fg;
+    $focus-tab-color: $color-focus-on-light-bg;
     $focus-tab-width: 2px;
-    $hover-tab-color-bg: #fc0; // FIXME: [#32] Define coherent colors
+    $hover-tab-color-bg: $color-yellow;
+    $hover-tab-color-fg: $color-teal-dark;
     $tab-border-radius: $border-radius-fraction;
-    $tab-color-bg: #aaa; // FIXME: [#32] Define coherent colors
-    $tab-color-fg: #444; // FIXME: [#32] Define coherent colors
+    $tab-color-bg: $color-content-bg-dim;
+    $tab-color-fg: $color-content-bg;
 
     @include horizontal-list;
 
@@ -36,8 +37,7 @@ body {
 
     /* These are the actual *tabs* */
     [role="tab"] {
-      // Using a ``<button>`` here, so the styles from ``base/button.scss`` do
-      // apply and might/will be needed to be overwritten!
+      @include button-base($color-focus-on-light-bg);
       @include root-element-shadow;
 
       position: relative;
@@ -45,15 +45,10 @@ body {
       margin: 0;
       margin-top: $active-tab-top-border-width;
       padding: 0.5em 0.5em 0.35em;
-      border: 0 solid transparent;
       border-radius: $tab-border-radius $tab-border-radius 0 0;
-      outline: none;
-      background: none; // reset the default button background!
-      background-color: $tab-color-bg;
+      background: $tab-color-bg;
       color: $tab-color-fg;
       font-size: 1.2em;
-      font-weight: bold;
-      cursor: pointer;
 
       &::after {
         /* stylelint-disable scss/operator-no-newline-after */
@@ -75,8 +70,6 @@ body {
 
       /* stylelint-disable selector-max-compound-selectors */
       .focus {
-        margin: 0;
-        padding: 2px;
         border-radius: $tab-border-radius;
       }
       /* stylelint-enable selector-max-compound-selectors */
@@ -93,14 +86,8 @@ body {
 
       &:hover {
         background-color: $hover-tab-color-bg;
+        color: $hover-tab-color-fg;
       }
-
-      /* stylelint-disable selector-max-compound-selectors */
-      &:focus .focus {
-        outline: $focus-tab-color solid $focus-tab-width;
-        outline-offset: 0;
-      }
-      /* stylelint-enable selector-max-compound-selectors */
     }
   }
 
@@ -113,6 +100,7 @@ body {
     padding: 1px;
     border-radius: $border-radius-fraction * 2;
     background-color: $color-content-bg;
+    color: $color-content-fg;
 
     > * {
       margin: 0 1em;

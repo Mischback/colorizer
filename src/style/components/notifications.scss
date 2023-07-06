@@ -9,13 +9,12 @@
   width: 25%;
 
   > section {
-    margin: 0.25em 0;
-    padding: 0.25em 0.5em;
-    transition: opacity 500ms ease-in-out;
+    @include content-box-shadow;
 
-    // FIXME: [#32] Build an overall colorscheme
-    border: 1px solid #000;
-    border-radius: 5px;
+    margin: 0.25em 0;
+    padding: 0.5em 1em;
+    transition: opacity 500ms ease-in-out;
+    border-radius: $border-radius-fraction * 2;
 
     p {
       display: inline-block;
@@ -27,26 +26,28 @@
       margin-left: 0.5em;
     }
 
+    /* purgecss start ignore */
     /* stylelint-disable selector-no-qualifying-type */
     &.message {
-      // FIXME: [#32] Build an overall colorscheme
-      background-color: #9c9;
+      background: $color-notification-message-bg;
+      color: $color-notification-message-fg;
     }
 
     &.info {
-      // FIXME: [#32] Build an overall colorscheme
-      background-color: rgb(255 220 0);
+      background: $color-notification-info-bg;
+      color: $color-notification-info-fg;
     }
 
     &.error {
-      // FIXME: [#32] Build an overall colorscheme
-      background-color: rgb(196 0 0);
-      color: #fff;
+      background: $color-notification-error-bg;
+      color: $color-notification-error-fg;
     }
 
     &.notify-fade-out {
       opacity: 0;
     }
     /* stylelint-enable selector-no-qualifying-type */
+
+    /* purgecss start ignore */
   }
 }

@@ -51,15 +51,7 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
       getDomElement(this.paletteContainer, ".notations-toggles")
     );
     this.notations.forEach((notation) => {
-      const tmpButton = document.createElement("button");
-      tmpButton.setAttribute("type", "button");
-      tmpButton.setAttribute("aria-pressed", "true");
-      tmpButton.setAttribute("colorizer-notation", notation);
-      tmpButton.innerHTML = notation;
-      tmpButton.addEventListener(
-        "click",
-        this.toggleNotationButtonEventHandler.bind(this)
-      );
+      const tmpButton = this.generateColorNotationToggle(notation);
 
       const tmpLi = document.createElement("li");
       tmpLi.appendChild(tmpButton);
@@ -121,17 +113,25 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     evt.preventDefault();
     evt.stopPropagation();
 
-    let mode = (evt.target as HTMLButtonElement).getAttribute("aria-pressed");
+    let mode = (evt.currentTarget as HTMLButtonElement).getAttribute(
+      "aria-pressed"
+    );
     if (mode === null) {
       mode = "false";
     }
 
     if (mode === "false") {
       this.paletteContainer.classList.add("compact-mode");
-      (evt.target as HTMLButtonElement).setAttribute("aria-pressed", "true");
+      (evt.currentTarget as HTMLButtonElement).setAttribute(
+        "aria-pressed",
+        "true"
+      );
     } else {
       this.paletteContainer.classList.remove("compact-mode");
-      (evt.target as HTMLButtonElement).setAttribute("aria-pressed", "false");
+      (evt.currentTarget as HTMLButtonElement).setAttribute(
+        "aria-pressed",
+        "false"
+      );
     }
   }
 
@@ -139,14 +139,14 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     evt.preventDefault();
     evt.stopPropagation();
 
-    const notation = (evt.target as HTMLElement).getAttribute(
+    const notation = (evt.currentTarget as HTMLElement).getAttribute(
       "colorizer-notation"
     );
     if (notation === null) {
       return;
     }
 
-    const currentStatus = (evt.target as HTMLButtonElement).getAttribute(
+    const currentStatus = (evt.currentTarget as HTMLButtonElement).getAttribute(
       "aria-pressed"
     );
     if (currentStatus === null) {
@@ -166,13 +166,19 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
 
     if (currentStatus === "false") {
       this.notationToggles.set(notation as TColorizerPaletteItemNotation, true);
-      (evt.target as HTMLButtonElement).setAttribute("aria-pressed", "true");
+      (evt.currentTarget as HTMLButtonElement).setAttribute(
+        "aria-pressed",
+        "true"
+      );
     } else {
       this.notationToggles.set(
         notation as TColorizerPaletteItemNotation,
         false
       );
-      (evt.target as HTMLButtonElement).setAttribute("aria-pressed", "false");
+      (evt.currentTarget as HTMLButtonElement).setAttribute(
+        "aria-pressed",
+        "false"
+      );
     }
   }
 
@@ -338,5 +344,25 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
     }
 
     return li;
+  }
+
+  private generateColorNotationToggle(notation: string): HTMLButtonElement {
+    const template = <HTMLTemplateElement>(
+      getDomElement(null, "#tpl-toggle-button")
+    );
+
+    const toggleButton = (
+      template.content.firstElementChild as HTMLButtonElement
+    ).cloneNode(true) as HTMLButtonElement;
+    toggleButton.setAttribute("colorizer-notation", notation);
+    toggleButton.addEventListener(
+      "click",
+      this.toggleNotationButtonEventHandler.bind(this)
+    );
+
+    const label = <HTMLSpanElement>getDomElement(toggleButton, ".text-wrapper");
+    label.innerHTML = notation;
+
+    return toggleButton;
   }
 }
