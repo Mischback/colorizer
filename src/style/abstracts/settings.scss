@@ -21,6 +21,12 @@ $color-focus-on-light-bg: $color-red-light;
 $color-danger: $color-red;
 $color-off: $color-red;
 $color-on: $color-green;
+$color-notification-message-bg: $color-green;
+$color-notification-message-fg: $color-teal-dim-dark;
+$color-notification-info-bg: $color-yellow;
+$color-notification-info-fg: $color-teal-dim-dark;
+$color-notification-error-bg: $color-red;
+$color-notification-error-fg: $color-light-grey;
 
 /* Overall settings to create a coherent look'n'feel */
 $border-radius-fraction: 0.25rem;

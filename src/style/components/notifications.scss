@@ -30,17 +30,18 @@
     /* purgecss start ignore */
     /* stylelint-disable selector-no-qualifying-type */
     &.message {
-      background-color: $color-teal;
-      color: $color-light-grey;
+      background: $color-notification-message-bg;
+      color: $color-notification-message-fg;
     }
 
     &.info {
-      background-color: $color-yellow;
+      background: $color-notification-info-bg;
+      color: $color-notification-info-fg;
     }
 
     &.error {
-      background-color: $color-red;
-      color: $color-light-grey;
+      background: $color-notification-error-bg;
+      color: $color-notification-error-fg;
     }
 
     &.notify-fade-out {
