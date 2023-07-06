@@ -194,8 +194,7 @@
   }
 
   &[aria-pressed="false"] .toggle-base {
-    // FIXME: [#32] Define coherent colors!
-    background: #f00;
+    @include bg-gradient-auto($color-off);
 
     > .toggle-thumb {
       left: -0.1em;
@@ -203,8 +202,7 @@
   }
 
   &[aria-pressed="true"] .toggle-base {
-    // FIXME: [#32] Define coherent colors!
-    background: #0f0;
+    @include bg-gradient-auto($color-on);
 
     > .toggle-thumb {
       // Note: Actually this is ``100% - [width of thumb] + [offset]``
