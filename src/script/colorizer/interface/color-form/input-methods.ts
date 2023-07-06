@@ -28,6 +28,7 @@ type TColorizerFormInputCallback = (evt?: Event, ...args: any[]) => void;
 type TColorizerFormInputMethodComponentConfig = {
   componentCaption: string;
   componentCssClass: string;
+  componentCssProperty: string;
   textInputPattern: string;
   textInputMode: string;
   textInputLabelText: string;
@@ -35,6 +36,12 @@ type TColorizerFormInputMethodComponentConfig = {
   sliderMax: number;
   sliderStep: number;
   sliderLabelText: string;
+};
+
+type TColorizerFormInputMethodComponentStore = {
+  textInput: HTMLInputElement | null;
+  sliderInput: HTMLInputElement | null;
+  cssProperty: string | null;
 };
 
 /**
@@ -138,6 +145,10 @@ abstract class ColorizerFormInputMethod
   protected cCText: HTMLInputElement;
   protected cCSlider: HTMLInputElement;
   protected cCProperty: string;
+  protected components = new Map<
+    string,
+    TColorizerFormInputMethodComponentStore
+  >();
 
   public abstract getColor(): ColorizerColor;
   public abstract setColor(color: ColorizerColor): void;
@@ -209,7 +220,24 @@ abstract class ColorizerFormInputMethod
     );
     /* eslint-enable @typescript-eslint/unbound-method */
 
-    this.setupDomElements("foo", "bar");
+    this.setupDomElements("foo", "bar", [
+      {
+        componentId: "r",
+        config: {
+          componentCaption: "Red Component",
+          componentCssClass: "rgb-r",
+          componentCssProperty: "--rgb-r",
+          textInputPattern: "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for red component in range 0 to 255",
+          sliderMin: 0,
+          sliderMax: 255,
+          sliderStep: 1,
+          sliderLabelText: "Slider to adjust the red component",
+        },
+      },
+    ]);
   }
 
   private setupComponent(
@@ -263,10 +291,23 @@ abstract class ColorizerFormInputMethod
     console.debug(textLabel);
     console.debug(text);
 
+    this.components.set(componentId, {
+      textInput: text,
+      sliderInput: slider,
+      cssProperty: config.componentCssProperty,
+    });
+
     return component;
   }
 
-  private setupDomElements(method: string, methodCaption: string): void {
+  private setupDomElements(
+    method: string,
+    methodCaption: string,
+    components: {
+      componentId: string;
+      config: TColorizerFormInputMethodComponentConfig;
+    }[]
+  ): void {
     // Setup the input method **overall template**
     const template = <HTMLTemplateElement>(
       getDomElement(null, "#tpl-input-method")
@@ -282,19 +323,11 @@ abstract class ColorizerFormInputMethod
     );
     caption.innerHTML = methodCaption;
 
-    methodDom.appendChild(
-      this.setupComponent(method, "r", {
-        componentCaption: "Red Component",
-        componentCssClass: "rgb-r",
-        textInputPattern: "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$",
-        textInputMode: "numeric",
-        textInputLabelText: "Decimal input for red component in range 0 to 255",
-        sliderMin: 0,
-        sliderMax: 255,
-        sliderStep: 1,
-        sliderLabelText: "Slider to adjust the red component",
-      })
-    );
+    components.forEach((comp) => {
+      methodDom.appendChild(
+        this.setupComponent(method, comp.componentId, comp.config)
+      );
+    });
 
     console.debug(methodDom);
     // this.fieldset = methodDom;
