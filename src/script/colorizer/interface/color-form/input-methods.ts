@@ -196,6 +196,106 @@ abstract class ColorizerFormInputMethod
       )
     );
     /* eslint-enable @typescript-eslint/unbound-method */
+
+    this.setupDomElements("foo", "bar");
+  }
+
+  private setupComponent(
+    method: string,
+    componentId: string,
+    componentCaption: string,
+    componentCssClass: string,
+    textPattern: string,
+    textInputMode: string,
+    textLabelText: string,
+    sliderMin: number,
+    sliderMax: number,
+    sliderStep: number,
+    sliderLabelText: string
+  ): HTMLFieldSetElement {
+    const template = <HTMLTemplateElement>(
+      getDomElement(null, "#tpl-input-method-component")
+    );
+
+    const component = (
+      template.content.firstElementChild as HTMLFieldSetElement
+    ).cloneNode(true) as HTMLFieldSetElement;
+    component.classList.add(componentCssClass);
+
+    const caption = <HTMLLegendElement>getDomElement(component, "legend");
+    caption.innerHTML = componentCaption;
+
+    const sliderLabel = <HTMLLabelElement>(
+      getDomElement(component, "label[for=slider]")
+    );
+    sliderLabel.setAttribute(
+      "for",
+      `color-form-${method}-${componentId}-slider`
+    );
+    sliderLabel.innerHTML = sliderLabelText;
+
+    const slider = <HTMLInputElement>(
+      getDomElement(component, "input[type=range]")
+    );
+    slider.setAttribute("id", `color-form-${method}-${componentId}-slider`);
+    slider.setAttribute("min", sliderMin.toString());
+    slider.setAttribute("max", sliderMax.toString());
+    slider.setAttribute("step", sliderStep.toString());
+
+    const textLabel = <HTMLLabelElement>(
+      getDomElement(component, "label[for=text]")
+    );
+    textLabel.setAttribute("for", `color-form-${method}-${componentId}`);
+    textLabel.innerHTML = textLabelText;
+
+    const text = <HTMLInputElement>getDomElement(component, "input[type=text]");
+    text.setAttribute("id", `color-form-${method}-${componentId}`);
+    text.setAttribute("pattern", textPattern);
+    text.setAttribute("inputmode", textInputMode);
+
+    console.debug(component);
+    console.debug(sliderLabel);
+    console.debug(slider);
+    console.debug(textLabel);
+    console.debug(text);
+
+    return component;
+  }
+
+  private setupDomElements(method: string, methodCaption: string): void {
+    // Setup the input method **overall template**
+    const template = <HTMLTemplateElement>(
+      getDomElement(null, "#tpl-input-method")
+    );
+
+    const methodDom = (
+      template.content.firstElementChild as HTMLFieldSetElement
+    ).cloneNode(true) as HTMLFieldSetElement;
+    methodDom.setAttribute("id", `color-form-${method}`);
+
+    const caption = <HTMLSpanElement>(
+      getDomElement(methodDom, ".method-caption")
+    );
+    caption.innerHTML = methodCaption;
+
+    methodDom.appendChild(
+      this.setupComponent(
+        method,
+        "r",
+        "Red Component",
+        "rgb-r",
+        "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$",
+        "numeric",
+        "Decimal input for red component in range 0 to 255",
+        0,
+        255,
+        1,
+        "Slider to adjust the red component"
+      )
+    );
+
+    console.debug(methodDom);
+    // this.fieldset = methodDom;
   }
 
   /**

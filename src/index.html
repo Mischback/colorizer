@@ -168,20 +168,20 @@
 </template>
 
 <template id="tpl-input-method">
-  <fieldset id="color-form-rgb" class="color-form-input-method">
+  <fieldset class="color-form-input-method">
     <legend>
-      <strong>RGB input</strong>
+      <span class="method-caption">Template input</span>
     </legend>
   </fieldset>
 </template>
 
 <template id="tpl-input-method-component">
-  <fieldset class="component-red">
-    <legend>Red component</legend>
-    <label for="color-form-rgb-r-slider" class="hide-visually">Slider to adjust red component</label>
-    <input id="color-form-rgb-r-slider" type="range" min="0" max="255" step="1" aria-describedby="color-form-rgb-tooltip">
-    <label for="color-form-rgb-r" class="hide-visually">Decimal input for red component</label>
-    <input id="color-form-rgb-r" type="text" pattern="^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$" inputmode="numeric" aria-describedby="color-form-rgb-tooltip">
+  <fieldset>
+    <legend>Template component</legend>
+    <label for="slider" class="hide-visually">Slider label</label>
+    <input type="range" min="0" max="100" step="1">
+    <label for="text" class="hide-visually">Text label</label>
+    <input id="color-form-rgb-r" type="text" pattern="^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$" inputmode="numeric">
   </fieldset>
 </template>
 
