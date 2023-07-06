@@ -334,6 +334,22 @@ abstract class ColorizerFormInputMethod
   }
 
   /**
+   * Updates all elements related to a component.
+   *
+   * @param componentId
+   * @param value The new value, provided as string!
+   *
+   * TODO: Should be re-used in e.g. ``setColor()`` methods!
+   */
+  protected setComponentValue(componentId: string, value: string): void {
+    const compStore = this.components.get(componentId);
+
+    compStore.textInput.value = value;
+    compStore.sliderInput.value = value;
+    this.updateCoordinateInStyleProperty(compStore.cssProperty, value);
+  }
+
+  /**
    * Publish the current color to the parent ``<form ...>``.
    *
    * Internally, this relies on ``getColor()`` of the concrete (child) class to
