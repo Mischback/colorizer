@@ -149,6 +149,7 @@
 
   .toggle-base {
     @include content-box-shadow;
+    @include bg-gradient-auto($color-light-grey);
 
     display: inline-block;
     position: relative;
@@ -158,10 +159,7 @@
     padding: 0;
     border-radius: 0.5em;
 
-    // FIXME: [#32] Define coherent colors!
-    background: rgb(222 222 222);
-
-    // TODO: Transition timings have to be synchronized with ``toggle-thumb``!
+    // Note: Transition timings have to be synchronized with ``toggle-thumb``!
 
     /* transition: background 100ms cubic-bezier(0.37, 0, 0.63, 1) 150ms; */
 
@@ -176,14 +174,16 @@
       height: 1.1em;
       border-radius: 5em;
 
-      // FIXME: [#32] Define coherent colors!
+      // The colors in this gradient are not derived from
+      // ``abstracts/colors.scss`` because they are independent from the actual
+      // colorscheme
       background: radial-gradient(
         circle farthest-corner at right bottom,
         #333 0%,
         #fff 100%
       );
 
-      // TODO: Transition timings have to be synchronized with ``toggle-base``!
+      // Note: Transition timings have to be synchronized with ``toggle-base``!
 
       /* transition: left 200ms cubic-bezier(0.2, 0.1, 0.6, 2.0); */
     }
