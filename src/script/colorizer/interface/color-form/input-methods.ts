@@ -25,6 +25,18 @@ export type TColorizerFormInputMethod = Omit<TColorizerColorNotation, "xyz">;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TColorizerFormInputCallback = (evt?: Event, ...args: any[]) => void;
 
+type TColorizerFormInputMethodComponentConfig = {
+  componentCaption: string;
+  componentCssClass: string;
+  textInputPattern: string;
+  textInputMode: string;
+  textInputLabelText: string;
+  sliderMin: number;
+  sliderMax: number;
+  sliderStep: number;
+  sliderLabelText: string;
+};
+
 /**
  * The public interface of the input method classes.
  */
@@ -203,15 +215,7 @@ abstract class ColorizerFormInputMethod
   private setupComponent(
     method: string,
     componentId: string,
-    componentCaption: string,
-    componentCssClass: string,
-    textPattern: string,
-    textInputMode: string,
-    textLabelText: string,
-    sliderMin: number,
-    sliderMax: number,
-    sliderStep: number,
-    sliderLabelText: string
+    config: TColorizerFormInputMethodComponentConfig
   ): HTMLFieldSetElement {
     const template = <HTMLTemplateElement>(
       getDomElement(null, "#tpl-input-method-component")
@@ -220,10 +224,10 @@ abstract class ColorizerFormInputMethod
     const component = (
       template.content.firstElementChild as HTMLFieldSetElement
     ).cloneNode(true) as HTMLFieldSetElement;
-    component.classList.add(componentCssClass);
+    component.classList.add(config.componentCssClass);
 
     const caption = <HTMLLegendElement>getDomElement(component, "legend");
-    caption.innerHTML = componentCaption;
+    caption.innerHTML = config.componentCaption;
 
     const sliderLabel = <HTMLLabelElement>(
       getDomElement(component, "label[for=slider]")
@@ -232,26 +236,26 @@ abstract class ColorizerFormInputMethod
       "for",
       `color-form-${method}-${componentId}-slider`
     );
-    sliderLabel.innerHTML = sliderLabelText;
+    sliderLabel.innerHTML = config.sliderLabelText;
 
     const slider = <HTMLInputElement>(
       getDomElement(component, "input[type=range]")
     );
     slider.setAttribute("id", `color-form-${method}-${componentId}-slider`);
-    slider.setAttribute("min", sliderMin.toString());
-    slider.setAttribute("max", sliderMax.toString());
-    slider.setAttribute("step", sliderStep.toString());
+    slider.setAttribute("min", config.sliderMin.toString());
+    slider.setAttribute("max", config.sliderMax.toString());
+    slider.setAttribute("step", config.sliderStep.toString());
 
     const textLabel = <HTMLLabelElement>(
       getDomElement(component, "label[for=text]")
     );
     textLabel.setAttribute("for", `color-form-${method}-${componentId}`);
-    textLabel.innerHTML = textLabelText;
+    textLabel.innerHTML = config.textInputLabelText;
 
     const text = <HTMLInputElement>getDomElement(component, "input[type=text]");
     text.setAttribute("id", `color-form-${method}-${componentId}`);
-    text.setAttribute("pattern", textPattern);
-    text.setAttribute("inputmode", textInputMode);
+    text.setAttribute("pattern", config.textInputPattern);
+    text.setAttribute("inputmode", config.textInputMode);
 
     console.debug(component);
     console.debug(sliderLabel);
@@ -279,19 +283,17 @@ abstract class ColorizerFormInputMethod
     caption.innerHTML = methodCaption;
 
     methodDom.appendChild(
-      this.setupComponent(
-        method,
-        "r",
-        "Red Component",
-        "rgb-r",
-        "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$",
-        "numeric",
-        "Decimal input for red component in range 0 to 255",
-        0,
-        255,
-        1,
-        "Slider to adjust the red component"
-      )
+      this.setupComponent(method, "r", {
+        componentCaption: "Red Component",
+        componentCssClass: "rgb-r",
+        textInputPattern: "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$",
+        textInputMode: "numeric",
+        textInputLabelText: "Decimal input for red component in range 0 to 255",
+        sliderMin: 0,
+        sliderMax: 255,
+        sliderStep: 1,
+        sliderLabelText: "Slider to adjust the red component",
+      })
     );
 
     console.debug(methodDom);
