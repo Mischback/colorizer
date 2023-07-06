@@ -2,12 +2,18 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-/* A Sans-serif font-stack, based on system fonts.
- *
- * This is the font-stack of github.com as of 26 Jun 2023.
- *
- * It's grabbed directly from the source, but there is a nice article about it
- * aswell: https://markdotto.com/2018/02/07/github-system-fonts/
- */
-$font-stack-sans-serif: -apple-system, blinkmacsystemfont, "Segoe UI",
-  "Noto Sans", helvetica, arial, sans-serif;
+/* A Sans-serif font-stack, based on system fonts. */
+
+// This is the font-stack of github.com as of 26 Jun 2023.
+
+// It's grabbed directly from the source, but there is a nice article about it
+// aswell: https://markdotto.com/2018/02/07/github-system-fonts/
+// $font-stack-sans-serif: -apple-system, blinkmacsystemfont, "Segoe UI",
+//   "Noto Sans", helvetica, arial, sans-serif;
+
+// See: https://github.com/system-fonts/modern-font-stacks#system-ui
+$font-stack-sans-serif: system-ui, sans-serif;
+
+// See: https://github.com/system-fonts/modern-font-stacks#monospace-code
+$font-stack-monospace: ui-monospace, "Cascadia Code", "Source Code Pro", menlo,
+  consolas, "DejaVu Sans Mono", monospace;

@@ -76,6 +76,10 @@
         /* stylelint-enable max-nesting-depth */
       }
 
+      .value {
+        font-family: $font-stack-monospace;
+      }
+
       > .rgb .preview {
         /* purgecss ignore current */
         background-color: rgb(
