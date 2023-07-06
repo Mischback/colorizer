@@ -75,10 +75,6 @@
       <fieldset id="color-form-rgb" class="color-form-input-method">
         <legend>
           <strong>RGB input</strong>
-          <span class="tooltip-anchor">
-            <button type="button" aria-label="Description of the RGB input">?</button>
-            <div class="tooltip-display" role="status"></div>
-          </span>
         </legend>
         <fieldset class="component-red">
           <legend>Red component</legend>
@@ -101,11 +97,6 @@
           <label for="color-form-rgb-b" class="hide-visually">Decimal input for blue component</label>
           <input id="color-form-rgb-b" type="text" pattern="^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$" inputmode="numeric" aria-describedby="color-form-rgb-tooltip">
         </fieldset>
-        <div role="tooltip" id="color-form-rgb-tooltip" class="tooltip-content">
-          <p>The RGB input lets you specify the values for R, G and B components of the color directly.</p>
-          <p>Each of the components may be specified in a range between 0 and 255.</p>
-          <p>The values may be entered directly or using the corresponding sliders.</p>
-        </div>
       </fieldset>
 
       <button type="submit" class="content-button">
