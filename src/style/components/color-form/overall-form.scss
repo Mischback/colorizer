@@ -16,7 +16,7 @@
 
   position: relative;
   margin: 1.5em 0 0;
-  padding: 1em 0 0;
+  padding: 2em 1em 1em;
   border: 0 solid transparent;
   border-radius: $border-radius-fraction * 2;
   background: $color-content-bg-alt;
@@ -34,6 +34,25 @@
 
     > .method-caption {
       font-weight: bold;
+    }
+  }
+
+  .component {
+    // This is a <fieldset> element!
+    display: flex;
+    position: relative;
+    margin: 0 0 1.5em;
+    padding: 0.75em 0 0;
+    border: 0 solid transparent;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    > legend {
+      position: absolute;
+      top: -0.6em;
+      background: $color-content-bg-alt;
     }
   }
 }

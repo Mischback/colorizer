@@ -56,7 +56,9 @@
   input[type="range"] {
     appearance: none;
     width: $color-form-input-range-width;
-    border: 1px solid $color-unstyled; // FIXME: just for dev! set to 0 solid transparent
+
+    // border: 1px solid $color-unstyled; // FIXME: just for dev! set to 0 solid transparent
+    border: 0 solid transparent;
     background: transparent;
 
     &::-webkit-slider-runnable-track {
