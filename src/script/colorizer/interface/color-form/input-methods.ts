@@ -25,6 +25,10 @@ export type TColorizerFormInputMethod = Omit<TColorizerColorNotation, "xyz">;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TColorizerFormInputCallback = (evt?: Event, ...args: any[]) => void;
 
+/**
+ * The required parameters to create the ``<input>`` elements of a single
+ * component.
+ */
 type TColorizerFormInputMethodComponentConfig = {
   componentCaption: string;
   componentCssClass: string;
@@ -38,6 +42,10 @@ type TColorizerFormInputMethodComponentConfig = {
   sliderLabelText: string;
 };
 
+/**
+ * The components of an input method are associated with different ``<input>``
+ * elements and have a corresponding ``cssProperty``.
+ */
 type TColorizerFormInputMethodComponentStore = {
   textInput: HTMLInputElement;
   sliderInput: HTMLInputElement;
@@ -90,18 +98,8 @@ export function getColorizerFormInput(
  *                           ``setTimeout()``. Default: ``500``.
  *
  * This class provides the implementations for the generic, method-unrelated,
- * repetitive tasks. It does handle the heavy lifting, like synchronizing the
- * ``<input ...>`` elements and publishing the color to the parent
- * ``<form ...>`` element.
- *
- * The implementations are as generic as possible, so there are some
- * assumptions:
- * - the input method relies on **three** *coordinates* / *components* to
- *   represent the color;
- * - each *coordinate* / *component* is represented by a number of a given
- *   range;
- * - all required DOM elements are structured as siblings of a ``fieldset``
- *   element and follow a pre-defined structure;
+ * repetitive tasks. It creates the required DOM elements and keeps them in
+ * sync and handles publishing the color to the parent ``<form>`` element.
  */
 abstract class ColorizerFormInputMethod
   implements IColorizerFormInputMethod, IColorizerColorObserver
@@ -127,10 +125,113 @@ abstract class ColorizerFormInputMethod
     this.inputDebounceDelay = inputDebounceDelay;
   }
 
+  /**
+   * Get the ``<fieldset>`` element of this input method.
+   */
   public get fieldset(): HTMLFieldSetElement {
     return this._fieldset;
   }
 
+  /**
+   * Create the overall ``<fieldset>`` element and populate it with the
+   * required *components*.
+   *
+   * @param method A string defining the *input method*. Will be applied in
+   *               several ``id`` attributes, so it **has to be** unique for
+   *               every concrete *input method* implementation.
+   * @param methodCaption The caption of this *input method's* ``<fieldset>``
+   *                      element, provided in its ``<legend>``. To keep the
+   *                      ``<form>`` as accessible as possible, this
+   *                      *should be* unique for every *input method*
+   *                      implementation.
+   * @param components An array of components to be created. Each entry in this
+   *                   array **must** consist of an *ID* (which **must be**
+   *                   unique for the component in the *input method*) and the
+   *                   corresponding configuration object (of type
+   *                   ``TColorizerFormInputMethodComponentConfig``). The
+   *                   configuration object will be passed to
+   *                   ``setupComponent()``.
+   * @returns The input method's ``<fieldset>`` DOM element.
+   *
+   * Internally, this method uses ``setupComponent()`` to create the actual
+   * ``<input>`` elements for the *input method's* components, e.g. it creates
+   * dedicated R, G and B components for RGB input.
+   *
+   * Note: This method is *protected*, as it will be called from the concrete
+   * child classes rather than from this class!
+   */
+  protected setupDomElements(
+    method: string,
+    methodCaption: string,
+    components: {
+      componentId: string;
+      config: TColorizerFormInputMethodComponentConfig;
+    }[]
+  ): HTMLFieldSetElement {
+    // Setup the input method **overall template**
+    const template = <HTMLTemplateElement>(
+      getDomElement(null, "#tpl-input-method")
+    );
+
+    const methodDom = (
+      template.content.firstElementChild as HTMLFieldSetElement
+    ).cloneNode(true) as HTMLFieldSetElement;
+    methodDom.setAttribute("id", `color-form-${method}`);
+
+    // This ``<span>`` is inside of ``<legend>``
+    const caption = <HTMLSpanElement>(
+      getDomElement(methodDom, ".method-caption")
+    );
+    caption.innerHTML = methodCaption;
+
+    components.forEach((comp) => {
+      methodDom.appendChild(
+        this.setupComponent(method, comp.componentId, comp.config)
+      );
+    });
+
+    // Attach event listener for publishing the current color.
+    //
+    // The actual method (``publishColor()``) is executed with a (configurable)
+    // delay using ``debounceInput()``.
+    //
+    // eslint complains about the usage of an *unbound method*. This rule is
+    // ignored for this block, as ``debounceInput()`` will take care of the
+    // correct binding of ``publishColor()``.
+    //
+    // See https://typescript-eslint.io/rules/unbound-method/
+    //
+    /* eslint-disable @typescript-eslint/unbound-method */
+    methodDom.addEventListener(
+      "input",
+      (this.constructor as typeof ColorizerFormInputMethod).debounceInput(
+        this,
+        this.publishColor,
+        this.inputDebounceDelay
+      )
+    );
+    /* eslint-enable @typescript-eslint/unbound-method */
+
+    return methodDom;
+  }
+
+  /**
+   * Create the required ``<input>`` elements for a single component.
+   *
+   * @param method A string defining the *input method*. Will be applied in
+   *               several ``id`` attributes, so it **has to be** unique for
+   *               every concrete *input method* implementation.
+   * @param componentId A string defining the component. Will be applied in
+   *                    ``id`` attributes, so it **has to be** unique for the
+   *                    *input method*.
+   * @param config The config object for this component.
+   * @returns A ``<fieldset>`` element, containing the (related) ``<input>``
+   *          elements, ready for further use.
+   *
+   * The method creates/populates the required ``<input>`` elements, usually
+   * for every component there is a text-based input and a slider-based input.
+   * Both ``<input>`` elements are kept in sync.
+   */
   private setupComponent(
     method: string,
     componentId: string,
@@ -203,67 +304,11 @@ abstract class ColorizerFormInputMethod
     return component;
   }
 
-  protected setupDomElements(
-    method: string,
-    methodCaption: string,
-    components: {
-      componentId: string;
-      config: TColorizerFormInputMethodComponentConfig;
-    }[]
-  ): HTMLFieldSetElement {
-    // Setup the input method **overall template**
-    const template = <HTMLTemplateElement>(
-      getDomElement(null, "#tpl-input-method")
-    );
-
-    const methodDom = (
-      template.content.firstElementChild as HTMLFieldSetElement
-    ).cloneNode(true) as HTMLFieldSetElement;
-    methodDom.setAttribute("id", `color-form-${method}`);
-
-    const caption = <HTMLSpanElement>(
-      getDomElement(methodDom, ".method-caption")
-    );
-    caption.innerHTML = methodCaption;
-
-    components.forEach((comp) => {
-      methodDom.appendChild(
-        this.setupComponent(method, comp.componentId, comp.config)
-      );
-    });
-
-    // Attach event listener for publishing the current color.
-    //
-    // The actual method (``publishColor()``) is executed with a (configurable)
-    // delay using ``debounceInput()``.
-    //
-    // eslint complains about the usage of an *unbound method*. This rule is
-    // ignored for this block, as ``debounceInput()`` will take care of the
-    // correct binding of ``publishColor()``.
-    //
-    // See https://typescript-eslint.io/rules/unbound-method/
-    //
-    /* eslint-disable @typescript-eslint/unbound-method */
-    methodDom.addEventListener(
-      "input",
-      (this.constructor as typeof ColorizerFormInputMethod).debounceInput(
-        this,
-        this.publishColor,
-        this.inputDebounceDelay
-      )
-    );
-    /* eslint-enable @typescript-eslint/unbound-method */
-
-    return methodDom;
-  }
-
   /**
    * Updates all elements related to a component.
    *
    * @param componentId
    * @param value The new value, provided as string!
-   *
-   * TODO: Should be re-used in e.g. ``setColor()`` methods!
    */
   protected setComponentValue(componentId: string, value: string): void {
     const compStore = this.components.get(componentId);
@@ -275,6 +320,19 @@ abstract class ColorizerFormInputMethod
     compStore.textInput.value = value;
     compStore.sliderInput.value = value;
     this.updateCoordinateInStyleProperty(compStore.cssProperty, value);
+  }
+
+  /**
+   * Sets a custom CSS property on the ``fieldset`` element.
+   *
+   * @param propertyName The name of the custom CSS property.
+   * @param value The actual value.
+   */
+  protected updateCoordinateInStyleProperty(
+    propertyName: string,
+    value: string
+  ): void {
+    this._fieldset.style.setProperty(propertyName, value);
   }
 
   /**
@@ -309,19 +367,6 @@ abstract class ColorizerFormInputMethod
     }
 
     this.inputReceiver(this.getColor());
-  }
-
-  /**
-   * Sets a custom CSS property on the ``fieldset`` element.
-   *
-   * @param propertyName The name of the custom CSS property.
-   * @param value The actual value.
-   */
-  protected updateCoordinateInStyleProperty(
-    propertyName: string,
-    value: string
-  ): void {
-    this._fieldset.style.setProperty(propertyName, value);
   }
 
   /**
