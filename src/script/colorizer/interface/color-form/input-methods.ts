@@ -106,7 +106,8 @@ export function getColorizerFormInput(
 abstract class ColorizerFormInputMethod
   implements IColorizerFormInputMethod, IColorizerColorObserver
 {
-  private fieldset: HTMLFieldSetElement;
+  // @ts-expect-error TS2564 Initializer in child classes
+  protected fieldset: HTMLFieldSetElement;
   private inputReceiver: TColorizerFormReceiverCallback;
   private inputDebounceDelay: number;
   protected components = new Map<
@@ -124,47 +125,6 @@ abstract class ColorizerFormInputMethod
     // Store elemental values in the instance
     this.inputReceiver = receiver;
     this.inputDebounceDelay = inputDebounceDelay;
-
-    this.fieldset = this.setupDomElements("foo", "bar", [
-      {
-        componentId: "r",
-        config: {
-          componentCaption: "Red Component",
-          componentCssClass: "rgb-r",
-          componentCssProperty: "--rgb-r",
-          textInputPattern: "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$",
-          textInputMode: "numeric",
-          textInputLabelText:
-            "Decimal input for red component in range 0 to 255",
-          sliderMin: 0,
-          sliderMax: 255,
-          sliderStep: 1,
-          sliderLabelText: "Slider to adjust the red component",
-        },
-      },
-    ]);
-
-    // Attach event listener for publishing the current color.
-    //
-    // The actual method (``publishColor()``) is executed with a (configurable)
-    // delay using ``debounceInput()``.
-    //
-    // eslint complains about the usage of an *unbound method*. This rule is
-    // ignored for this block, as ``debounceInput()`` will take care of the
-    // correct binding of ``publishColor()``.
-    //
-    // See https://typescript-eslint.io/rules/unbound-method/
-    //
-    /* eslint-disable @typescript-eslint/unbound-method */
-    this.fieldset.addEventListener(
-      "input",
-      (this.constructor as typeof ColorizerFormInputMethod).debounceInput(
-        this,
-        this.publishColor,
-        this.inputDebounceDelay
-      )
-    );
-    /* eslint-enable @typescript-eslint/unbound-method */
   }
 
   private setupComponent(
@@ -245,7 +205,7 @@ abstract class ColorizerFormInputMethod
     return component;
   }
 
-  private setupDomElements(
+  protected setupDomElements(
     method: string,
     methodCaption: string,
     components: {
@@ -273,6 +233,28 @@ abstract class ColorizerFormInputMethod
         this.setupComponent(method, comp.componentId, comp.config)
       );
     });
+
+    // Attach event listener for publishing the current color.
+    //
+    // The actual method (``publishColor()``) is executed with a (configurable)
+    // delay using ``debounceInput()``.
+    //
+    // eslint complains about the usage of an *unbound method*. This rule is
+    // ignored for this block, as ``debounceInput()`` will take care of the
+    // correct binding of ``publishColor()``.
+    //
+    // See https://typescript-eslint.io/rules/unbound-method/
+    //
+    /* eslint-disable @typescript-eslint/unbound-method */
+    methodDom.addEventListener(
+      "input",
+      (this.constructor as typeof ColorizerFormInputMethod).debounceInput(
+        this,
+        this.publishColor,
+        this.inputDebounceDelay
+      )
+    );
+    /* eslint-enable @typescript-eslint/unbound-method */
 
     console.debug(methodDom);
 
@@ -412,6 +394,25 @@ class ColorizerFormInputRgb
     inputDebounceDelay?: number
   ) {
     super(receiver, inputDebounceDelay);
+
+    this.fieldset = this.setupDomElements("foo", "bar", [
+      {
+        componentId: "r",
+        config: {
+          componentCaption: "Red Component",
+          componentCssClass: "rgb-r",
+          componentCssProperty: "--rgb-r",
+          textInputPattern: "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for red component in range 0 to 255",
+          sliderMin: 0,
+          sliderMax: 255,
+          sliderStep: 1,
+          sliderLabelText: "Slider to adjust the red component",
+        },
+      },
+    ]);
   }
 
   /**
