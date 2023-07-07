@@ -87,9 +87,9 @@ export class ColorizerForm implements IColorizerColorObservable {
 
     // Setup the available input methods and keep track of them
     inputMethods.forEach((m) => {
-      this.addColorObserver(
-        getColorizerFormInput(m, this.receiveColor.bind(this))
-      );
+      const tmpMethod = getColorizerFormInput(m, this.receiveColor.bind(this));
+      this.addColorObserver(tmpMethod);
+      this.form.insertBefore(tmpMethod.fieldset, this.form.lastElementChild);
     });
 
     // Set an initial color for the form and all input methods

@@ -107,7 +107,7 @@ abstract class ColorizerFormInputMethod
   implements IColorizerFormInputMethod, IColorizerColorObserver
 {
   // @ts-expect-error TS2564 Initializer in child classes
-  protected fieldset: HTMLFieldSetElement;
+  protected _fieldset: HTMLFieldSetElement;
   private inputReceiver: TColorizerFormReceiverCallback;
   private inputDebounceDelay: number;
   protected components = new Map<
@@ -125,6 +125,10 @@ abstract class ColorizerFormInputMethod
     // Store elemental values in the instance
     this.inputReceiver = receiver;
     this.inputDebounceDelay = inputDebounceDelay;
+  }
+
+  public get fieldset(): HTMLFieldSetElement {
+    return this._fieldset;
   }
 
   private setupComponent(
@@ -325,7 +329,7 @@ abstract class ColorizerFormInputMethod
     propertyName: string,
     value: string
   ): void {
-    this.fieldset.style.setProperty(propertyName, value);
+    this._fieldset.style.setProperty(propertyName, value);
   }
 
   /**
@@ -395,7 +399,7 @@ class ColorizerFormInputRgb
   ) {
     super(receiver, inputDebounceDelay);
 
-    this.fieldset = this.setupDomElements("foo", "bar", [
+    this._fieldset = this.setupDomElements("rgb", "RGB input", [
       {
         componentId: "r",
         config: {
