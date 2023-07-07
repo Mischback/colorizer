@@ -194,12 +194,6 @@ abstract class ColorizerFormInputMethod
       this.setComponentValue(componentId, val);
     });
 
-    console.debug(component);
-    console.debug(sliderLabel);
-    console.debug(slider);
-    console.debug(textLabel);
-    console.debug(text);
-
     this.components.set(componentId, {
       textInput: text,
       sliderInput: slider,
@@ -259,8 +253,6 @@ abstract class ColorizerFormInputMethod
       )
     );
     /* eslint-enable @typescript-eslint/unbound-method */
-
-    console.debug(methodDom);
 
     return methodDom;
   }
