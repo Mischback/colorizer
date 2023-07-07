@@ -39,9 +39,9 @@ type TColorizerFormInputMethodComponentConfig = {
 };
 
 type TColorizerFormInputMethodComponentStore = {
-  textInput: HTMLInputElement | null;
-  sliderInput: HTMLInputElement | null;
-  cssProperty: string | null;
+  textInput: HTMLInputElement;
+  sliderInput: HTMLInputElement;
+  cssProperty: string;
 };
 
 /**
@@ -192,12 +192,6 @@ abstract class ColorizerFormInputMethod
       getDomElement(this.fieldset, `${cCSelector} > input[type=range]`)
     );
 
-    // Establish connections between related input elements
-    this.fieldset.addEventListener(
-      "input",
-      this.synchronizeInputElements.bind(this)
-    );
-
     // Attach event listeners for publishing the current color.
     //
     // The actual method (``publishColor()``) is executed with a (configurable)
@@ -285,6 +279,24 @@ abstract class ColorizerFormInputMethod
     text.setAttribute("pattern", config.textInputPattern);
     text.setAttribute("inputmode", config.textInputMode);
 
+    slider.addEventListener("input", (evt) => {
+      // **MUST NOT** stop event propagation because the overall method's
+      // ``publishColor()`` is attached to the overall ``<fieldset>`` element.
+      const val = Number(
+        (evt.currentTarget as HTMLInputElement).value
+      ).toString();
+      this.setComponentValue(componentId, val);
+    });
+
+    text.addEventListener("input", (evt) => {
+      // **MUST NOT** stop event propagation because the overall method's
+      // ``publishColor()`` is attached to the overall ``<fieldset>`` element.
+      const val = Number(
+        (evt.currentTarget as HTMLInputElement).value
+      ).toString();
+      this.setComponentValue(componentId, val);
+    });
+
     console.debug(component);
     console.debug(sliderLabel);
     console.debug(slider);
@@ -343,6 +355,10 @@ abstract class ColorizerFormInputMethod
    */
   protected setComponentValue(componentId: string, value: string): void {
     const compStore = this.components.get(componentId);
+    if (compStore === undefined) {
+      console.warn(`No component with id '${componentId}'`);
+      return;
+    }
 
     compStore.textInput.value = value;
     compStore.sliderInput.value = value;
@@ -381,70 +397,6 @@ abstract class ColorizerFormInputMethod
     }
 
     this.inputReceiver(this.getColor());
-  }
-
-  /**
-   * Provide synchronization between ``input`` elements.
-   *
-   * The implementation assumes, that the input method uses three distinct
-   * components / color coordinates, each of them represented by a (numerical)
-   * text input and a slider to adjust the value.
-   *
-   * The value is assumed to be a *number*.
-   *
-   * Internally, no sanitization or input validation is performed. The value
-   * is just applied to the corresponding element and set as a custom CSS
-   * property on the instance's ``fieldset`` element (using
-   * ``updateCoordateInStyleProperty()``).
-   */
-  private synchronizeInputElements(evt: Event): void {
-    // The ``Event``/``InputEvent`` is handled here!
-    evt.stopPropagation();
-
-    // Assuming that all inputs are based on numbers!
-    let val: string;
-
-    switch (evt.target) {
-      case this.cAText:
-        val = Number(this.cAText.value).toString();
-        this.cASlider.value = val;
-        this.updateCoordinateInStyleProperty(this.cAProperty, val);
-        break;
-      case this.cASlider:
-        val = Number(this.cASlider.value).toString();
-        this.cAText.value = val;
-        this.updateCoordinateInStyleProperty(this.cAProperty, val);
-        break;
-      case this.cBText:
-        val = Number(this.cBText.value).toString();
-        this.cBSlider.value = val;
-        this.updateCoordinateInStyleProperty(this.cBProperty, val);
-        break;
-      case this.cBSlider:
-        val = Number(this.cBSlider.value).toString();
-        this.cBText.value = val;
-        this.updateCoordinateInStyleProperty(this.cBProperty, val);
-        break;
-      case this.cCText:
-        val = Number(this.cCText.value).toString();
-        this.cCSlider.value = val;
-        this.updateCoordinateInStyleProperty(this.cCProperty, val);
-        break;
-      case this.cCSlider:
-        val = Number(this.cCSlider.value).toString();
-        this.cCText.value = val;
-        this.updateCoordinateInStyleProperty(this.cCProperty, val);
-        break;
-      default:
-        console.warn(
-          // The ``evt.target`` might be ``null``, which is marked by eslint.
-          // However, for debugging it is desired to know the actual value of
-          // ``evt.target``, even if it is ``null``.
-          //
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          `"InputEvent" originated from an unexpected element: ${evt.target}`
-        );
-    }
   }
 
   /**
