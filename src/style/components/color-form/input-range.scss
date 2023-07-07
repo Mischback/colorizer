@@ -444,38 +444,38 @@
  * some *more resolution*, because the components do not work strictly linear.
  */
 /* stylelint-disable no-descending-specificity */
+
+/* purgecss start ignore */
 #color-form-hwb {
-  > fieldset {
-    > input[type="range"] {
-      &::-webkit-slider-thumb {
-        /* prettier-ignore */
-        background: hwb(calc(var(--this-hue) * 1deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%));
-      }
+  input[type="range"] {
+    &::-webkit-slider-thumb {
+      /* prettier-ignore */
+      background: hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%));
+    }
 
-      &::-moz-range-thumb {
-        /* prettier-ignore */
-        background: hwb(calc(var(--this-hue) * 1deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%));
-      }
+    &::-moz-range-thumb {
+      /* prettier-ignore */
+      background: hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%));
     }
   }
 
-  > .component-hue {
-    > input[type="range"] {
+  > .hwb-h {
+    input[type="range"] {
       &::-webkit-slider-runnable-track {
         /* prettier-ignore */
         background: linear-gradient(
           90deg,
-          hwb(0deg calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 0%,
-          hwb(calc(0.1 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 10%,
-          hwb(calc(0.2 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 20%,
-          hwb(calc(0.3 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 30%,
-          hwb(calc(0.4 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 40%,
-          hwb(calc(0.5 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 50%,
-          hwb(calc(0.6 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 60%,
-          hwb(calc(0.7 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 70%,
-          hwb(calc(0.8 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 80%,
-          hwb(calc(0.9 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 90%,
-          hwb(360deg calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 100%
+          hwb(0deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 0%,
+          hwb(36deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 10%,
+          hwb(72deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 20%,
+          hwb(108deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 30%,
+          hwb(144deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 40%,
+          hwb(180deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 50%,
+          hwb(216deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 60%,
+          hwb(252deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 70%,
+          hwb(288deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 80%,
+          hwb(324deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 90%,
+          hwb(360deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 100%
         );
       }
 
@@ -483,30 +483,31 @@
         /* prettier-ignore */
         background: linear-gradient(
           90deg,
-          hwb(0deg calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 0%,
-          hwb(calc(0.1 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 10%,
-          hwb(calc(0.2 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 20%,
-          hwb(calc(0.3 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 30%,
-          hwb(calc(0.4 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 40%,
-          hwb(calc(0.5 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 50%,
-          hwb(calc(0.6 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 60%,
-          hwb(calc(0.7 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 70%,
-          hwb(calc(0.8 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 80%,
-          hwb(calc(0.9 * 360deg) calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 90%,
-          hwb(360deg calc(var(--this-white) * 1%) calc(var(--this-black) * 1%)) 100%
+          hwb(0deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 0%,
+          hwb(36deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 10%,
+          hwb(72deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 20%,
+          hwb(108deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 30%,
+          hwb(144deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 40%,
+          hwb(180deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 50%,
+          hwb(216deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 60%,
+          hwb(252deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 70%,
+          hwb(288deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 80%,
+          hwb(324deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 90%,
+          hwb(360deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 100%
         );
       }
     }
   }
 
-  > .component-white {
-    > input[type="range"] {
+  > .hwb-w {
+    input[type="range"] {
       &::-webkit-slider-runnable-track {
         /* prettier-ignore */
         background: linear-gradient(
           90deg,
-          hwb(calc(var(--this-hue) * 1deg) 0.1% calc(var(--this-black) * 1%)) 0%,
-          hwb(calc(var(--this-hue) * 1deg) 100% calc(var(--this-black) * 1%)) 100%
+          hwb(calc(var(--hwb-h) * 1deg) 0% calc(var(--hwb-b) * 1%)) 0%,
+          hwb(calc(var(--hwb-h) * 1deg) 50% calc(var(--hwb-b) * 1%)) 50%,
+          hwb(calc(var(--hwb-h) * 1deg) 100% calc(var(--hwb-b) * 1%)) 100%
         );
       }
 
@@ -514,21 +515,23 @@
         /* prettier-ignore */
         background: linear-gradient(
           90deg,
-          hwb(calc(var(--this-hue) * 1deg) 0.1% calc(var(--this-black) * 1%)) 0%,
-          hwb(calc(var(--this-hue) * 1deg) 100% calc(var(--this-black) * 1%)) 100%
+          hwb(calc(var(--hwb-h) * 1deg) 0% calc(var(--hwb-b) * 1%)) 0%,
+          hwb(calc(var(--hwb-h) * 1deg) 50% calc(var(--hwb-b) * 1%)) 50%,
+          hwb(calc(var(--hwb-h) * 1deg) 100% calc(var(--hwb-b) * 1%)) 100%
         );
       }
     }
   }
 
-  > .component-black {
-    > input[type="range"] {
+  > .hwb-b {
+    input[type="range"] {
       &::-webkit-slider-runnable-track {
         /* prettier-ignore */
         background: linear-gradient(
           90deg,
-          hwb(calc(var(--this-hue) * 1deg) calc(var(--this-white) * 1%) 0.1%) 0%,
-          hwb(calc(var(--this-hue) * 1deg) calc(var(--this-white) * 1%) 100%) 100%
+          hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) 0%) 0%,
+          hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) 50%) 50%,
+          hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) 100%) 100%
         );
       }
 
@@ -536,11 +539,14 @@
         /* prettier-ignore */
         background: linear-gradient(
           90deg,
-          hwb(calc(var(--this-hue) * 1deg) calc(var(--this-white) * 1%) 0.1%) 0%,
-          hwb(calc(var(--this-hue) * 1deg) calc(var(--this-white) * 1%) 100%) 100%
+          hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) 0%) 0%,
+          hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) 50%) 50%,
+          hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) 100%) 100%
         );
       }
     }
   }
 }
+
+/* purgecss end ignore */
 /* stylelint-enable no-descending-specificity */
