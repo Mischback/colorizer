@@ -22,7 +22,7 @@ export class ColorizerController {
 
   public constructor(
     // inputMethods: TColorizerFormInputMethod[] = ["rgb", "hsl", "hwb", "oklch"],
-    inputMethods: TColorizerFormInputMethod[] = ["rgb"],
+    inputMethods: TColorizerFormInputMethod[] = ["rgb", "hsl"],
     outputNotations: TColorizerPaletteItemNotation[] = [
       "rgb",
       "rgb-hex",

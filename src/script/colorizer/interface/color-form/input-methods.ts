@@ -82,6 +82,8 @@ export function getColorizerFormInput(
   switch (method) {
     case "rgb":
       return new ColorizerFormInputRgb(receiver);
+    case "hsl":
+      return new ColorizerFormInputHsl(receiver);
     default:
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       throw new Error(`Unknown input method '${method}'`);
@@ -532,5 +534,120 @@ class ColorizerFormInputRgb
 
     tmp = color255.b.toString();
     this.setComponentValue("b", tmp);
+  }
+}
+
+/**
+ * Represent HSL color input.
+ *
+ * @param receiver A callback function that is called whenever the input
+ *                 method's current color changes.
+ * @param inputDebounceDelay The delay to be applied to the method's input
+ *                           event handlers, given in **ms** and passed to
+ *                           ``setTimeout()``. **Optional**, will get a default
+ *                           value of ``500`` in ``ColorizerFormInputMethod``.
+ */
+class ColorizerFormInputHsl
+  extends ColorizerFormInputMethod
+  implements IColorizerFormInputMethod
+{
+  constructor(
+    receiver: TColorizerFormReceiverCallback,
+    inputDebounceDelay?: number
+  ) {
+    super(receiver, inputDebounceDelay);
+
+    this._fieldset = this.setupDomElements("hsl", "HSL input", [
+      {
+        componentId: "h",
+        config: {
+          componentCaption: "Hue Component",
+          componentCssClass: "hsl-h",
+          componentCssProperty: "--hsl-h",
+          textInputPattern:
+            "^(NaN|360|((3[0-5][0-9]|[12][0-9]{2}|([1-9]?[0-9]{1}))(.[0-9]+)?))$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for hue component in range 0 to 360",
+          sliderMin: 0,
+          sliderMax: 360,
+          sliderStep: 1,
+          sliderLabelText: "Slider to adjust the hue component",
+        },
+      },
+      {
+        componentId: "s",
+        config: {
+          componentCaption: "Saturation Component",
+          componentCssClass: "hsl-s",
+          componentCssProperty: "--hsl-s",
+          textInputPattern: "^(100|[1-9]?[0-9](.[0-9]+)?)$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for saturation component in range 0% to 100%",
+          sliderMin: 0,
+          sliderMax: 100,
+          sliderStep: 0.01,
+          sliderLabelText: "Slider to adjust the saturation component",
+        },
+      },
+      {
+        componentId: "l",
+        config: {
+          componentCaption: "Lightness Component",
+          componentCssClass: "hsl-l",
+          componentCssProperty: "--hsl-l",
+          textInputPattern: "^(100|[1-9]?[0-9](.[0-9]+)?)$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for lightness component in range 0% to 100%",
+          sliderMin: 0,
+          sliderMax: 100,
+          sliderStep: 0.01,
+          sliderLabelText: "Slider to adjust the lightness component",
+        },
+      },
+    ]);
+  }
+
+  /**
+   * Return the current color.
+   *
+   * This method creates an instance of ``ColorizerColor``, using the values
+   * of the ``<input type="text" ...>`` elements (which are synchronized with
+   * the corresponding sliders!).
+   *
+   * The values of the ``<input type="text" ...>`` elements are converted to
+   * actual numbers by calling ``Number()`` on them. Forcing them into the
+   * required ranges (e.g. into range [0..1]) is done in
+   * ``ColorizerColor.fromHsl()``.
+   */
+  public getColor(): ColorizerColor {
+    const h = this.components.get("h");
+    const s = this.components.get("s");
+    const l = this.components.get("l");
+
+    if (h === undefined || s === undefined || l === undefined) {
+      throw new Error("A required component is 'undefined'");
+    }
+
+    return ColorizerColor.fromHsl(
+      Number(h.textInput.value),
+      Number(s.textInput.value) / 100,
+      Number(l.textInput.value) / 100
+    );
+  }
+
+  /**
+   * Set the color of this input method.
+   *
+   * @param color An instance of ``ColorizerColor``.
+   */
+  public setColor(color: ColorizerColor): void {
+    const colorHsl = color.toHslString();
+
+    this.setComponentValue("h", colorHsl.h);
+    this.setComponentValue("s", colorHsl.s);
+    this.setComponentValue("l", colorHsl.l);
   }
 }
