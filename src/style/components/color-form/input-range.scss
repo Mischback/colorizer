@@ -24,7 +24,6 @@
   //        color.
   background: rgb(200 200 200);
   box-shadow: $color-preview-inner-shadow, $element-shadow-as-outline;
-  cursor: pointer;
 }
 
 /**
@@ -55,32 +54,11 @@
  *
  * The general styling of all input methods should be uniform.
  */
-.color-form-input-method > fieldset {
-  > input {
-    display: inline-block;
-    height: $color-form-input-height;
-    margin: 0;
-    padding: $color-form-input-vertical-padding 0.5em;
-
-    // FIXME: [#32] Build an overall colorscheme
-    // border: 1px solid rgb(0 0 0);
-    border: 0; // If this is kept in the final stylesheet, it may be removed from type=range selector!
-
-    // FIXME: Create and use font-stacks!
-    font-family: monospace;
-    font-size: $color-form-input-text-size;
-    vertical-align: middle;
-  }
-
-  > input[type="text"] {
-    border-radius: 5px;
-    box-shadow: $color-preview-inner-shadow, $element-shadow-as-outline;
-  }
-
-  > input[type="range"] {
+.color-form-input-method {
+  input[type="range"] {
     appearance: none;
     width: 10em;
-    border: 0;
+    border: 0 solid transparent;
     background: transparent;
 
     &::-webkit-slider-runnable-track {

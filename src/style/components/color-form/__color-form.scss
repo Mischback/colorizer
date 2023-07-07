@@ -3,7 +3,7 @@
 // SPDX-FileType: SOURCE
 
 /* stylelint-disable scss/operator-no-newline-after */
-$color-form-input-text-size: 1.5em;
+$color-form-input-text-size: 1.25em;
 $color-form-input-vertical-padding: 0.25em;
 $color-form-input-height: $color-form-input-text-size +
   (2 * $color-form-input-vertical-padding);
@@ -12,5 +12,6 @@ $color-form-input-range-thumb-size: 0.85 * $color-form-input-text-size;
 /* stylelint-enable scss/operator-no-newline-after */
 
 @import "tooltip";
+@import "input-text";
 @import "input-range";
 @import "button";

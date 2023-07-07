@@ -1,0 +1,19 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+.color-form-input-method {
+  input {
+    display: inline-block;
+    height: $color-form-input-height;
+    margin: 0;
+    padding: $color-form-input-vertical-padding 0.5em;
+    font-family: $font-stack-monospace;
+    font-size: $color-form-input-text-size;
+  }
+
+  input[type="text"] {
+    border-radius: 5px;
+    box-shadow: $color-preview-inner-shadow, $element-shadow-as-outline;
+  }
+}
