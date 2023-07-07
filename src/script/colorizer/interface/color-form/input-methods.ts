@@ -86,6 +86,8 @@ export function getColorizerFormInput(
       return new ColorizerFormInputHsl(receiver);
     case "hwb":
       return new ColorizerFormInputHwb(receiver);
+    case "oklch":
+      return new ColorizerFormInputOklch(receiver);
     default:
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       throw new Error(`Unknown input method '${method}'`);
@@ -747,6 +749,7 @@ class ColorizerFormInputHwb
     if (h === undefined || w === undefined || b === undefined) {
       throw new Error("A required component is 'undefined'");
     }
+
     return ColorizerColor.fromHwb(
       Number(h.textInput.value),
       Number(w.textInput.value) / 100,
@@ -765,5 +768,120 @@ class ColorizerFormInputHwb
     this.setComponentValue("h", colorHwb.h);
     this.setComponentValue("w", colorHwb.w);
     this.setComponentValue("b", colorHwb.b);
+  }
+}
+
+/**
+ * Represent Oklch color input.
+ *
+ * @param receiver A callback function that is called whenever the input
+ *                 method's current color changes.
+ * @param inputDebounceDelay The delay to be applied to the method's input
+ *                           event handlers, given in **ms** and passed to
+ *                           ``setTimeout()``. **Optional**, will get a default
+ *                           value of ``500`` in ``ColorizerFormInputMethod``.
+ */
+class ColorizerFormInputOklch
+  extends ColorizerFormInputMethod
+  implements IColorizerFormInputMethod
+{
+  constructor(
+    receiver: TColorizerFormReceiverCallback,
+    inputDebounceDelay?: number
+  ) {
+    super(receiver, inputDebounceDelay);
+
+    this._fieldset = this.setupDomElements("oklch", "OkLCH input", [
+      {
+        componentId: "l",
+        config: {
+          componentCaption: "Lightness Component",
+          componentCssClass: "oklch-l",
+          componentCssProperty: "--oklch-l",
+          textInputPattern: "^(100|[1-9]?[0-9](.[0-9]+)?)$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for lightness component in range 0% to 100%",
+          sliderMin: 0,
+          sliderMax: 100,
+          sliderStep: 0.01,
+          sliderLabelText: "Slider to adjust the lightness component",
+        },
+      },
+      {
+        componentId: "c",
+        config: {
+          componentCaption: "Chroma Component",
+          componentCssClass: "oklch-c",
+          componentCssProperty: "--oklch-c",
+          textInputPattern: "^(100|[1-9]?[0-9](.[0-9]+)?)$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for chroma component in range 0% to 100%",
+          sliderMin: 0,
+          sliderMax: 100,
+          sliderStep: 0.01,
+          sliderLabelText: "Slider to adjust the chroma component",
+        },
+      },
+      {
+        componentId: "h",
+        config: {
+          componentCaption: "Hue Component",
+          componentCssClass: "oklch-h",
+          componentCssProperty: "--oklch-h",
+          textInputPattern:
+            "^(360|((3[0-5][0-9]|[12][0-9]{2}|([1-9]?[0-9]{1}))(.[0-9]+)?))$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for hue component in range 0 to 360",
+          sliderMin: 0,
+          sliderMax: 360,
+          sliderStep: 1,
+          sliderLabelText: "Slider to adjust the hue component",
+        },
+      },
+    ]);
+  }
+
+  /**
+   * Return the current color.
+   *
+   * This method creates an instance of ``ColorizerColor``, using the values
+   * of the ``<input type="text" ...>`` elements (which are synchronized with
+   * the corresponding sliders!).
+   *
+   * The values of the ``<input type="text" ...>`` elements are converted to
+   * actual numbers by calling ``Number()`` on them. Forcing  them into the
+   * required ranges (e.g. into range [0..1]) is done in
+   * ``ColorizerColor.fromOklch()``.
+   */
+  public getColor(): ColorizerColor {
+    const l = this.components.get("l");
+    const c = this.components.get("c");
+    const h = this.components.get("h");
+
+    if (l === undefined || c === undefined || h === undefined) {
+      throw new Error("A required component is 'undefined'");
+    }
+
+    return ColorizerColor.fromOklch(
+      Number(l.textInput.value) / 100,
+      (Number(c.textInput.value) / 100) * 0.4,
+      Number(h.textInput.value)
+    );
+  }
+
+  /**
+   * Set the color of this input method.
+   *
+   * @param color An instance of ``ColorizerColor``.
+   */
+  public setColor(color: ColorizerColor): void {
+    const colorOklch = color.toOklchString();
+
+    this.setComponentValue("l", colorOklch.l);
+    this.setComponentValue("c", colorOklch.c);
+    this.setComponentValue("h", colorOklch.h);
   }
 }

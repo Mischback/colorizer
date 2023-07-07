@@ -21,8 +21,7 @@ export class ColorizerController {
   private paletteIO: ColorizerPaletteIO;
 
   public constructor(
-    // inputMethods: TColorizerFormInputMethod[] = ["rgb", "hsl", "hwb", "oklch"],
-    inputMethods: TColorizerFormInputMethod[] = ["rgb", "hsl", "hwb"],
+    inputMethods: TColorizerFormInputMethod[] = ["rgb", "hsl", "hwb", "oklch"],
     outputNotations: TColorizerPaletteItemNotation[] = [
       "rgb",
       "rgb-hex",
