@@ -84,6 +84,8 @@ export function getColorizerFormInput(
       return new ColorizerFormInputRgb(receiver);
     case "hsl":
       return new ColorizerFormInputHsl(receiver);
+    case "hwb":
+      return new ColorizerFormInputHwb(receiver);
     default:
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       throw new Error(`Unknown input method '${method}'`);
@@ -649,5 +651,119 @@ class ColorizerFormInputHsl
     this.setComponentValue("h", colorHsl.h);
     this.setComponentValue("s", colorHsl.s);
     this.setComponentValue("l", colorHsl.l);
+  }
+}
+
+/**
+ * Represent HWB color input.
+ *
+ * @param receiver A callback function that is called whenever the input
+ *                 method's current color changes.
+ * @param inputDebounceDelay The delay to be applied to the method's input
+ *                           event handlers, given in **ms** and passed to
+ *                           ``setTimeout()``. **Optional**, will get a default
+ *                           value of ``500`` in ``ColorizerFormInputMethod``.
+ */
+class ColorizerFormInputHwb
+  extends ColorizerFormInputMethod
+  implements IColorizerFormInputMethod
+{
+  constructor(
+    receiver: TColorizerFormReceiverCallback,
+    inputDebounceDelay?: number
+  ) {
+    super(receiver, inputDebounceDelay);
+
+    this._fieldset = this.setupDomElements("hwb", "HWB input", [
+      {
+        componentId: "h",
+        config: {
+          componentCaption: "Hue Component",
+          componentCssClass: "hwb-h",
+          componentCssProperty: "--hwb-h",
+          textInputPattern:
+            "^(NaN|360|((3[0-5][0-9]|[12][0-9]{2}|([1-9]?[0-9]{1}))(.[0-9]+)?))$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for hue component in range 0 to 360",
+          sliderMin: 0,
+          sliderMax: 360,
+          sliderStep: 1,
+          sliderLabelText: "Slider to adjust the hue component",
+        },
+      },
+      {
+        componentId: "w",
+        config: {
+          componentCaption: "Whiteness Component",
+          componentCssClass: "hwb-w",
+          componentCssProperty: "--hwb-w",
+          textInputPattern: "^(100|[1-9]?[0-9](.[0-9]+)?)$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for whiteness component in range 0% to 100%",
+          sliderMin: 0,
+          sliderMax: 100,
+          sliderStep: 0.01,
+          sliderLabelText: "Slider to adjust the whiteness component",
+        },
+      },
+      {
+        componentId: "b",
+        config: {
+          componentCaption: "Blackness Component",
+          componentCssClass: "hwb-b",
+          componentCssProperty: "--hwb-b",
+          textInputPattern: "^(100|[1-9]?[0-9](.[0-9]+)?)$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for blackness component in range 0% to 100%",
+          sliderMin: 0,
+          sliderMax: 100,
+          sliderStep: 0.01,
+          sliderLabelText: "Slider to adjust the blackness component",
+        },
+      },
+    ]);
+  }
+
+  /**
+   * Return the current color.
+   *
+   * This method creates an instance of ``ColorizerColor``, using the values
+   * of the ``<input type="text" ...>`` elements (which are synchronized with
+   * the corresponding sliders!).
+   *
+   * The values of the ``<input type="text" ...>`` elements are converted to
+   * actual numbers by calling ``Number()`` on them. Forcing them into the
+   * required ranges (e.g. into range [0..1]) is done in
+   * ``ColorizerColor.fromHwb()``.
+   */
+  public getColor(): ColorizerColor {
+    const h = this.components.get("h");
+    const w = this.components.get("w");
+    const b = this.components.get("b");
+
+    if (h === undefined || w === undefined || b === undefined) {
+      throw new Error("A required component is 'undefined'");
+    }
+    return ColorizerColor.fromHwb(
+      Number(h.textInput.value),
+      Number(w.textInput.value) / 100,
+      Number(b.textInput.value) / 100
+    );
+  }
+
+  /**
+   * Set the color of this input method.
+   *
+   * @param color An instance of ``ColorizerColor``.
+   */
+  public setColor(color: ColorizerColor): void {
+    const colorHwb = color.toHwbString();
+
+    this.setComponentValue("h", colorHwb.h);
+    this.setComponentValue("w", colorHwb.w);
+    this.setComponentValue("b", colorHwb.b);
   }
 }
