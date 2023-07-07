@@ -412,6 +412,38 @@ class ColorizerFormInputRgb
           sliderLabelText: "Slider to adjust the red component",
         },
       },
+      {
+        componentId: "g",
+        config: {
+          componentCaption: "Green Component",
+          componentCssClass: "rgb-g",
+          componentCssProperty: "--rgb-g",
+          textInputPattern: "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for green component in range 0 to 255",
+          sliderMin: 0,
+          sliderMax: 255,
+          sliderStep: 1,
+          sliderLabelText: "Slider to adjust the green component",
+        },
+      },
+      {
+        componentId: "b",
+        config: {
+          componentCaption: "Blue Component",
+          componentCssClass: "rgb-b",
+          componentCssProperty: "--rgb-b",
+          textInputPattern: "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for blue component in range 0 to 255",
+          sliderMin: 0,
+          sliderMax: 255,
+          sliderStep: 1,
+          sliderLabelText: "Slider to adjust the blue component",
+        },
+      },
     ]);
   }
 
@@ -428,10 +460,18 @@ class ColorizerFormInputRgb
    * ``ColorizerColor.fromRgb255()``.
    */
   public getColor(): ColorizerColor {
+    const r = this.components.get("r");
+    const g = this.components.get("g");
+    const b = this.components.get("b");
+
+    if (r === undefined || g === undefined || b === undefined) {
+      throw new Error("A required component is 'undefined'");
+    }
+
     return ColorizerColor.fromRgb255(
-      Number(this.cAText.value),
-      Number(this.cBText.value),
-      Number(this.cCText.value)
+      Number(r.textInput.value),
+      Number(g.textInput.value),
+      Number(b.textInput.value)
     );
   }
 
@@ -444,18 +484,12 @@ class ColorizerFormInputRgb
     const color255 = color.toRgb255();
 
     let tmp = color255.r.toString();
-    this.cAText.value = tmp;
-    this.cASlider.value = tmp;
-    this.updateCoordinateInStyleProperty(this.cAProperty, tmp);
+    this.setComponentValue("r", tmp);
 
     tmp = color255.g.toString();
-    this.cBText.value = tmp;
-    this.cBSlider.value = tmp;
-    this.updateCoordinateInStyleProperty(this.cBProperty, tmp);
+    this.setComponentValue("g", tmp);
 
     tmp = color255.b.toString();
-    this.cCText.value = tmp;
-    this.cCSlider.value = tmp;
-    this.updateCoordinateInStyleProperty(this.cCProperty, tmp);
+    this.setComponentValue("b", tmp);
   }
 }
