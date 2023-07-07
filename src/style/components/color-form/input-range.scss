@@ -16,7 +16,7 @@
   /* transition: all .2s ease; */
   width: 100%;
   height: $color-form-input-range-track-height;
-  border-radius: 5em;
+  border-radius: 999px;
 
   // Note: The track's ``background`` is actually styled in the input method's
   //       specific block, visualizing the component's impact on the current
@@ -103,79 +103,81 @@
  *
  * The slider's thumb visualizes the current color.
  */
+
+/* purgecss start ignore */
 #color-form-rgb {
-  > fieldset {
-    > input[type="range"] {
-      &::-webkit-slider-thumb {
-        background: rgb(var(--this-red) var(--this-green) var(--this-blue));
-      }
+  input[type="range"] {
+    &::-webkit-slider-thumb {
+      background: rgb(var(--rgb-r) var(--rgb-g) var(--rgb-b));
+    }
 
-      &::-moz-range-thumb {
-        background: rgb(var(--this-red) var(--this-green) var(--this-blue));
-      }
+    &::-moz-range-thumb {
+      background: rgb(var(--rgb-r) var(--rgb-g) var(--rgb-b));
     }
   }
 
-  > .component-red {
-    > input[type="range"] {
+  > .rgb-r {
+    input[type="range"] {
       &::-webkit-slider-runnable-track {
         background: linear-gradient(
           90deg,
-          rgb(0 var(--this-green) var(--this-blue)) 0%,
-          rgb(255 var(--this-green) var(--this-blue)) 100%
+          rgb(0 var(--rgb-g) var(--rgb-b)) 0%,
+          rgb(255 var(--rgb-g) var(--rgb-b)) 100%
         );
       }
 
       &::-moz-range-track {
         background: linear-gradient(
           90deg,
-          rgb(0 var(--this-green) var(--this-blue)) 0%,
-          rgb(255 var(--this-green) var(--this-blue)) 100%
+          rgb(0 var(--rgb-g) var(--rgb-b)) 0%,
+          rgb(255 var(--rgb-g) var(--rgb-b)) 100%
         );
       }
     }
   }
 
-  > .component-green {
-    > input[type="range"] {
+  > .rgb-g {
+    input[type="range"] {
       &::-webkit-slider-runnable-track {
         background: linear-gradient(
           90deg,
-          rgb(var(--this-red) 0 var(--this-blue)) 0%,
-          rgb(var(--this-red) 255 var(--this-blue)) 100%
+          rgb(var(--rgb-r) 0 var(--rgb-b)) 0%,
+          rgb(var(--rgb-r) 255 var(--rgb-b)) 100%
         );
       }
 
       &::-moz-range-track {
         background: linear-gradient(
           90deg,
-          rgb(var(--this-red) 0 var(--this-blue)) 0%,
-          rgb(var(--this-red) 255 var(--this-blue)) 100%
+          rgb(var(--rgb-r) 0 var(--rgb-b)) 0%,
+          rgb(var(--rgb-r) 255 var(--rgb-b)) 100%
         );
       }
     }
   }
 
-  > .component-blue {
-    > input[type="range"] {
+  > .rgb-b {
+    input[type="range"] {
       &::-webkit-slider-runnable-track {
         background: linear-gradient(
           90deg,
-          rgb(var(--this-red) var(--this-green) 0) 0%,
-          rgb(var(--this-red) var(--this-green) 255) 100%
+          rgb(var(--rgb-r) var(--rgb-g) 0) 0%,
+          rgb(var(--rgb-r) var(--rgb-g) 255) 100%
         );
       }
 
       &::-moz-range-track {
         background: linear-gradient(
           90deg,
-          rgb(var(--this-red) var(--this-green) 0) 0%,
-          rgb(var(--this-red) var(--this-green) 255) 100%
+          rgb(var(--rgb-r) var(--rgb-g) 0) 0%,
+          rgb(var(--rgb-r) var(--rgb-g) 255) 100%
         );
       }
     }
   }
 }
+
+/* purgecss end ignore */
 
 /**
  * OkLCH input
