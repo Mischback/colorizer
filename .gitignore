@@ -7,3 +7,7 @@ node_modules/
 
 # The actual release / public / distribution
 dist/
+
+# FIXME: Just for this PR!
+input-method-rgb.src
+input-method-oklch.src

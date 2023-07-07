@@ -13,7 +13,7 @@ import type {
 /**
  * Dedicated typing for the available input methods.
  */
-export type TColorizerFormInputMethod = Omit<TColorizerColorNotation, "xyz">;
+export type TColorizerFormInputMethod = Exclude<TColorizerColorNotation, "xyz">;
 
 /**
  * The generic prototype of a function that acts a a callback / event handler
@@ -24,6 +24,33 @@ export type TColorizerFormInputMethod = Omit<TColorizerColorNotation, "xyz">;
 //
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TColorizerFormInputCallback = (evt?: Event, ...args: any[]) => void;
+
+/**
+ * The required parameters to create the ``<input>`` elements of a single
+ * component.
+ */
+type TColorizerFormInputMethodComponentConfig = {
+  componentCaption: string;
+  componentCssClass: string;
+  componentCssProperty: string;
+  textInputPattern: string;
+  textInputMode: string;
+  textInputLabelText: string;
+  sliderMin: number;
+  sliderMax: number;
+  sliderStep: number;
+  sliderLabelText: string;
+};
+
+/**
+ * The components of an input method are associated with different ``<input>``
+ * elements and have a corresponding ``cssProperty``.
+ */
+type TColorizerFormInputMethodComponentStore = {
+  textInput: HTMLInputElement;
+  sliderInput: HTMLInputElement;
+  cssProperty: string;
+};
 
 /**
  * The public interface of the input method classes.
@@ -70,27 +97,6 @@ export function getColorizerFormInput(
 /**
  * Base class for alle input methods.
  *
- * @param fieldsetId The ``id`` attribute of the method's parent
- *                   ``<fieldset ...>`` element, used to get the DOM element
- *                   using ``querySelector()``.
- * @param cASelector The selector for the *A component*. It will be searched
- *                   as a sibling of the ``<fieldset ...>`` element and used to
- *                   identify the component's text input and range input.
- * @param cAProperty The name of a CSS custom property that will be set on the
- *                   ``<fieldset ...>`` element to trach the *A component's*
- *                   current value.
- * @param cBSelector The selector for the *B component*. It will be searched
- *                   as a sibling of the ``<fieldset ...>`` element and used to
- *                   identify the component's text input and range input.
- * @param cBProperty The name of a CSS custom property that will be set on the
- *                   ``<fieldset ...>`` element to trach the *B component's*
- *                   current value.
- * @param cCSelector The selector for the *C component*. It will be searched
- *                   as a sibling of the ``<fieldset ...>`` element and used to
- *                   identify the component's text input and range input.
- * @param cCProperty The name of a CSS custom property that will be set on the
- *                   ``<fieldset ...>`` element to trach the *C component's*
- *                   current value.
  * @param receiver A callback function that is called whenever the input
  *                 method's current color changes.
  * @param inputDebounceDelay The delay to be applied to the method's input
@@ -98,84 +104,99 @@ export function getColorizerFormInput(
  *                           ``setTimeout()``. Default: ``500``.
  *
  * This class provides the implementations for the generic, method-unrelated,
- * repetitive tasks. It does handle the heavy lifting, like synchronizing the
- * ``<input ...>`` elements and publishing the color to the parent
- * ``<form ...>`` element.
- *
- * The implementations are as generic as possible, so there are some
- * assumptions:
- * - the input method relies on **three** *coordinates* / *components* to
- *   represent the color;
- * - each *coordinate* / *component* is represented by a number of a given
- *   range;
- * - all required DOM elements are structured as siblings of a ``fieldset``
- *   element and follow a pre-defined structure;
+ * repetitive tasks. It creates the required DOM elements and keeps them in
+ * sync and handles publishing the color to the parent ``<form>`` element.
  */
 abstract class ColorizerFormInputMethod
   implements IColorizerFormInputMethod, IColorizerColorObserver
 {
-  private fieldset: HTMLFieldSetElement;
+  // @ts-expect-error TS2564 Initializer in child classes
+  protected _fieldset: HTMLFieldSetElement;
   private inputReceiver: TColorizerFormReceiverCallback;
   private inputDebounceDelay: number;
-  protected cAText: HTMLInputElement;
-  protected cASlider: HTMLInputElement;
-  protected cAProperty: string;
-  protected cBText: HTMLInputElement;
-  protected cBSlider: HTMLInputElement;
-  protected cBProperty: string;
-  protected cCText: HTMLInputElement;
-  protected cCSlider: HTMLInputElement;
-  protected cCProperty: string;
+  protected components = new Map<
+    string,
+    TColorizerFormInputMethodComponentStore
+  >();
 
   public abstract getColor(): ColorizerColor;
   public abstract setColor(color: ColorizerColor): void;
 
   constructor(
-    fieldsetId: string,
-    cASelector: string,
-    cAProperty: string,
-    cBSelector: string,
-    cBProperty: string,
-    cCSelector: string,
-    cCProperty: string,
     receiver: TColorizerFormReceiverCallback,
     inputDebounceDelay = 500
   ) {
     // Store elemental values in the instance
-    this.cAProperty = cAProperty;
-    this.cBProperty = cBProperty;
-    this.cCProperty = cCProperty;
     this.inputReceiver = receiver;
     this.inputDebounceDelay = inputDebounceDelay;
+  }
 
-    // Get DOM elements
-    this.fieldset = <HTMLFieldSetElement>getDomElement(null, fieldsetId);
-    this.cAText = <HTMLInputElement>(
-      getDomElement(this.fieldset, `${cASelector} > input[type=text]`)
-    );
-    this.cASlider = <HTMLInputElement>(
-      getDomElement(this.fieldset, `${cASelector} > input[type=range]`)
-    );
-    this.cBText = <HTMLInputElement>(
-      getDomElement(this.fieldset, `${cBSelector} > input[type=text]`)
-    );
-    this.cBSlider = <HTMLInputElement>(
-      getDomElement(this.fieldset, `${cBSelector} > input[type=range]`)
-    );
-    this.cCText = <HTMLInputElement>(
-      getDomElement(this.fieldset, `${cCSelector} > input[type=text]`)
-    );
-    this.cCSlider = <HTMLInputElement>(
-      getDomElement(this.fieldset, `${cCSelector} > input[type=range]`)
+  /**
+   * Get the ``<fieldset>`` element of this input method.
+   */
+  public get fieldset(): HTMLFieldSetElement {
+    return this._fieldset;
+  }
+
+  /**
+   * Create the overall ``<fieldset>`` element and populate it with the
+   * required *components*.
+   *
+   * @param method A string defining the *input method*. Will be applied in
+   *               several ``id`` attributes, so it **has to be** unique for
+   *               every concrete *input method* implementation.
+   * @param methodCaption The caption of this *input method's* ``<fieldset>``
+   *                      element, provided in its ``<legend>``. To keep the
+   *                      ``<form>`` as accessible as possible, this
+   *                      *should be* unique for every *input method*
+   *                      implementation.
+   * @param components An array of components to be created. Each entry in this
+   *                   array **must** consist of an *ID* (which **must be**
+   *                   unique for the component in the *input method*) and the
+   *                   corresponding configuration object (of type
+   *                   ``TColorizerFormInputMethodComponentConfig``). The
+   *                   configuration object will be passed to
+   *                   ``setupComponent()``.
+   * @returns The input method's ``<fieldset>`` DOM element.
+   *
+   * Internally, this method uses ``setupComponent()`` to create the actual
+   * ``<input>`` elements for the *input method's* components, e.g. it creates
+   * dedicated R, G and B components for RGB input.
+   *
+   * Note: This method is *protected*, as it will be called from the concrete
+   * child classes rather than from this class!
+   */
+  protected setupDomElements(
+    method: TColorizerFormInputMethod,
+    methodCaption: string,
+    components: {
+      componentId: string;
+      config: TColorizerFormInputMethodComponentConfig;
+    }[]
+  ): HTMLFieldSetElement {
+    // Setup the input method **overall template**
+    const template = <HTMLTemplateElement>(
+      getDomElement(null, "#tpl-input-method")
     );
 
-    // Establish connections between related input elements
-    this.fieldset.addEventListener(
-      "input",
-      this.synchronizeInputElements.bind(this)
-    );
+    const methodDom = (
+      template.content.firstElementChild as HTMLFieldSetElement
+    ).cloneNode(true) as HTMLFieldSetElement;
+    methodDom.setAttribute("id", `color-form-${method}`);
 
-    // Attach event listeners for publishing the current color.
+    // This ``<span>`` is inside of ``<legend>``
+    const caption = <HTMLSpanElement>(
+      getDomElement(methodDom, ".method-caption")
+    );
+    caption.innerHTML = methodCaption;
+
+    components.forEach((comp) => {
+      methodDom.appendChild(
+        this.setupComponent(method, comp.componentId, comp.config)
+      );
+    });
+
+    // Attach event listener for publishing the current color.
     //
     // The actual method (``publishColor()``) is executed with a (configurable)
     // delay using ``debounceInput()``.
@@ -187,7 +208,7 @@ abstract class ColorizerFormInputMethod
     // See https://typescript-eslint.io/rules/unbound-method/
     //
     /* eslint-disable @typescript-eslint/unbound-method */
-    this.fieldset.addEventListener(
+    methodDom.addEventListener(
       "input",
       (this.constructor as typeof ColorizerFormInputMethod).debounceInput(
         this,
@@ -197,10 +218,127 @@ abstract class ColorizerFormInputMethod
     );
     /* eslint-enable @typescript-eslint/unbound-method */
 
-    // Setup the tooltip
-    (this.constructor as typeof ColorizerFormInputMethod).setupTooltip(
-      this.fieldset
+    return methodDom;
+  }
+
+  /**
+   * Create the required ``<input>`` elements for a single component.
+   *
+   * @param method A string defining the *input method*. Will be applied in
+   *               several ``id`` attributes, so it **has to be** unique for
+   *               every concrete *input method* implementation.
+   * @param componentId A string defining the component. Will be applied in
+   *                    ``id`` attributes, so it **has to be** unique for the
+   *                    *input method*.
+   * @param config The config object for this component.
+   * @returns A ``<fieldset>`` element, containing the (related) ``<input>``
+   *          elements, ready for further use.
+   *
+   * The method creates/populates the required ``<input>`` elements, usually
+   * for every component there is a text-based input and a slider-based input.
+   * Both ``<input>`` elements are kept in sync.
+   */
+  private setupComponent(
+    method: TColorizerFormInputMethod,
+    componentId: string,
+    config: TColorizerFormInputMethodComponentConfig
+  ): HTMLFieldSetElement {
+    const template = <HTMLTemplateElement>(
+      getDomElement(null, "#tpl-input-method-component")
     );
+
+    const component = (
+      template.content.firstElementChild as HTMLFieldSetElement
+    ).cloneNode(true) as HTMLFieldSetElement;
+    component.classList.add(config.componentCssClass);
+
+    const caption = <HTMLLegendElement>getDomElement(component, "legend");
+    caption.innerHTML = config.componentCaption;
+
+    const sliderLabel = <HTMLLabelElement>(
+      getDomElement(component, "label[for=slider]")
+    );
+    sliderLabel.setAttribute(
+      "for",
+      `color-form-${method}-${componentId}-slider`
+    );
+    sliderLabel.innerHTML = config.sliderLabelText;
+
+    const slider = <HTMLInputElement>(
+      getDomElement(component, "input[type=range]")
+    );
+    slider.setAttribute("id", `color-form-${method}-${componentId}-slider`);
+    slider.setAttribute("min", config.sliderMin.toString());
+    slider.setAttribute("max", config.sliderMax.toString());
+    slider.setAttribute("step", config.sliderStep.toString());
+
+    const textLabel = <HTMLLabelElement>(
+      getDomElement(component, "label[for=text]")
+    );
+    textLabel.setAttribute("for", `color-form-${method}-${componentId}`);
+    textLabel.innerHTML = config.textInputLabelText;
+
+    const text = <HTMLInputElement>getDomElement(component, "input[type=text]");
+    text.setAttribute("id", `color-form-${method}-${componentId}`);
+    text.setAttribute("pattern", config.textInputPattern);
+    text.setAttribute("inputmode", config.textInputMode);
+
+    slider.addEventListener("input", (evt) => {
+      // **MUST NOT** stop event propagation because the overall method's
+      // ``publishColor()`` is attached to the overall ``<fieldset>`` element.
+      const val = Number(
+        (evt.currentTarget as HTMLInputElement).value
+      ).toString();
+      this.setComponentValue(componentId, val);
+    });
+
+    text.addEventListener("input", (evt) => {
+      // **MUST NOT** stop event propagation because the overall method's
+      // ``publishColor()`` is attached to the overall ``<fieldset>`` element.
+      const val = Number(
+        (evt.currentTarget as HTMLInputElement).value
+      ).toString();
+      this.setComponentValue(componentId, val);
+    });
+
+    this.components.set(componentId, {
+      textInput: text,
+      sliderInput: slider,
+      cssProperty: config.componentCssProperty,
+    });
+
+    return component;
+  }
+
+  /**
+   * Updates all elements related to a component.
+   *
+   * @param componentId
+   * @param value The new value, provided as string!
+   */
+  protected setComponentValue(componentId: string, value: string): void {
+    const compStore = this.components.get(componentId);
+    if (compStore === undefined) {
+      console.warn(`No component with id '${componentId}'`);
+      return;
+    }
+
+    compStore.textInput.value = value;
+    compStore.sliderInput.value = value;
+    this.updateCoordinateInStyleProperty(compStore.cssProperty, value);
+  }
+
+  /**
+   * Sets a custom CSS property on the ``fieldset`` element.
+   *
+   * @param propertyName The name of the custom CSS property.
+   * @param value The actual value.
+   */
+  protected updateCoordinateInStyleProperty(
+    propertyName: string,
+    value: string
+  ): void {
+    this._fieldset.style.setProperty(propertyName, value);
   }
 
   /**
@@ -235,83 +373,6 @@ abstract class ColorizerFormInputMethod
     }
 
     this.inputReceiver(this.getColor());
-  }
-
-  /**
-   * Provide synchronization between ``input`` elements.
-   *
-   * The implementation assumes, that the input method uses three distinct
-   * components / color coordinates, each of them represented by a (numerical)
-   * text input and a slider to adjust the value.
-   *
-   * The value is assumed to be a *number*.
-   *
-   * Internally, no sanitization or input validation is performed. The value
-   * is just applied to the corresponding element and set as a custom CSS
-   * property on the instance's ``fieldset`` element (using
-   * ``updateCoordateInStyleProperty()``).
-   */
-  private synchronizeInputElements(evt: Event): void {
-    // The ``Event``/``InputEvent`` is handled here!
-    evt.stopPropagation();
-
-    // Assuming that all inputs are based on numbers!
-    let val: string;
-
-    switch (evt.target) {
-      case this.cAText:
-        val = Number(this.cAText.value).toString();
-        this.cASlider.value = val;
-        this.updateCoordinateInStyleProperty(this.cAProperty, val);
-        break;
-      case this.cASlider:
-        val = Number(this.cASlider.value).toString();
-        this.cAText.value = val;
-        this.updateCoordinateInStyleProperty(this.cAProperty, val);
-        break;
-      case this.cBText:
-        val = Number(this.cBText.value).toString();
-        this.cBSlider.value = val;
-        this.updateCoordinateInStyleProperty(this.cBProperty, val);
-        break;
-      case this.cBSlider:
-        val = Number(this.cBSlider.value).toString();
-        this.cBText.value = val;
-        this.updateCoordinateInStyleProperty(this.cBProperty, val);
-        break;
-      case this.cCText:
-        val = Number(this.cCText.value).toString();
-        this.cCSlider.value = val;
-        this.updateCoordinateInStyleProperty(this.cCProperty, val);
-        break;
-      case this.cCSlider:
-        val = Number(this.cCSlider.value).toString();
-        this.cCText.value = val;
-        this.updateCoordinateInStyleProperty(this.cCProperty, val);
-        break;
-      default:
-        console.warn(
-          // The ``evt.target`` might be ``null``, which is marked by eslint.
-          // However, for debugging it is desired to know the actual value of
-          // ``evt.target``, even if it is ``null``.
-          //
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          `"InputEvent" originated from an unexpected element: ${evt.target}`
-        );
-    }
-  }
-
-  /**
-   * Sets a custom CSS property on the ``fieldset`` element.
-   *
-   * @param propertyName The name of the custom CSS property.
-   * @param value The actual value.
-   */
-  protected updateCoordinateInStyleProperty(
-    propertyName: string,
-    value: string
-  ): void {
-    this.fieldset.style.setProperty(propertyName, value);
   }
 
   /**
@@ -359,61 +420,6 @@ abstract class ColorizerFormInputMethod
       }, debounceTime);
     };
   }
-
-  /**
-   * Attach tooltip to a toggle button.
-   *
-   * The implementation is based on
-   * [this guide](https://inclusive-components.design/tooltips-toggletips/).
-   * It makes some **assumptions** about the general structure of the DOM,
-   * meaning this script source is **heavily tied** to the actual
-   * ``index.html`` (tight coupling).
-   *
-   * Please note: The ``<fieldset>`` is setup to be as accessible as possible
-   * on its own, this tooltip adds more context and additional information.
-   *
-   * Implementation detail: While the content of the tooltip is accessible by
-   * an ``id`` attribute, this method uses a *class-based* selector in order to
-   * limit the scope of ``getDomElement()`` / ``querySelector()`` to the
-   * children of the ``container``, which is known to the calling functions.
-   */
-  private static setupTooltip(container: HTMLFieldSetElement): void {
-    const ttButton = getDomElement(
-      container,
-      "legend > .tooltip-anchor > button"
-    );
-    const ttContent = getDomElement(container, ".tooltip-content");
-    const ttDisplay = getDomElement(
-      container,
-      "legend > .tooltip-anchor > .tooltip-display"
-    );
-
-    ttButton.addEventListener("click", () => {
-      ttDisplay.innerHTML = "";
-      window.setTimeout(() => {
-        ttDisplay.innerHTML = `<div>${ttContent.innerHTML}</div>`;
-      }, 100);
-    });
-
-    ttButton.addEventListener("keydown", (evt) => {
-      const keyboardEvent = <KeyboardEvent>evt;
-      if ((keyboardEvent.keyCode || keyboardEvent.which) === 27) {
-        ttDisplay.innerHTML = "";
-      }
-    });
-
-    document.addEventListener("click", (evt) => {
-      if (evt.target !== ttButton) {
-        ttDisplay.innerHTML = "";
-      }
-    });
-
-    // Setup is completed, now remove ``ttContent`` from the (visual) DOM.
-    //
-    // TODO: [#22] Is this the correct way? Or should it be *removed* from the
-    //       DOM by using ``visibility: hidden``?
-    ttContent.classList.add("hide-visually");
-  }
 }
 
 /**
@@ -434,20 +440,58 @@ class ColorizerFormInputRgb
     receiver: TColorizerFormReceiverCallback,
     inputDebounceDelay?: number
   ) {
-    // cA = red component
-    // cB = green component
-    // cC = blue component
-    super(
-      "#color-form-rgb",
-      ".component-red",
-      "--this-red",
-      ".component-green",
-      "--this-green",
-      ".component-blue",
-      "--this-blue",
-      receiver,
-      inputDebounceDelay
-    );
+    super(receiver, inputDebounceDelay);
+
+    this._fieldset = this.setupDomElements("rgb", "RGB input", [
+      {
+        componentId: "r",
+        config: {
+          componentCaption: "Red Component",
+          componentCssClass: "rgb-r",
+          componentCssProperty: "--rgb-r",
+          textInputPattern: "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for red component in range 0 to 255",
+          sliderMin: 0,
+          sliderMax: 255,
+          sliderStep: 1,
+          sliderLabelText: "Slider to adjust the red component",
+        },
+      },
+      {
+        componentId: "g",
+        config: {
+          componentCaption: "Green Component",
+          componentCssClass: "rgb-g",
+          componentCssProperty: "--rgb-g",
+          textInputPattern: "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for green component in range 0 to 255",
+          sliderMin: 0,
+          sliderMax: 255,
+          sliderStep: 1,
+          sliderLabelText: "Slider to adjust the green component",
+        },
+      },
+      {
+        componentId: "b",
+        config: {
+          componentCaption: "Blue Component",
+          componentCssClass: "rgb-b",
+          componentCssProperty: "--rgb-b",
+          textInputPattern: "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for blue component in range 0 to 255",
+          sliderMin: 0,
+          sliderMax: 255,
+          sliderStep: 1,
+          sliderLabelText: "Slider to adjust the blue component",
+        },
+      },
+    ]);
   }
 
   /**
@@ -463,10 +507,18 @@ class ColorizerFormInputRgb
    * ``ColorizerColor.fromRgb255()``.
    */
   public getColor(): ColorizerColor {
+    const r = this.components.get("r");
+    const g = this.components.get("g");
+    const b = this.components.get("b");
+
+    if (r === undefined || g === undefined || b === undefined) {
+      throw new Error("A required component is 'undefined'");
+    }
+
     return ColorizerColor.fromRgb255(
-      Number(this.cAText.value),
-      Number(this.cBText.value),
-      Number(this.cCText.value)
+      Number(r.textInput.value),
+      Number(g.textInput.value),
+      Number(b.textInput.value)
     );
   }
 
@@ -479,95 +531,13 @@ class ColorizerFormInputRgb
     const color255 = color.toRgb255();
 
     let tmp = color255.r.toString();
-    this.cAText.value = tmp;
-    this.cASlider.value = tmp;
-    this.updateCoordinateInStyleProperty(this.cAProperty, tmp);
+    this.setComponentValue("r", tmp);
 
     tmp = color255.g.toString();
-    this.cBText.value = tmp;
-    this.cBSlider.value = tmp;
-    this.updateCoordinateInStyleProperty(this.cBProperty, tmp);
+    this.setComponentValue("g", tmp);
 
     tmp = color255.b.toString();
-    this.cCText.value = tmp;
-    this.cCSlider.value = tmp;
-    this.updateCoordinateInStyleProperty(this.cCProperty, tmp);
-  }
-}
-
-/**
- * Represent Oklch color input.
- *
- * @param receiver A callback function that is called whenever the input
- *                 method's current color changes.
- * @param inputDebounceDelay The delay to be applied to the method's input
- *                           event handlers, given in **ms** and passed to
- *                           ``setTimeout()``. **Optional**, will get a default
- *                           value of ``500`` in ``ColorizerFormInputMethod``.
- */
-class ColorizerFormInputOklch
-  extends ColorizerFormInputMethod
-  implements IColorizerFormInputMethod
-{
-  constructor(
-    receiver: TColorizerFormReceiverCallback,
-    inputDebounceDelay?: number
-  ) {
-    // cA = lightness component
-    // cB = chroma component
-    // cC = hue component
-    super(
-      "#color-form-oklch",
-      ".component-lightness",
-      "--this-lightness",
-      ".component-chroma",
-      "--this-chroma",
-      ".component-hue",
-      "--this-hue",
-      receiver,
-      inputDebounceDelay
-    );
-  }
-
-  /**
-   * Return the current color.
-   *
-   * This method creates an instance of ``ColorizerColor``, using the values
-   * of the ``<input type="text" ...>`` elements (which are synchronized with
-   * the corresponding sliders!).
-   *
-   * The values of the ``<input type="text" ...>`` elements are converted to
-   * actual numbers by calling ``Number()`` on them. Forcing  them into the
-   * required ranges (e.g. into range [0..1]) is done in
-   * ``ColorizerColor.fromOklch()``.
-   */
-  public getColor(): ColorizerColor {
-    return ColorizerColor.fromOklch(
-      Number(this.cAText.value) / 100,
-      (Number(this.cBText.value) / 100) * 0.4,
-      Number(this.cCText.value)
-    );
-  }
-
-  /**
-   * Set the color of this input method.
-   *
-   * @param color An instance of ``ColorizerColor``.
-   */
-  public setColor(color: ColorizerColor): void {
-    const colorOklch = color.toOklchString();
-
-    this.cAText.value = colorOklch.l;
-    this.cASlider.value = colorOklch.l;
-    this.updateCoordinateInStyleProperty(this.cAProperty, colorOklch.l);
-
-    this.cBText.value = colorOklch.c;
-    this.cBSlider.value = colorOklch.c;
-    this.updateCoordinateInStyleProperty(this.cBProperty, colorOklch.c);
-
-    this.cCText.value = colorOklch.h;
-    this.cCSlider.value = colorOklch.h;
-    this.updateCoordinateInStyleProperty(this.cCProperty, colorOklch.h);
+    this.setComponentValue("b", tmp);
   }
 }
 
@@ -589,20 +559,59 @@ class ColorizerFormInputHsl
     receiver: TColorizerFormReceiverCallback,
     inputDebounceDelay?: number
   ) {
-    // cA = hue component
-    // cB = saturation component
-    // cC = light component
-    super(
-      "#color-form-hsl",
-      ".component-hue",
-      "--this-hue",
-      ".component-saturation",
-      "--this-saturation",
-      ".component-light",
-      "--this-light",
-      receiver,
-      inputDebounceDelay
-    );
+    super(receiver, inputDebounceDelay);
+
+    this._fieldset = this.setupDomElements("hsl", "HSL input", [
+      {
+        componentId: "h",
+        config: {
+          componentCaption: "Hue Component",
+          componentCssClass: "hsl-h",
+          componentCssProperty: "--hsl-h",
+          textInputPattern:
+            "^(NaN|360|((3[0-5][0-9]|[12][0-9]{2}|([1-9]?[0-9]{1}))(.[0-9]+)?))$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for hue component in range 0 to 360",
+          sliderMin: 0,
+          sliderMax: 360,
+          sliderStep: 1,
+          sliderLabelText: "Slider to adjust the hue component",
+        },
+      },
+      {
+        componentId: "s",
+        config: {
+          componentCaption: "Saturation Component",
+          componentCssClass: "hsl-s",
+          componentCssProperty: "--hsl-s",
+          textInputPattern: "^(100|[1-9]?[0-9](.[0-9]+)?)$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for saturation component in range 0% to 100%",
+          sliderMin: 0,
+          sliderMax: 100,
+          sliderStep: 0.01,
+          sliderLabelText: "Slider to adjust the saturation component",
+        },
+      },
+      {
+        componentId: "l",
+        config: {
+          componentCaption: "Lightness Component",
+          componentCssClass: "hsl-l",
+          componentCssProperty: "--hsl-l",
+          textInputPattern: "^(100|[1-9]?[0-9](.[0-9]+)?)$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for lightness component in range 0% to 100%",
+          sliderMin: 0,
+          sliderMax: 100,
+          sliderStep: 0.01,
+          sliderLabelText: "Slider to adjust the lightness component",
+        },
+      },
+    ]);
   }
 
   /**
@@ -618,10 +627,18 @@ class ColorizerFormInputHsl
    * ``ColorizerColor.fromHsl()``.
    */
   public getColor(): ColorizerColor {
+    const h = this.components.get("h");
+    const s = this.components.get("s");
+    const l = this.components.get("l");
+
+    if (h === undefined || s === undefined || l === undefined) {
+      throw new Error("A required component is 'undefined'");
+    }
+
     return ColorizerColor.fromHsl(
-      Number(this.cAText.value),
-      Number(this.cBText.value) / 100,
-      Number(this.cCText.value) / 100
+      Number(h.textInput.value),
+      Number(s.textInput.value) / 100,
+      Number(l.textInput.value) / 100
     );
   }
 
@@ -633,17 +650,9 @@ class ColorizerFormInputHsl
   public setColor(color: ColorizerColor): void {
     const colorHsl = color.toHslString();
 
-    this.cAText.value = colorHsl.h;
-    this.cASlider.value = colorHsl.h;
-    this.updateCoordinateInStyleProperty(this.cAProperty, colorHsl.h);
-
-    this.cBText.value = colorHsl.s;
-    this.cBSlider.value = colorHsl.s;
-    this.updateCoordinateInStyleProperty(this.cBProperty, colorHsl.s);
-
-    this.cCText.value = colorHsl.l;
-    this.cCSlider.value = colorHsl.l;
-    this.updateCoordinateInStyleProperty(this.cCProperty, colorHsl.l);
+    this.setComponentValue("h", colorHsl.h);
+    this.setComponentValue("s", colorHsl.s);
+    this.setComponentValue("l", colorHsl.l);
   }
 }
 
@@ -665,20 +674,59 @@ class ColorizerFormInputHwb
     receiver: TColorizerFormReceiverCallback,
     inputDebounceDelay?: number
   ) {
-    // cA = hue component
-    // cB = white component
-    // cC = black component
-    super(
-      "#color-form-hwb",
-      ".component-hue",
-      "--this-hue",
-      ".component-white",
-      "--this-white",
-      ".component-black",
-      "--this-black",
-      receiver,
-      inputDebounceDelay
-    );
+    super(receiver, inputDebounceDelay);
+
+    this._fieldset = this.setupDomElements("hwb", "HWB input", [
+      {
+        componentId: "h",
+        config: {
+          componentCaption: "Hue Component",
+          componentCssClass: "hwb-h",
+          componentCssProperty: "--hwb-h",
+          textInputPattern:
+            "^(NaN|360|((3[0-5][0-9]|[12][0-9]{2}|([1-9]?[0-9]{1}))(.[0-9]+)?))$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for hue component in range 0 to 360",
+          sliderMin: 0,
+          sliderMax: 360,
+          sliderStep: 1,
+          sliderLabelText: "Slider to adjust the hue component",
+        },
+      },
+      {
+        componentId: "w",
+        config: {
+          componentCaption: "Whiteness Component",
+          componentCssClass: "hwb-w",
+          componentCssProperty: "--hwb-w",
+          textInputPattern: "^(100|[1-9]?[0-9](.[0-9]+)?)$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for whiteness component in range 0% to 100%",
+          sliderMin: 0,
+          sliderMax: 100,
+          sliderStep: 0.01,
+          sliderLabelText: "Slider to adjust the whiteness component",
+        },
+      },
+      {
+        componentId: "b",
+        config: {
+          componentCaption: "Blackness Component",
+          componentCssClass: "hwb-b",
+          componentCssProperty: "--hwb-b",
+          textInputPattern: "^(100|[1-9]?[0-9](.[0-9]+)?)$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for blackness component in range 0% to 100%",
+          sliderMin: 0,
+          sliderMax: 100,
+          sliderStep: 0.01,
+          sliderLabelText: "Slider to adjust the blackness component",
+        },
+      },
+    ]);
   }
 
   /**
@@ -694,10 +742,18 @@ class ColorizerFormInputHwb
    * ``ColorizerColor.fromHwb()``.
    */
   public getColor(): ColorizerColor {
+    const h = this.components.get("h");
+    const w = this.components.get("w");
+    const b = this.components.get("b");
+
+    if (h === undefined || w === undefined || b === undefined) {
+      throw new Error("A required component is 'undefined'");
+    }
+
     return ColorizerColor.fromHwb(
-      Number(this.cAText.value),
-      Number(this.cBText.value) / 100,
-      Number(this.cCText.value) / 100
+      Number(h.textInput.value),
+      Number(w.textInput.value) / 100,
+      Number(b.textInput.value) / 100
     );
   }
 
@@ -709,16 +765,123 @@ class ColorizerFormInputHwb
   public setColor(color: ColorizerColor): void {
     const colorHwb = color.toHwbString();
 
-    this.cAText.value = colorHwb.h;
-    this.cASlider.value = colorHwb.h;
-    this.updateCoordinateInStyleProperty(this.cAProperty, colorHwb.h);
+    this.setComponentValue("h", colorHwb.h);
+    this.setComponentValue("w", colorHwb.w);
+    this.setComponentValue("b", colorHwb.b);
+  }
+}
 
-    this.cBText.value = colorHwb.w;
-    this.cBSlider.value = colorHwb.w;
-    this.updateCoordinateInStyleProperty(this.cBProperty, colorHwb.w);
+/**
+ * Represent Oklch color input.
+ *
+ * @param receiver A callback function that is called whenever the input
+ *                 method's current color changes.
+ * @param inputDebounceDelay The delay to be applied to the method's input
+ *                           event handlers, given in **ms** and passed to
+ *                           ``setTimeout()``. **Optional**, will get a default
+ *                           value of ``500`` in ``ColorizerFormInputMethod``.
+ */
+class ColorizerFormInputOklch
+  extends ColorizerFormInputMethod
+  implements IColorizerFormInputMethod
+{
+  constructor(
+    receiver: TColorizerFormReceiverCallback,
+    inputDebounceDelay?: number
+  ) {
+    super(receiver, inputDebounceDelay);
 
-    this.cCText.value = colorHwb.b;
-    this.cCSlider.value = colorHwb.b;
-    this.updateCoordinateInStyleProperty(this.cCProperty, colorHwb.b);
+    this._fieldset = this.setupDomElements("oklch", "OkLCH input", [
+      {
+        componentId: "l",
+        config: {
+          componentCaption: "Lightness Component",
+          componentCssClass: "oklch-l",
+          componentCssProperty: "--oklch-l",
+          textInputPattern: "^(100|[1-9]?[0-9](.[0-9]+)?)$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for lightness component in range 0% to 100%",
+          sliderMin: 0,
+          sliderMax: 100,
+          sliderStep: 0.01,
+          sliderLabelText: "Slider to adjust the lightness component",
+        },
+      },
+      {
+        componentId: "c",
+        config: {
+          componentCaption: "Chroma Component",
+          componentCssClass: "oklch-c",
+          componentCssProperty: "--oklch-c",
+          textInputPattern: "^(100|[1-9]?[0-9](.[0-9]+)?)$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for chroma component in range 0% to 100%",
+          sliderMin: 0,
+          sliderMax: 100,
+          sliderStep: 0.01,
+          sliderLabelText: "Slider to adjust the chroma component",
+        },
+      },
+      {
+        componentId: "h",
+        config: {
+          componentCaption: "Hue Component",
+          componentCssClass: "oklch-h",
+          componentCssProperty: "--oklch-h",
+          textInputPattern:
+            "^(360|((3[0-5][0-9]|[12][0-9]{2}|([1-9]?[0-9]{1}))(.[0-9]+)?))$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for hue component in range 0 to 360",
+          sliderMin: 0,
+          sliderMax: 360,
+          sliderStep: 1,
+          sliderLabelText: "Slider to adjust the hue component",
+        },
+      },
+    ]);
+  }
+
+  /**
+   * Return the current color.
+   *
+   * This method creates an instance of ``ColorizerColor``, using the values
+   * of the ``<input type="text" ...>`` elements (which are synchronized with
+   * the corresponding sliders!).
+   *
+   * The values of the ``<input type="text" ...>`` elements are converted to
+   * actual numbers by calling ``Number()`` on them. Forcing  them into the
+   * required ranges (e.g. into range [0..1]) is done in
+   * ``ColorizerColor.fromOklch()``.
+   */
+  public getColor(): ColorizerColor {
+    const l = this.components.get("l");
+    const c = this.components.get("c");
+    const h = this.components.get("h");
+
+    if (l === undefined || c === undefined || h === undefined) {
+      throw new Error("A required component is 'undefined'");
+    }
+
+    return ColorizerColor.fromOklch(
+      Number(l.textInput.value) / 100,
+      (Number(c.textInput.value) / 100) * 0.4,
+      Number(h.textInput.value)
+    );
+  }
+
+  /**
+   * Set the color of this input method.
+   *
+   * @param color An instance of ``ColorizerColor``.
+   */
+  public setColor(color: ColorizerColor): void {
+    const colorOklch = color.toOklchString();
+
+    this.setComponentValue("l", colorOklch.l);
+    this.setComponentValue("c", colorOklch.c);
+    this.setComponentValue("h", colorOklch.h);
   }
 }
