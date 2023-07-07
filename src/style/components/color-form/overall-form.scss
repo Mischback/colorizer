@@ -1,0 +1,39 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+#color-form {
+  margin: 0;
+  padding: 0;
+
+  // display: flex;
+  // flex-flow: row wrap;
+  // gap: 1em;
+}
+
+.color-form-input-method {
+  @include content-box-shadow;
+
+  position: relative;
+  margin: 1.5em 0 0;
+  padding: 1em 0 0;
+  border: 0 solid transparent;
+  border-radius: $border-radius-fraction * 2;
+  background: $color-content-bg-alt;
+
+  > legend {
+    @include content-box-shadow;
+
+    position: absolute;
+    top: -1em;
+    right: 1em;
+    padding: 0.25em 0.5em;
+    border-radius: $border-radius-fraction;
+    background: $color-content-bg-dim;
+    color: $color-content-bg;
+
+    > .method-caption {
+      font-weight: bold;
+    }
+  }
+}
