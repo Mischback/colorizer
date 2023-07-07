@@ -61,6 +61,10 @@
     border: 0 solid transparent;
     background: transparent;
 
+    &:focus {
+      outline-offset: 5px;
+    }
+
     &::-webkit-slider-runnable-track {
       @include input-method-range-track;
     }
