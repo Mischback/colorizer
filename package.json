@@ -36,6 +36,7 @@
     "lint-staged": "^13.2.0",
     "postcss": "^8.4.24",
     "postcss-cli": "^10.1.0",
+    "postcss-reporter": "^7.0.5",
     "posthtml": "^0.16.6",
     "posthtml-cli": "^0.7.7",
     "posthtml-hash": "^1.2.2",
