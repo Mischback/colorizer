@@ -83,27 +83,6 @@ export function getColorizerFormInput(
 /**
  * Base class for alle input methods.
  *
- * @param fieldsetId The ``id`` attribute of the method's parent
- *                   ``<fieldset ...>`` element, used to get the DOM element
- *                   using ``querySelector()``.
- * @param cASelector The selector for the *A component*. It will be searched
- *                   as a sibling of the ``<fieldset ...>`` element and used to
- *                   identify the component's text input and range input.
- * @param cAProperty The name of a CSS custom property that will be set on the
- *                   ``<fieldset ...>`` element to trach the *A component's*
- *                   current value.
- * @param cBSelector The selector for the *B component*. It will be searched
- *                   as a sibling of the ``<fieldset ...>`` element and used to
- *                   identify the component's text input and range input.
- * @param cBProperty The name of a CSS custom property that will be set on the
- *                   ``<fieldset ...>`` element to trach the *B component's*
- *                   current value.
- * @param cCSelector The selector for the *C component*. It will be searched
- *                   as a sibling of the ``<fieldset ...>`` element and used to
- *                   identify the component's text input and range input.
- * @param cCProperty The name of a CSS custom property that will be set on the
- *                   ``<fieldset ...>`` element to trach the *C component's*
- *                   current value.
  * @param receiver A callback function that is called whenever the input
  *                 method's current color changes.
  * @param inputDebounceDelay The delay to be applied to the method's input
@@ -130,15 +109,6 @@ abstract class ColorizerFormInputMethod
   private fieldset: HTMLFieldSetElement;
   private inputReceiver: TColorizerFormReceiverCallback;
   private inputDebounceDelay: number;
-  protected cAText: HTMLInputElement;
-  protected cASlider: HTMLInputElement;
-  protected cAProperty: string;
-  protected cBText: HTMLInputElement;
-  protected cBSlider: HTMLInputElement;
-  protected cBProperty: string;
-  protected cCText: HTMLInputElement;
-  protected cCSlider: HTMLInputElement;
-  protected cCProperty: string;
   protected components = new Map<
     string,
     TColorizerFormInputMethodComponentStore
@@ -148,45 +118,33 @@ abstract class ColorizerFormInputMethod
   public abstract setColor(color: ColorizerColor): void;
 
   constructor(
-    fieldsetId: string,
-    cASelector: string,
-    cAProperty: string,
-    cBSelector: string,
-    cBProperty: string,
-    cCSelector: string,
-    cCProperty: string,
     receiver: TColorizerFormReceiverCallback,
     inputDebounceDelay = 500
   ) {
     // Store elemental values in the instance
-    this.cAProperty = cAProperty;
-    this.cBProperty = cBProperty;
-    this.cCProperty = cCProperty;
     this.inputReceiver = receiver;
     this.inputDebounceDelay = inputDebounceDelay;
 
-    // Get DOM elements
-    this.fieldset = <HTMLFieldSetElement>getDomElement(null, fieldsetId);
-    this.cAText = <HTMLInputElement>(
-      getDomElement(this.fieldset, `${cASelector} > input[type=text]`)
-    );
-    this.cASlider = <HTMLInputElement>(
-      getDomElement(this.fieldset, `${cASelector} > input[type=range]`)
-    );
-    this.cBText = <HTMLInputElement>(
-      getDomElement(this.fieldset, `${cBSelector} > input[type=text]`)
-    );
-    this.cBSlider = <HTMLInputElement>(
-      getDomElement(this.fieldset, `${cBSelector} > input[type=range]`)
-    );
-    this.cCText = <HTMLInputElement>(
-      getDomElement(this.fieldset, `${cCSelector} > input[type=text]`)
-    );
-    this.cCSlider = <HTMLInputElement>(
-      getDomElement(this.fieldset, `${cCSelector} > input[type=range]`)
-    );
+    this.fieldset = this.setupDomElements("foo", "bar", [
+      {
+        componentId: "r",
+        config: {
+          componentCaption: "Red Component",
+          componentCssClass: "rgb-r",
+          componentCssProperty: "--rgb-r",
+          textInputPattern: "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$",
+          textInputMode: "numeric",
+          textInputLabelText:
+            "Decimal input for red component in range 0 to 255",
+          sliderMin: 0,
+          sliderMax: 255,
+          sliderStep: 1,
+          sliderLabelText: "Slider to adjust the red component",
+        },
+      },
+    ]);
 
-    // Attach event listeners for publishing the current color.
+    // Attach event listener for publishing the current color.
     //
     // The actual method (``publishColor()``) is executed with a (configurable)
     // delay using ``debounceInput()``.
@@ -207,25 +165,6 @@ abstract class ColorizerFormInputMethod
       )
     );
     /* eslint-enable @typescript-eslint/unbound-method */
-
-    this.setupDomElements("foo", "bar", [
-      {
-        componentId: "r",
-        config: {
-          componentCaption: "Red Component",
-          componentCssClass: "rgb-r",
-          componentCssProperty: "--rgb-r",
-          textInputPattern: "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$",
-          textInputMode: "numeric",
-          textInputLabelText:
-            "Decimal input for red component in range 0 to 255",
-          sliderMin: 0,
-          sliderMax: 255,
-          sliderStep: 1,
-          sliderLabelText: "Slider to adjust the red component",
-        },
-      },
-    ]);
   }
 
   private setupComponent(
@@ -313,7 +252,7 @@ abstract class ColorizerFormInputMethod
       componentId: string;
       config: TColorizerFormInputMethodComponentConfig;
     }[]
-  ): void {
+  ): HTMLFieldSetElement {
     // Setup the input method **overall template**
     const template = <HTMLTemplateElement>(
       getDomElement(null, "#tpl-input-method")
@@ -336,7 +275,8 @@ abstract class ColorizerFormInputMethod
     });
 
     console.debug(methodDom);
-    // this.fieldset = methodDom;
+
+    return methodDom;
   }
 
   /**
@@ -471,20 +411,7 @@ class ColorizerFormInputRgb
     receiver: TColorizerFormReceiverCallback,
     inputDebounceDelay?: number
   ) {
-    // cA = red component
-    // cB = green component
-    // cC = blue component
-    super(
-      "#color-form-rgb",
-      ".component-red",
-      "--this-red",
-      ".component-green",
-      "--this-green",
-      ".component-blue",
-      "--this-blue",
-      receiver,
-      inputDebounceDelay
-    );
+    super(receiver, inputDebounceDelay);
   }
 
   /**
