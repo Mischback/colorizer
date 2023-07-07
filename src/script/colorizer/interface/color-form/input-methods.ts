@@ -13,7 +13,7 @@ import type {
 /**
  * Dedicated typing for the available input methods.
  */
-export type TColorizerFormInputMethod = Omit<TColorizerColorNotation, "xyz">;
+export type TColorizerFormInputMethod = Exclude<TColorizerColorNotation, "xyz">;
 
 /**
  * The generic prototype of a function that acts a a callback / event handler
@@ -161,7 +161,7 @@ abstract class ColorizerFormInputMethod
    * child classes rather than from this class!
    */
   protected setupDomElements(
-    method: string,
+    method: TColorizerFormInputMethod,
     methodCaption: string,
     components: {
       componentId: string;
@@ -233,7 +233,7 @@ abstract class ColorizerFormInputMethod
    * Both ``<input>`` elements are kept in sync.
    */
   private setupComponent(
-    method: string,
+    method: TColorizerFormInputMethod,
     componentId: string,
     config: TColorizerFormInputMethodComponentConfig
   ): HTMLFieldSetElement {
