@@ -3,12 +3,15 @@
 // SPDX-FileType: SOURCE
 
 #color-form {
+  display: flex;
+  flex-flow: row wrap;
   margin: 0;
   padding: 0;
+  gap: 1em;
 
-  // display: flex;
-  // flex-flow: row wrap;
-  // gap: 1em;
+  > button {
+    flex-basis: 100%;
+  }
 }
 
 .color-form-input-method {
@@ -41,9 +44,12 @@
     // This is a <fieldset> element!
     display: flex;
     position: relative;
+    flex-flow: row nowrap;
+    align-items: center;
     margin: 0 0 1.5em;
     padding: 0.75em 0 0;
     border: 0 solid transparent;
+    gap: 1em;
 
     &:last-child {
       margin-bottom: 0;
