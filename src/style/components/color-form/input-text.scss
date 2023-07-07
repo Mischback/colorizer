@@ -32,3 +32,35 @@
     }
   }
 }
+
+#color-form-rgb {
+  input[type="text"] {
+    /* purgecss ignore current */
+
+    // FIXME: ``3.5em`` is working on:
+    //          - Linux / Firefox
+    //          - Linux / Chromium
+    width: 3.5em;
+  }
+}
+
+#color-form-hsl {
+  input[type="text"] {
+    /* purgecss ignore current */
+    width: 5em;
+  }
+}
+
+#color-form-hwb {
+  input[type="text"] {
+    /* purgecss ignore current */
+    width: 5em;
+  }
+}
+
+#color-form-oklch {
+  input[type="text"] {
+    /* purgecss ignore current */
+    width: 5em;
+  }
+}
