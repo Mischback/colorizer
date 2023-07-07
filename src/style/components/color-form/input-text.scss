@@ -11,9 +11,24 @@
   }
 
   input[type="text"] {
-    height: $color-form-input-height;
-    padding: $color-form-input-vertical-padding 0.5em;
+    @include content-box-shadow;
+
+    padding: 0.25em 0.5em;
+    border: 0 solid transparent;
     border-radius: $border-radius-fraction;
-    box-shadow: $color-preview-inner-shadow, $element-shadow-as-outline;
+    background: $color-content-bg-alt;
+    color: $color-content-fg;
+
+    &:focus {
+      outline: $color-focus-on-light-bg solid 2px;
+      outline-offset: 3px;
+      background: $color-content-bg-dim;
+      color: $color-content-button-fg;
+    }
+
+    &:hover {
+      background: $color-content-bg-dim;
+      color: $color-content-button-fg;
+    }
   }
 }
