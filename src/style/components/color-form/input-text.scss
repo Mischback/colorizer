@@ -5,15 +5,15 @@
 .color-form-input-method {
   input {
     display: inline-block;
-    height: $color-form-input-height;
     margin: 0;
-    padding: $color-form-input-vertical-padding 0.5em;
     font-family: $font-stack-monospace;
     font-size: $color-form-input-text-size;
   }
 
   input[type="text"] {
-    border-radius: 5px;
+    height: $color-form-input-height;
+    padding: $color-form-input-vertical-padding 0.5em;
+    border-radius: $border-radius-fraction;
     box-shadow: $color-preview-inner-shadow, $element-shadow-as-outline;
   }
 }

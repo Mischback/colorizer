@@ -18,11 +18,10 @@
   height: $color-form-input-range-track-height;
   border-radius: 5em;
 
-  // FIXME: [#32] Build an overall colorscheme
-  //        The track's ``background`` is actually styled in the input method's
-  //        specific block, visualizing the component's impact on the current
-  //        color.
-  background: rgb(200 200 200);
+  // Note: The track's ``background`` is actually styled in the input method's
+  //       specific block, visualizing the component's impact on the current
+  //       color.
+  background: $color-unstyled;
   box-shadow: $color-preview-inner-shadow, $element-shadow-as-outline;
 }
 
@@ -39,10 +38,9 @@
   height: $color-form-input-range-thumb-size;
   border-radius: 999px;
 
-  // FIXME: [#32] Build an overall colorscheme
-  //        The thumb's ``background`` is actually styled in the input method's
-  //        specific block, visualizing the current color.
-  background: rgb(255 0 255);
+  // Note: The thumb's ``background`` is actually styled in the input method's
+  //       specific block, visualizing the current color.
+  background: $color-unstyled;
   box-shadow: $color-preview-inner-shadow, $element-shadow-as-outline;
   cursor: pointer;
 }
@@ -57,8 +55,8 @@
 .color-form-input-method {
   input[type="range"] {
     appearance: none;
-    width: 10em;
-    border: 0 solid transparent;
+    width: $color-form-input-range-width;
+    border: 1px solid $color-unstyled; // FIXME: just for dev! set to 0 solid transparent
     background: transparent;
 
     &::-webkit-slider-runnable-track {
@@ -107,13 +105,6 @@
  */
 #color-form-rgb {
   > fieldset {
-    > input[type="text"] {
-      // TODO: Works on Ubuntu with Firefox and Chromium. Dependent on the
-      //       font-stack for monospace fonts.
-      //       Required width: Three digits (``ddd``).
-      width: 4em;
-    }
-
     > input[type="range"] {
       &::-webkit-slider-thumb {
         background: rgb(var(--this-red) var(--this-green) var(--this-blue));
@@ -195,13 +186,6 @@
 /* stylelint-disable no-descending-specificity */
 #color-form-oklch {
   > fieldset {
-    > input[type="text"] {
-      // TODO: Works on Ubuntu with Firefox and Chromium. Dependent on the
-      //       font-stack for monospace fonts.
-      //       Required width: three digits with two decimal places (``ddd.dd``).
-      width: 5em;
-    }
-
     > input[type="range"] {
       &::-webkit-slider-thumb {
         /* prettier-ignore */
@@ -346,13 +330,6 @@
 /* stylelint-disable no-descending-specificity */
 #color-form-hsl {
   > fieldset {
-    > input[type="text"] {
-      // TODO: Works on Ubuntu with Firefox and Chromium. Dependent on the
-      //       font-stack for monospace fonts.
-      //       Required width: three digits with two decimal places (``ddd.dd``).
-      width: 5em;
-    }
-
     > input[type="range"] {
       &::-webkit-slider-thumb {
         /* prettier-ignore */
@@ -462,13 +439,6 @@
 /* stylelint-disable no-descending-specificity */
 #color-form-hwb {
   > fieldset {
-    > input[type="text"] {
-      // TODO: Works on Ubuntu with Firefox and Chromium. Dependent on the
-      //       font-stack for monospace fonts.
-      //       Required width: three digits with two decimal places (``ddd.dd``).
-      width: 5em;
-    }
-
     > input[type="range"] {
       &::-webkit-slider-thumb {
         /* prettier-ignore */
