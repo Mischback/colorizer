@@ -17,6 +17,7 @@
     border: 0 solid transparent;
     background: transparent;
     color: $color-content-fg;
+    text-align: right;
   }
 
   .text-input-wrapper {
@@ -50,30 +51,66 @@
   input[type="text"] {
     /* purgecss ignore current */
 
-    // FIXME: ``3.5em`` is working on:
+    // FIXME: ``3em`` is working on:
     //          - Linux / Firefox
     //          - Linux / Chromium
-    width: 3.5em;
+    width: 3em;
   }
 }
 
 #color-form-hsl {
   input[type="text"] {
     /* purgecss ignore current */
-    width: 5em;
+    width: 4em;
+  }
+
+  .hsl-s,
+  .hsl-l {
+    .text-input-wrapper {
+      &::after {
+        /* purgecss ignore current */
+        content: "%";
+        font-family: $font-stack-monospace;
+        font-size: $color-form-input-text-size;
+      }
+    }
   }
 }
 
 #color-form-hwb {
   input[type="text"] {
     /* purgecss ignore current */
-    width: 5em;
+    width: 4em;
+  }
+
+  .hwb-w,
+  .hwb-b {
+    .text-input-wrapper {
+      &::after {
+        /* purgecss ignore current */
+        content: "%";
+        font-family: $font-stack-monospace;
+        font-size: $color-form-input-text-size;
+      }
+    }
   }
 }
 
 #color-form-oklch {
   input[type="text"] {
     /* purgecss ignore current */
-    width: 5em;
+    width: 4em;
+  }
+
+  .oklch-l,
+  .oklch-c {
+    .text-input-wrapper {
+      &::after {
+        /* purgecss ignore current */
+        content: "%";
+        font-family: $font-stack-monospace;
+        font-size: $color-form-input-text-size;
+      }
+    }
   }
 }
