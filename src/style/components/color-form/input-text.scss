@@ -7,27 +7,41 @@
     display: inline-block;
     margin: 0;
     border-radius: $border-radius-fraction;
+    outline: none;
     font-family: $font-stack-monospace;
     font-size: $color-form-input-text-size;
-
-    &:focus {
-      outline: $color-focus-on-light-bg solid 2px;
-      outline-offset: 3px;
-    }
   }
 
   input[type="text"] {
+    padding: 0;
+    border: 0 solid transparent;
+    background: transparent;
+    color: $color-content-fg;
+  }
+
+  .text-input-wrapper {
     @include content-box-shadow;
 
     padding: 0.25em 0.5em;
-    border: 0 solid transparent;
+    border-radius: $border-radius-fraction;
     background: $color-content-bg-alt;
-    color: $color-content-fg;
 
-    &:hover,
-    &:focus {
+    &:hover {
       background: $color-content-bg-dim;
-      color: $color-content-button-fg;
+
+      > input[type="text"] {
+        color: $color-content-button-fg;
+      }
+    }
+
+    &:focus-within {
+      outline: $color-focus-on-light-bg solid 2px;
+      outline-offset: 3px;
+      background: $color-content-bg-dim;
+
+      > input[type="text"] {
+        color: $color-content-button-fg;
+      }
     }
   }
 }
