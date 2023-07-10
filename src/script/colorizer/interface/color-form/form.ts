@@ -47,6 +47,7 @@ export type TColorizerFormSubmitCallback = (color: ColorizerColor) => void;
  * implementation (implementing ``IColorizerColorObservable``).
  */
 export class ColorizerForm implements IColorizerColorObservable {
+  private formContainer: HTMLElement;
   private form: HTMLFormElement;
 
   // Initialization of color **is done** in the ``constructor()`` by calling
@@ -83,6 +84,9 @@ export class ColorizerForm implements IColorizerColorObservable {
     this.submitCallback = submitCallback;
 
     // Get DOM elements
+    this.formContainer = <HTMLElement>(
+      getDomElement(null, "#panel-root-color-form")
+    );
     this.form = <HTMLFormElement>getDomElement(null, "#color-form");
 
     // Setup the available input methods and keep track of them
@@ -97,6 +101,11 @@ export class ColorizerForm implements IColorizerColorObservable {
 
     // Attach the event handler for submitting the ``<form ...>``
     this.form.addEventListener("submit", this.submit.bind(this));
+    this.form.addEventListener("reset", (evt) => {
+      evt.preventDefault();
+
+      this.receiveColor(ColorizerColor.fromRgb(0, 0, 0));
+    });
   }
 
   /**

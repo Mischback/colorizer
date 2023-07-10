@@ -9,8 +9,16 @@
   padding: 0;
   gap: 1em;
 
-  > button {
+  > div {
+    display: flex;
     flex-basis: 100%;
+    gap: 1em;
+
+    > {
+      button[type="submit"] {
+        flex-basis: 90%;
+      }
+    }
   }
 }
 
