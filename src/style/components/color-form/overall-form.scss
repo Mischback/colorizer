@@ -9,15 +9,18 @@
   padding: 0;
   gap: 1em;
 
+  button {
+    margin: 0.5em 0;
+    font-size: 1.25em;
+  }
+
   > div {
     display: flex;
     flex-basis: 100%;
     gap: 1em;
 
-    > {
-      button[type="submit"] {
-        flex-basis: 90%;
-      }
+    > button[type="submit"] {
+      flex-basis: 90%;
     }
   }
 }
@@ -31,6 +34,12 @@
   border: 0 solid transparent;
   border-radius: $border-radius-fraction * 2;
   background: $color-content-bg-alt;
+
+  /* This class is attached by the form's *toggle button* */
+  &.hide-notation {
+    /* purgecss ignore current */
+    display: none;
+  }
 
   > legend {
     @include content-box-shadow;

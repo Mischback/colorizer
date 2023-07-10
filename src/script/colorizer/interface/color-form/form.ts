@@ -88,12 +88,21 @@ export class ColorizerForm implements IColorizerColorObservable {
       getDomElement(null, "#panel-root-color-form")
     );
     this.form = <HTMLFormElement>getDomElement(null, "#color-form");
+    const notationsToggleContainer = <HTMLUListElement>(
+      getDomElement(this.formContainer, ".notations-toggles")
+    );
 
     // Setup the available input methods and keep track of them
     inputMethods.forEach((m) => {
       const tmpMethod = getColorizerFormInput(m, this.receiveColor.bind(this));
       this.addColorObserver(tmpMethod);
       this.form.insertBefore(tmpMethod.fieldset, this.form.lastElementChild);
+
+      const tmpButton = this.generateNotationToggle(m);
+      const tmpLi = document.createElement("li");
+      tmpLi.appendChild(tmpButton);
+
+      notationsToggleContainer.appendChild(tmpLi);
     });
 
     // Set an initial color for the form and all input methods
@@ -209,5 +218,68 @@ export class ColorizerForm implements IColorizerColorObservable {
     evt.stopPropagation();
 
     this.submitCallback(this.color);
+  }
+
+  private toggleNotationButtonEventHandler(evt: Event): void {
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    const notation = (evt.currentTarget as HTMLElement).getAttribute(
+      "colorizer-notation"
+    );
+    if (notation === null) {
+      return;
+    }
+
+    const currentStatus = (evt.currentTarget as HTMLButtonElement).getAttribute(
+      "aria-pressed"
+    );
+    if (currentStatus === null) {
+      return;
+    }
+
+    // Note: This makes a **hard assumption** about an implementation detail
+    //       of the actual input methods!
+    //       The ``id`` attribute is determined dynamically during class
+    //       initialization of the input method.
+    //
+    //       This is not really considered an issue, because the input methods
+    //       are logically linked to the overall form anyways.
+    const inputMethod = <HTMLFieldSetElement>(
+      getDomElement(this.form, `#color-form-${notation}`)
+    );
+    if (currentStatus === "false") {
+      (evt.currentTarget as HTMLButtonElement).setAttribute(
+        "aria-pressed",
+        "true"
+      );
+      inputMethod.classList.remove("hide-notation");
+    } else {
+      (evt.currentTarget as HTMLButtonElement).setAttribute(
+        "aria-pressed",
+        "false"
+      );
+      inputMethod.classList.add("hide-notation");
+    }
+  }
+
+  private generateNotationToggle(notation: string): HTMLButtonElement {
+    const template = <HTMLTemplateElement>(
+      getDomElement(null, "#tpl-toggle-button")
+    );
+
+    const toggleButton = (
+      template.content.firstElementChild as HTMLButtonElement
+    ).cloneNode(true) as HTMLButtonElement;
+    toggleButton.setAttribute("colorizer-notation", notation);
+    toggleButton.addEventListener(
+      "click",
+      this.toggleNotationButtonEventHandler.bind(this)
+    );
+
+    const label = <HTMLSpanElement>getDomElement(toggleButton, ".text-wrapper");
+    label.innerHTML = notation;
+
+    return toggleButton;
   }
 }

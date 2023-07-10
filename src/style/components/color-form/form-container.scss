@@ -2,9 +2,8 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileType: SOURCE
 
-#color-form {
-  button {
-    margin: 0.5em 0;
-    font-size: 1.25em;
+#panel-root-color-form {
+  .notations-toggles {
+    @include notation-toggles;
   }
 }
