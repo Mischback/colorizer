@@ -66,6 +66,47 @@
       <h2>Add a new Color</h2>
     </header>
     <ul class="notations-toggles"></ul>
+    <section>
+      <button id="form-description-toggle" type="button" aria-pressed="false" class="disclosure-button">
+        <span class="focus">
+          <span class="text-wrapper">Show form description</span>
+        </span>
+      </button>
+      <section>
+        <h3>Usage Guide</h3>
+        <p>This form is used to add new colors to your palette.</p>
+        <p>The <em>Input Methods</em> provide different notations for colors and might employ different <em>colorspaces</em> (see the detailled description below). Most of the notations rely on different <em>components</em>, usually mapping to coordinates in a colorspace or are translatable into coordinates.</p>
+        <p>Each <em>component</em> might be adjusted using a <em>slider</em> or a direct, text-based <em>input</em> field.</p>
+        <p><strong>Colorizer</strong> supports the following <em>notations</em> for input of colors:</p>
+        <dl>
+          <dt>RGB</dt>
+          <dd>
+            <p>The <em>RGB</em> notation is the most basic method to specify a color in <strong>sRGB</strong> colorspace.</p>
+            <p>It represents a color by specifying the <em>Red</em>, <em>Green</em>, and <em>Blue</em> components of the color with values between <code>0</code> and <code>255</code>.</p>
+          </dd>
+
+          <dt>HSL</dt>
+          <dd>
+            <p>The <em>HSL</em> notation is an alternate method to specify a color in <strong>sRGB</strong> colorspace.</p>
+            <p>The <em>Hue</em> of the color is specified in <code>degree</code> in a range between <code>0</code> and <code>360</code>. The <em>Saturation</em> and <em>Lightness</em> of the color are specified in percent between <code>0</code> and <code>100</code>.</p>
+            <p>For <em>Lightness</em> values of <code>0%</code> and <code>100%</code> the values of <em>hue</em> and <em>saturation</em> are considered <em>powerless</em>, meaning they have no effect on the actual color, which will be <code>black</code> / <code>white</code>.</p>
+            <p>Please note that the <em>Lightness</em> of the <em>HSL</em> notation is just a linear and artificial value. This means, that <code>hsl(120 100% 50%)</code> and <code>hsl(240 100% 50%)</code> share the <em>lightness</em> value of <code>50%</code>, but the <code>green</code> seems significantly brighter than the <code>blue</code>. The reason for this is, that the <strong>perceived lightness</strong> of green and blue hues is different. Other input methods (e.g. <em>OkLCH</em>) do provide the direct manipluation of <em>perceived lightness</em>.</p>
+          </dd>
+
+          <dt>HWB</dt>
+          <dd>
+            <p><em>HWB</em> is another alternate method to specify colors in <strong>sRGB</strong> colorspace.</p>
+            <p>The <em>Hue</em> of the color is specified in <code>degree</code> in a range between <code>0</code> and <code>360</code>. <em>Whiteness</em> and <em>Blackness</em> specify the amount of <code>white/black</code> mixed into the color and are specified in percent between <code>0</code> and <code>100</code>.</p>
+          </dd>
+
+          <dt>OkLCH</dt>
+          <dd>
+            <p><em>OkLCH</em> is the polar notation for the <strong>OkLAB</strong> colorspace.</p>
+            <p>The <em>Lightness</em> component is the <strong>perceived lightness</strong> of the color, specified in percent in range <code>0</code> and <code>100</code>. The <em>Chroma</em> component specifies how <em>colorful</em> the color is. <strong>Colorizer</strong> provides inputs based on percent. However, the value range is not really clipped! The <em>Hue</em> component is specified in <code>degree</code> in a range between <code>0</code> and <code>360</code> (<em>please note</em> that this <em>Hue</em> is not synchronized with <em>HSL's</em> or <em>HWB's</em> <em>hue</em> components!).</p>
+          </dd>
+        </dl>
+      </section>
+    </section>
     <form id="color-form">
       <div>
         <button type="submit" class="content-button">
