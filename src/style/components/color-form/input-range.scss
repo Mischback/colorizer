@@ -63,7 +63,7 @@ $color-form-input-range-thumb-size: 0.85 * $color-form-input-text-size;
     background: transparent;
 
     &:focus {
-      outline: $color-focus-on-light-bg solid 2px;
+      outline: $color-focus-on-light-bg solid $focus-outline-width;
       outline-offset: 5px;
     }
 

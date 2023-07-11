@@ -20,7 +20,7 @@
  */
 @mixin button-base(
   $focus-color,
-  $focus-width: 2px,
+  $focus-width: $focus-outline-width,
   $button-border-radius: $border-radius-fraction
 ) {
   padding: calc(0.25em + $focus-width) calc(0.5em + $focus-width);

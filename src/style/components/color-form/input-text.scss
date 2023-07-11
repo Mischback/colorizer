@@ -36,7 +36,7 @@
     }
 
     &:focus-within {
-      outline: $color-focus-on-light-bg solid 2px;
+      outline: $color-focus-on-light-bg solid $focus-outline-width;
       outline-offset: 3px;
       background: $color-content-bg-dim;
 
