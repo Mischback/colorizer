@@ -215,8 +215,29 @@
   @include button-base($color-focus-on-light-bg);
 
   svg {
-    width: 1.5em;
-    height: 1.5em;
+    width: 1.25em;
+    height: 1.25em;
+    margin-left: 0.5em;
+
+    use {
+      /* purgecss ignore current */
+      --icon-stroke-color: #000;
+      --icon-stroke-width: 2.5em;
+    }
+  }
+
+  &[aria-pressed="true"] svg {
+    transform: rotate(90deg);
+
+    use {
+      /* purgecss ignore current */
+      --icon-fill-color: #{$color-on};
+    }
+  }
+
+  &[aria-pressed="false"] svg use {
+    /* purgecss ignore current */
+    --icon-fill-color: #{$color-off};
   }
 
   &:hover .text-wrapper {
