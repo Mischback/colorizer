@@ -5,10 +5,22 @@
 #panel-root-color-form {
   .notations-toggles {
     @include notation-toggles;
+
+    .disclosure-button {
+      @include content-box-shadow;
+      @include bg-gradient-auto($color-content-bg-dim);
+
+      margin-left: 3em;
+      color: $color-content-bg;
+    }
   }
 
   .disclosure-content {
-    margin-left: 1em;
+    @include content-box-shadow;
+
+    margin-bottom: 1.5em;
+    padding: 1px 1em;
+    border-radius: $border-radius-fraction;
 
     &.hide-disclosure {
       /* purgecss ignore current */

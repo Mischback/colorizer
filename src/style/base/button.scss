@@ -214,10 +214,12 @@
 .disclosure-button {
   @include button-base($color-focus-on-light-bg);
 
+  color: $color-content-fg;
+
   svg {
     width: 1.25em;
     height: 1.25em;
-    margin-left: 0.5em;
+    margin: 0 0 0 0.5em;
 
     use {
       /* purgecss ignore current */

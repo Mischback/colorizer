@@ -105,7 +105,10 @@ export class ColorizerForm implements IColorizerColorObservable {
       const tmpLi = document.createElement("li");
       tmpLi.appendChild(tmpButton);
 
-      notationsToggleContainer.appendChild(tmpLi);
+      notationsToggleContainer.insertBefore(
+        tmpLi,
+        notationsToggleContainer.lastElementChild
+      );
     });
 
     // Set an initial color for the form and all input methods
