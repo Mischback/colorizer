@@ -11,7 +11,7 @@
 
   button {
     margin: 0.5em 0;
-    font-size: 1.25em;
+    font-size: $color-form-input-text-size;
   }
 
   > div {
@@ -49,8 +49,8 @@
     right: 1em;
     padding: 0.25em 0.5em;
     border-radius: $border-radius-fraction;
-    background: $color-content-bg-dim;
-    color: $color-content-bg;
+    background: $color-form-legend-bg;
+    color: $color-form-legend-fg;
 
     > .method-caption {
       font-weight: bold;
@@ -75,7 +75,7 @@
     > legend {
       position: absolute;
       top: -0.7em;
-      background: $color-content-bg-alt;
+      background: transparent;
     }
   }
 }

@@ -4,6 +4,9 @@
 
 @use "sass:math";
 
+$color-form-input-range-track-height: 0.75em;
+$color-form-input-range-thumb-size: 0.85 * $color-form-input-text-size;
+
 /**
  * Common styling of ``<input type="range"> elements (the slider track).
  *
@@ -55,9 +58,7 @@
 .color-form-input-method {
   input[type="range"] {
     appearance: none;
-    width: $color-form-input-range-width;
-
-    // border: 1px solid $color-unstyled; // FIXME: just for dev! set to 0 solid transparent
+    width: 10em;
     border: 0 solid transparent;
     background: transparent;
 
