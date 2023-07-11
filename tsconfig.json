@@ -1,0 +1,179 @@
+{
+  "compilerOptions": {
+    /* The compilation target.
+     *
+     * https://www.typescriptlang.org/tsconfig#target
+     *
+     * Keep this as *low* as possible:
+     * - started with "es6" / "es2015";
+     */
+    "target": "es2015",
+
+    /* https://www.typescriptlang.org/tsconfig#useDefineForClassFields
+     *
+     * ``true` ` is from ``ViteJS``'s reference configuration and seems to be
+     * rather modern.
+     */
+    "useDefineForClassFields": true,
+
+    /* The module resolution system.
+     *
+     * https://www.typescriptlang.org/tsconfig#module
+     *
+     * "ESNext" is from ``ViteJS``'s reference configuration and rather modern,
+     * so, as "target" is tuned down to "ES6"/"ES2015", this value is also adjusted.
+     */
+    "module": "es6",
+
+    /* Adjust available *libraries*. This is meant to provide typings for JS runtime features.
+     *
+     * https://www.typescriptlang.org/tsconfig#lib
+     * a
+     * This included "ES2020" (from ``ViteJS``'s reference configuration). As "target"
+     * and "module" are tuned down, this is adjusted, too.
+     */
+    "lib": ["es2018", "DOM", "DOM.Iterable"],
+
+    "esModuleInterop": true,
+
+    /* https://www.typescriptlang.org/tsconfig#skipLibCheck
+     *
+     * ``ViteJS``'s reference config is ``true``, but there *should* be no issues
+     * for this project. Activating these checks until they cause problems.
+     */
+    "skipLibCheck": false,
+
+    /*** Bundler mode ***/
+
+    /* Don't emit the compilation result.
+     *
+     * https://www.typescriptlang.org/tsconfig#noEmit
+     *
+     * The TypeScript compilation is handled by ``Rollup`` and its ``plugin-typescript``.
+     */
+    "noEmit": true,
+
+    /* How are modules resolved?
+     *
+     * https://www.typescriptlang.org/tsconfig#moduleResolution
+     * https://www.typescriptlang.org/docs/handbook/module-resolution.html
+     *
+     * "bundler" is a ``TypeScript 5`` feature. This works with ``Rollup`` and is
+     * meant to use/support ES6 native modules.
+     */
+    "moduleResolution": "bundler",
+
+    /* Allow imports that include the ``.ts`` extension.
+     *
+     * https://www.typescriptlang.org/tsconfig#allowImportingTsExtensions
+     *
+     * This is from ``ViteJS``'s reference configuration, but should not be
+     * required and it reads as if it is not actually desired.
+     * It causes an error/warning in ``Rollup``'s compilation process.
+     *
+     * FIXME: ``false`` is most likely the default value anyway, so this might be removed!
+     */
+    "allowImportingTsExtensions": false,
+
+    /* Allow importing JSON files.
+     *
+     * https://www.typescriptlang.org/tsconfig#resolveJsonModule
+     *
+     * This is from ``ViteJS``'s reference configuration, but is - most likely - not
+     * required in the codebase.
+     *
+     * FIXME: Set to ``fase`` and verify that this is still working correctly!
+     * FIXME: ``false`` is most likely the default value anyway, so this might be removed!
+     */
+    "resolveJsonModule": true,
+
+    /* Make TypeScript play nicely with external bundlers, like ``Rollup``.
+     *
+     * https://www.typescriptlang.org/tsconfig#isolatedModules
+     *
+     * Taken from ``ViteJS``'s reference configuration.
+     */
+    "isolatedModules": true,
+
+    /*** Linting ***/
+
+    /* Activate TypeScript's strictest ruleset.
+     *
+     * https://www.typescriptlang.org/tsconfig#strict
+     */
+    "strict": true,
+
+    /* Raise compilation error for unreachable code.
+     *
+     * https://www.typescriptlang.org/tsconfig#allowUnreachableCode
+     */
+    "allowUnreachableCode": false,
+
+    /* Raise compilation errors for unused labels.
+     *
+     * https://www.typescriptlang.org/tsconfig#allowUnusedLabels
+     */
+    "allowUnusedLabels": false,
+
+    /* Be really strict about *optional properties*.
+     *
+     * https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes
+     */
+    "exactOptionalPropertyTypes": true,
+
+    /* ``case`` blocks must have ``return`` or ``break``.
+     *
+     * https://www.typescriptlang.org/tsconfig#noFallthroughCasesInSwitch
+     */
+    "noFallthroughCasesInSwitch": true,
+
+    /* Overriding methods in class inheritance must be explicit.
+     *
+     * https://www.typescriptlang.org/tsconfig#noImplicitOverride
+     */
+    "noImplicitOverride": true,
+
+    /* Non-void functions must have ``return`` statements.
+     *
+     * https://www.typescriptlang.org/tsconfig#noImplicitReturns
+     */
+    "noImplicitReturns": true,
+
+    /* No implicit ``this``.
+     *
+     * https://www.typescriptlang.org/tsconfig#noImplicitThis
+     *
+     * FIXME: Activated by ``strict: true``, but this may cause typing
+     *        problems for working code.
+     */
+    /* "noImplicitThis": true, */
+
+    /* [Opinionated] Prohibit access to undefined properties using the *dot-syntax*.
+     *
+     * https://www.typescriptlang.org/tsconfig#noPropertyAccessFromIndexSignature
+     */
+    "noPropertyAccessFromIndexSignature": true,
+
+    /* Undeclared fields in a type definition have an implicit ``undefined``.
+     *
+     * https://www.typescriptlang.org/tsconfig#noUncheckedIndexedAccess
+     *
+     * TODO: This doesn't seem to be really desired...
+     */
+    "noUncheckedIndexedAccess": true,
+
+    /* Unused locals and parameters are flagged as errors.
+     *
+     * https://www.typescriptlang.org/tsconfig#noUnusedLocals
+     * https://www.typescriptlang.org/tsconfig#noUnusedParameters
+     */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  /* Specify the source files:
+   *
+   * https://www.typescriptlang.org/tsconfig#include
+   */
+  "include": ["src/script/**/*.ts"],
+  "$schema": "https://json.schemastore.org/tsconfig"
+}

@@ -1,0 +1,15 @@
+# These items should not be treated by prettier.
+#
+# Basically, prettier should only work on the project's own source files,
+# ignoring generated/compiled files as well as 3rd party files.
+
+node_modules
+.npm
+
+# FIXME: Ignore the legacy (v1) codebase
+#        This might be removed when v2 is live!
+assets
+
+# FIXME: ``prettier`` is re-formatting HTML in an **undesired** way, e.g. it
+#        is adding trailing slashes, which are not required in HTML5
+index.html

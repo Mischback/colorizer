@@ -1,0 +1,36 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+/* Color definitions
+ *
+ * These are meant to be *semantic colors*. In the final code base the actual
+ * color definitions should be moved into a dedicated module.
+ */
+$color-unstyled: #c0f;
+$color-body-bg: $color-teal-dim-dark;
+$color-content-bg: $color-teal-dim-lightest;
+$color-content-bg-alt: $color-teal-dim-light;
+$color-content-fg: $color-teal-dark;
+$color-content-bg-dim: $color-teal-dim;
+$color-content-button-bg: $color-teal;
+$color-content-button-fg: $color-teal-light;
+$color-content-button-bg-hover: $color-yellow;
+$color-content-button-fg-hover: $color-teal-dim-dark;
+$color-focus-on-dark-bg: $color-yellow;
+$color-focus-on-light-bg: $color-red-light;
+$color-danger: $color-red;
+$color-off: $color-red;
+$color-on: $color-green;
+$color-notification-message-bg: $color-green;
+$color-notification-message-fg: $color-teal-dim-dark;
+$color-notification-info-bg: $color-yellow;
+$color-notification-info-fg: $color-teal-dim-dark;
+$color-notification-error-bg: $color-red;
+$color-notification-error-fg: $color-light-grey;
+
+/* Overall settings to create a coherent look'n'feel */
+$border-radius-fraction: 0.25rem;
+$focus-outline-width: 2px;
+$root-element-shadow-as-border-width: 1px;
+$root-element-drop-shadow-width: 2px;

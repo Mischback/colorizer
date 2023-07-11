@@ -1,0 +1,26 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+/* The stylesheet's entry point.
+ *
+ * The stylesheet is generated from SASS sources. The SASS source code is
+ * organized according to Matthew Elson's Simple SCSS playbook
+ * (https://matthewelsom.com/blog/simple-scss-playbook.html).
+ */
+
+@charset "utf-8";
+
+/* The ``abstracts`` directory contains non-output snippets, mixins and utility
+ * functions.
+ */
+@import "abstracts/__abstracts"; /* stylelint-disable-line scss/at-import-no-partial-leading-underscore */
+
+/* The ``base`` directory provides global styles. */
+@import "base/__base"; /* stylelint-disable-line scss/at-import-no-partial-leading-underscore */
+
+/* The ``components`` directory provides reusable elements. */
+@import "components/__components"; /* stylelint-disable-line scss/at-import-no-partial-leading-underscore */
+
+/* The ``layout`` directory provides overall site layout. */
+@import "layouts/__layouts"; /* stylelint-disable-line scss/at-import-no-partial-leading-underscore */

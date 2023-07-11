@@ -1,0 +1,86 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+@use "sass:color";
+
+/**
+ * This simulates a slight bevel, using ``box-shadow`` with *inset shadows*.
+ *
+ * This might be used together with ``element-shadow-as-outline``.
+ *
+ * Note: The colors are not derived from ``abstracts/colors.scss``, as they
+ *       are independent from the colorscheme.
+ */
+$color-preview-inner-shadow: inset 1px 1px 1px 0 rgb(255 255 255 / 50%),
+  inset -1px -1px 1px 0 rgb(0 0 0 / 70%);
+
+/**
+ * This defines a slight dark glow, acting as ouline against bright background.
+ *
+ * See ``content-box-shadow`` for a simple mixin. See
+ * ``color-preview-inner-shadow``, which might be applied together with this.
+ */
+$element-shadow-as-outline: 0 0 2px 1px $color-teal-dark;
+
+/**
+ * Coherent shadow of elements that are children of the ``<body>``.
+ */
+@mixin root-element-shadow {
+  $a: $root-element-shadow-as-border-width;
+  $b: $root-element-drop-shadow-width;
+  $shadow-color: $color-black;
+  $glow-color: $color-teal-light;
+
+  box-shadow: 0 0 ($a * 2) $a $shadow-color, $b $b 0 0 $shadow-color,
+    0 0 ($b * 2 + $a) $a $glow-color;
+}
+
+/**
+ * Coherent shadow of elements that are placed in the actual content container.
+ */
+@mixin content-box-shadow {
+  box-shadow: $element-shadow-as-outline;
+}
+
+/**
+ * Coherent background gradient, intended for buttons.
+ *
+ * The colors might be controlled by the dedicated arguments. A general
+ * guideline is as the following:
+ * - let ``color`` be the base color
+ * - ``darkest``: the base color with -10% in OkLCH's ``L``
+ * - ``dark``: the base color with -5% in OkLCH's ``L``
+ * - ``light``: the base color with +5% in OkLCH's ``L``
+ * - ``lightest``: the base color with +15% in OkLCH's ``L``
+ *
+ * If this manual approach seems overdone, see ``bg-gradient-auto``mixin below.
+ */
+@mixin bg-gradient($darkest, $dark, $light, $lightest) {
+  background: linear-gradient(
+    to bottom,
+    $lightest 0% 4%,
+    $light 5% 48%,
+    $dark 52% 95%,
+    $darkest 96% 100%
+  );
+}
+
+/**
+ * Coherent background-gradient with automatically calculated shades.
+ *
+ * This mixin uses the *HSL sRGB* notation to adjust the ``lightness`` of the
+ * color. This is not as exact as adjusting OkLCH's ``L`` component, as *HSL*
+ * is not meant to provide *perceived lightness* of colors in its ``L``
+ * component.
+ *
+ * See ``bg-gradient`` mixin for a more manual approach.
+ */
+@mixin bg-gradient-auto($color) {
+  @include bg-gradient(
+    color.scale($color, $lightness: -15%),
+    color.scale($color, $lightness: -8%),
+    color.scale($color, $lightness: 7%),
+    color.scale($color, $lightness: 15%)
+  );
+}

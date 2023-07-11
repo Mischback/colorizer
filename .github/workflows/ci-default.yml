@@ -1,0 +1,38 @@
+name: CI (default)
+
+# FIXME: The list of branches can be reduced, as soon as this workflow is
+#        included in the default branch.
+on:
+  push:
+    branches: [development, feat/v2-overall]
+  pull_request:
+    branches: [development, feat/v2-overall]
+
+jobs:
+  linting:
+    name: Run Linters
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: "npm"
+      - name: Cache build environment
+        id: cache-node
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            .npm
+          key: build-${{ hashFiles('package.json', 'package-lock.json') }}
+      - name: Run prettier
+        run: make util/lint/prettier
+      - name: Run eslint
+        run: make util/lint/eslint
+      - name: Run typechecking (using tsc)
+        run: make util/lint/typecheck
+      - name: Run stylelint
+        run: make util/lint/stylelint

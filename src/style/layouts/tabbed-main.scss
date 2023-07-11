@@ -1,0 +1,117 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+body {
+  $main-z-index: 100;
+
+  padding: 0 10px;
+  background-color: $color-body-bg;
+
+  nav {
+    margin: 0;
+    padding: 0;
+  }
+
+  // This is the list inside of <nav>!
+  #tabs-root {
+    $active-tab-top-border-width: 3px;
+    $active-tab-top-border-color: $color-red-light;
+    $active-tab-color-bg: $color-content-bg;
+    $active-tab-color-fg: $color-content-fg;
+    $focus-tab-color: $color-focus-on-light-bg;
+    $focus-tab-width: 2px;
+    $hover-tab-color-bg: $color-yellow;
+    $hover-tab-color-fg: $color-teal-dark;
+    $tab-border-radius: $border-radius-fraction;
+    $tab-color-bg: $color-content-bg-dim;
+    $tab-color-fg: $color-content-bg;
+
+    @include horizontal-list;
+
+    margin-left: $border-radius-fraction * 4;
+
+    > li {
+      margin-right: 1em;
+    }
+
+    /* These are the actual *tabs* */
+    [role="tab"] {
+      @include button-base($color-focus-on-light-bg);
+      @include root-element-shadow;
+
+      position: relative;
+      z-index: $main-z-index - 10;
+      margin: 0;
+      margin-top: $active-tab-top-border-width;
+      padding: 0.5em 0.5em 0.35em;
+      border-radius: $tab-border-radius $tab-border-radius 0 0;
+      background: $tab-color-bg;
+      color: $tab-color-fg;
+      font-size: 1.2em;
+
+      &::after {
+        /* stylelint-disable scss/operator-no-newline-after */
+        $glow-size: (
+          $root-element-drop-shadow-width * 2 +
+            $root-element-shadow-as-border-width
+        );
+        /* stylelint-enable scss/operator-no-newline-after */
+
+        content: "";
+        display: block;
+        position: absolute;
+        bottom: -$glow-size;
+        left: -$glow-size;
+        width: calc(100% + $glow-size * 2);
+        height: $glow-size;
+        background-color: $color-content-bg;
+      }
+
+      /* stylelint-disable selector-max-compound-selectors */
+      .focus {
+        border-radius: $tab-border-radius;
+      }
+      /* stylelint-enable selector-max-compound-selectors */
+
+      /* The currently active tab */
+      &[aria-selected="true"] {
+        z-index: $main-z-index + 10;
+        margin-top: 0;
+        border-top-width: $active-tab-top-border-width;
+        border-top-color: $active-tab-top-border-color;
+        background-color: $active-tab-color-bg;
+        color: $active-tab-color-fg;
+      }
+
+      &:hover {
+        background-color: $hover-tab-color-bg;
+        color: $hover-tab-color-fg;
+      }
+    }
+  }
+
+  main {
+    @include root-element-shadow;
+
+    position: relative;
+    z-index: $main-z-index;
+    margin: 0;
+    padding: 1px 1px 1em;
+    border-radius: $border-radius-fraction * 2;
+    background-color: $color-content-bg;
+    color: $color-content-fg;
+
+    > * {
+      margin: 0 1em;
+    }
+
+    > [role="tabpanel"] {
+      display: none;
+
+      &[aria-expanded="true"] {
+        display: block;
+      }
+    }
+  }
+}

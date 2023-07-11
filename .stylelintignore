@@ -1,0 +1,7 @@
+# Basically: ignore all files except scss sources
+*.*
+!src/**/*.scss
+
+# These files do not have a suffix, but should **not be processed**
+LICENSE
+Makefile

@@ -1,0 +1,14 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+/* stylelint-disable scss/operator-no-newline-after */
+$color-form-input-text-size: 1.25em;
+$color-form-legend-bg: $color-content-bg-dim;
+$color-form-legend-fg: $color-content-bg;
+/* stylelint-enable scss/operator-no-newline-after */
+
+@import "overall-form";
+@import "input-text";
+@import "input-range";
+@import "form-container";

@@ -1,0 +1,562 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+@use "sass:math";
+
+$color-form-input-range-track-height: 0.75em;
+$color-form-input-range-thumb-size: 0.85 * $color-form-input-text-size;
+
+/**
+ * Common styling of ``<input type="range"> elements (the slider track).
+ *
+ * These styles have to be applied multiple times, as the vendor-specific
+ * selectors (``-webkit-slider-runnable-track``/``-moz-range-track``) may not
+ * be combined. The implementation is based on
+ * https://github.com/darlanrod/input-range-scss (MIT licensed).
+ */
+@mixin input-method-range-track {
+  /* transition: all .2s ease; */
+  width: 100%;
+  height: $color-form-input-range-track-height;
+  border-radius: 999px;
+
+  // Note: The track's ``background`` is actually styled in the input method's
+  //       specific block, visualizing the component's impact on the current
+  //       color.
+  background: $color-unstyled;
+  box-shadow: $color-preview-inner-shadow, $element-shadow-as-outline;
+}
+
+/**
+ * Common styling of ``<input type="range"> elements (the slider thumb).
+ *
+ * These styles have to be applied multiple times, as the vendor-specific
+ * selectors (``-webkit-slider-runnable-track``/``-moz-range-track``) may not
+ * be combined. The implementation is based on
+ * https://github.com/darlanrod/input-range-scss (MIT licensed).
+ */
+@mixin input-method-range-thumb {
+  width: $color-form-input-range-thumb-size;
+  height: $color-form-input-range-thumb-size;
+  border-radius: 999px;
+
+  // Note: The thumb's ``background`` is actually styled in the input method's
+  //       specific block, visualizing the current color.
+  background: $color-unstyled;
+  box-shadow: $color-preview-inner-shadow, $element-shadow-as-outline;
+  cursor: pointer;
+}
+
+/**
+ * The common styling of all input methods.
+ *
+ * The *input methods* are grouped in one parent ``<fieldset>`` element.
+ *
+ * The general styling of all input methods should be uniform.
+ */
+.color-form-input-method {
+  input[type="range"] {
+    appearance: none;
+    width: 10em;
+    border: 0 solid transparent;
+    background: transparent;
+
+    &:focus {
+      outline: $color-focus-on-light-bg solid $focus-outline-width;
+      outline-offset: 5px;
+    }
+
+    &::-webkit-slider-runnable-track {
+      @include input-method-range-track;
+    }
+
+    &::-moz-range-track {
+      @include input-method-range-track;
+    }
+
+    &::-webkit-slider-thumb {
+      @include input-method-range-thumb;
+
+      appearance: none;
+      /* stylelint-disable scss/operator-no-newline-after */
+      margin-top: -1 *
+        math.div(
+          $color-form-input-range-thumb-size -
+            $color-form-input-range-track-height,
+          2
+        );
+      /* stylelint-enable scss/operator-no-newline-after */
+    }
+
+    &::-moz-range-thumb {
+      @include input-method-range-thumb;
+    }
+  }
+}
+
+/***** NOTE *****
+ *
+ * The following styling is specific to the actual *input methods* and applies
+ * styling, that is technically dependent on the *input method*, as it uses
+ * specific functions of W3C CSS Color Module 4 to apply colors.
+ */
+
+/**
+ * RGB input
+ *
+ * The sliders control the respective color component, so the styling just
+ * includes the two *other components* values and creates a linear gradient
+ * for the current one.
+ *
+ * The slider's thumb visualizes the current color.
+ */
+
+/* purgecss start ignore */
+#color-form-rgb {
+  input[type="range"] {
+    &::-webkit-slider-thumb {
+      background: rgb(var(--rgb-r) var(--rgb-g) var(--rgb-b));
+    }
+
+    &::-moz-range-thumb {
+      background: rgb(var(--rgb-r) var(--rgb-g) var(--rgb-b));
+    }
+  }
+
+  > .rgb-r {
+    input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        background: linear-gradient(
+          90deg,
+          rgb(0 var(--rgb-g) var(--rgb-b)) 0%,
+          rgb(255 var(--rgb-g) var(--rgb-b)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        background: linear-gradient(
+          90deg,
+          rgb(0 var(--rgb-g) var(--rgb-b)) 0%,
+          rgb(255 var(--rgb-g) var(--rgb-b)) 100%
+        );
+      }
+    }
+  }
+
+  > .rgb-g {
+    input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        background: linear-gradient(
+          90deg,
+          rgb(var(--rgb-r) 0 var(--rgb-b)) 0%,
+          rgb(var(--rgb-r) 255 var(--rgb-b)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        background: linear-gradient(
+          90deg,
+          rgb(var(--rgb-r) 0 var(--rgb-b)) 0%,
+          rgb(var(--rgb-r) 255 var(--rgb-b)) 100%
+        );
+      }
+    }
+  }
+
+  > .rgb-b {
+    input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        background: linear-gradient(
+          90deg,
+          rgb(var(--rgb-r) var(--rgb-g) 0) 0%,
+          rgb(var(--rgb-r) var(--rgb-g) 255) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        background: linear-gradient(
+          90deg,
+          rgb(var(--rgb-r) var(--rgb-g) 0) 0%,
+          rgb(var(--rgb-r) var(--rgb-g) 255) 100%
+        );
+      }
+    }
+  }
+}
+
+/* purgecss end ignore */
+
+/**
+ * OkLCH input
+ *
+ * The overall idea is identical to RGB inputs, but the sliders' gradients have
+ * some *more resolution*, because the components do not work strictly linear.
+ */
+/* stylelint-disable no-descending-specificity */
+
+/* purgecss start ignore */
+#color-form-oklch {
+  input[type="range"] {
+    &::-webkit-slider-thumb {
+      /* prettier-ignore */
+      background: oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg));
+    }
+
+    &::-moz-range-thumb {
+      /* prettier-ignore */
+      background: oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg));
+    }
+  }
+
+  > .oklch-l {
+    input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          oklch(0% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 0%,
+          oklch(10% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 10%,
+          oklch(20% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 20%,
+          oklch(30% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 30%,
+          oklch(40% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 40%,
+          oklch(50% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 50%,
+          oklch(60% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 60%,
+          oklch(70% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 70%,
+          oklch(80% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 80%,
+          oklch(90% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 90%,
+          oklch(100% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          oklch(0% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 0%,
+          oklch(10% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 10%,
+          oklch(20% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 20%,
+          oklch(30% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 30%,
+          oklch(40% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 40%,
+          oklch(50% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 50%,
+          oklch(60% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 60%,
+          oklch(70% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 70%,
+          oklch(80% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 80%,
+          oklch(90% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 90%,
+          oklch(100% calc(var(--oklch-c) / 100 * 0.4) calc(var(--oklch-h) * 1deg)) 100%
+        );
+      }
+    }
+  }
+
+  > .oklch-c {
+    input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          oklch(calc(var(--oklch-l) * 1%) 0 calc(var(--oklch-h) * 1deg)) 0%,
+          oklch(calc(var(--oklch-l) * 1%) 0.04 calc(var(--oklch-h) * 1deg)) 10%,
+          oklch(calc(var(--oklch-l) * 1%) 0.08 calc(var(--oklch-h) * 1deg)) 20%,
+          oklch(calc(var(--oklch-l) * 1%) 0.12 calc(var(--oklch-h) * 1deg)) 30%,
+          oklch(calc(var(--oklch-l) * 1%) 0.16 calc(var(--oklch-h) * 1deg)) 40%,
+          oklch(calc(var(--oklch-l) * 1%) 0.2 calc(var(--oklch-h) * 1deg)) 50%,
+          oklch(calc(var(--oklch-l) * 1%) 0.24 calc(var(--oklch-h) * 1deg)) 60%,
+          oklch(calc(var(--oklch-l) * 1%) 0.28 calc(var(--oklch-h) * 1deg)) 70%,
+          oklch(calc(var(--oklch-l) * 1%) 0.32 calc(var(--oklch-h) * 1deg)) 80%,
+          oklch(calc(var(--oklch-l) * 1%) 0.36 calc(var(--oklch-h) * 1deg)) 90%,
+          oklch(calc(var(--oklch-l) * 1%) 0.4 calc(var(--oklch-h) * 1deg)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          oklch(calc(var(--oklch-l) * 1%) 0 calc(var(--oklch-h) * 1deg)) 0%,
+          oklch(calc(var(--oklch-l) * 1%) 0.04 calc(var(--oklch-h) * 1deg)) 10%,
+          oklch(calc(var(--oklch-l) * 1%) 0.08 calc(var(--oklch-h) * 1deg)) 20%,
+          oklch(calc(var(--oklch-l) * 1%) 0.12 calc(var(--oklch-h) * 1deg)) 30%,
+          oklch(calc(var(--oklch-l) * 1%) 0.16 calc(var(--oklch-h) * 1deg)) 40%,
+          oklch(calc(var(--oklch-l) * 1%) 0.2 calc(var(--oklch-h) * 1deg)) 50%,
+          oklch(calc(var(--oklch-l) * 1%) 0.24 calc(var(--oklch-h) * 1deg)) 60%,
+          oklch(calc(var(--oklch-l) * 1%) 0.28 calc(var(--oklch-h) * 1deg)) 70%,
+          oklch(calc(var(--oklch-l) * 1%) 0.32 calc(var(--oklch-h) * 1deg)) 80%,
+          oklch(calc(var(--oklch-l) * 1%) 0.36 calc(var(--oklch-h) * 1deg)) 90%,
+          oklch(calc(var(--oklch-l) * 1%) 0.4 calc(var(--oklch-h) * 1deg)) 100%
+        );
+      }
+    }
+  }
+
+  > .oklch-h {
+    input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 0deg) 0%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 36deg) 10%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 72deg) 20%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 108deg) 30%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 144deg) 40%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 180deg) 50%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 216deg) 60%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 252deg) 70%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 288deg) 80%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 324deg) 90%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 360deg) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 0deg) 0%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 36deg) 10%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 72deg) 20%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 108deg) 30%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 144deg) 40%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 180deg) 50%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 216deg) 60%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 252deg) 70%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 288deg) 80%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 324deg) 90%,
+          oklch(calc(var(--oklch-l) * 1%) calc(var(--oklch-c) / 100 * 0.4) 360deg) 100%
+        );
+      }
+    }
+  }
+}
+
+/* purgecss end ignore */
+/* stylelint-enable no-descending-specificity */
+
+/**
+ * HSL input
+ *
+ * The overall idea is identical to RGB inputs, but the sliders' gradients have
+ * some *more resolution*, because the components do not work strictly linear.
+ */
+/* stylelint-disable no-descending-specificity */
+
+/* purgecss start ignore */
+#color-form-hsl {
+  input[type="range"] {
+    &::-webkit-slider-thumb {
+      /* prettier-ignore */
+      background: hsl(calc(var(--hsl-h) * 1deg) calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%));
+    }
+
+    &::-moz-range-thumb {
+      /* prettier-ignore */
+      background: hsl(calc(var(--hsl-h) * 1deg) calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%));
+    }
+  }
+
+  > .hsl-h {
+    input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hsl(0deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 0%,
+          hsl(36deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 10%,
+          hsl(72deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 20%,
+          hsl(108deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 30%,
+          hsl(144deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 40%,
+          hsl(180deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 50%,
+          hsl(216deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 60%,
+          hsl(252deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 70%,
+          hsl(288deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 80%,
+          hsl(324deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 90%,
+          hsl(360deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hsl(0deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 0%,
+          hsl(36deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 10%,
+          hsl(72deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 20%,
+          hsl(108deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 30%,
+          hsl(144deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 40%,
+          hsl(180deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 50%,
+          hsl(216deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 60%,
+          hsl(252deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 70%,
+          hsl(288deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 80%,
+          hsl(324deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 90%,
+          hsl(360deg calc(var(--hsl-s) * 1%) calc(var(--hsl-l) * 1%)) 100%
+        );
+      }
+    }
+  }
+
+  > .hsl-s {
+    input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hsl(calc(var(--hsl-h) * 1deg) 0% calc(var(--hsl-l) * 1%)) 0%,
+          hsl(calc(var(--hsl-h) * 1deg) 50% calc(var(--hsl-l) * 1%)) 50%,
+          hsl(calc(var(--hsl-h) * 1deg) 100% calc(var(--hsl-l) * 1%)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hsl(calc(var(--hsl-h) * 1deg) 0% calc(var(--hsl-l) * 1%)) 0%,
+          hsl(calc(var(--hsl-h) * 1deg) 50% calc(var(--hsl-l) * 1%)) 50%,
+          hsl(calc(var(--hsl-h) * 1deg) 100% calc(var(--hsl-l) * 1%)) 100%
+        );
+      }
+    }
+  }
+
+  > .hsl-l {
+    input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hsl(calc(var(--hsl-h) * 1deg) calc(var(--hsl-s) * 1%) 0%) 0%,
+          hsl(calc(var(--hsl-h) * 1deg) calc(var(--hsl-s) * 1%) 50%) 50%,
+          hsl(calc(var(--hsl-h) * 1deg) calc(var(--hsl-s) * 1%) 100%) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hsl(calc(var(--hsl-h) * 1deg) calc(var(--hsl-s) * 1%) 0%) 0%,
+          hsl(calc(var(--hsl-h) * 1deg) calc(var(--hsl-s) * 1%) 50%) 50%,
+          hsl(calc(var(--hsl-h) * 1deg) calc(var(--hsl-s) * 1%) 100%) 100%
+        );
+      }
+    }
+  }
+}
+
+/* purgecss end ignore */
+/* stylelint-enable no-descending-specificity */
+
+/**
+ * HWB input
+ *
+ * The overall idea is identical to RGB inputs, but the sliders' gradients have
+ * some *more resolution*, because the components do not work strictly linear.
+ */
+/* stylelint-disable no-descending-specificity */
+
+/* purgecss start ignore */
+#color-form-hwb {
+  input[type="range"] {
+    &::-webkit-slider-thumb {
+      /* prettier-ignore */
+      background: hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%));
+    }
+
+    &::-moz-range-thumb {
+      /* prettier-ignore */
+      background: hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%));
+    }
+  }
+
+  > .hwb-h {
+    input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hwb(0deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 0%,
+          hwb(36deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 10%,
+          hwb(72deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 20%,
+          hwb(108deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 30%,
+          hwb(144deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 40%,
+          hwb(180deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 50%,
+          hwb(216deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 60%,
+          hwb(252deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 70%,
+          hwb(288deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 80%,
+          hwb(324deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 90%,
+          hwb(360deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hwb(0deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 0%,
+          hwb(36deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 10%,
+          hwb(72deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 20%,
+          hwb(108deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 30%,
+          hwb(144deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 40%,
+          hwb(180deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 50%,
+          hwb(216deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 60%,
+          hwb(252deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 70%,
+          hwb(288deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 80%,
+          hwb(324deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 90%,
+          hwb(360deg calc(var(--hwb-w) * 1%) calc(var(--hwb-b) * 1%)) 100%
+        );
+      }
+    }
+  }
+
+  > .hwb-w {
+    input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hwb(calc(var(--hwb-h) * 1deg) 0% calc(var(--hwb-b) * 1%)) 0%,
+          hwb(calc(var(--hwb-h) * 1deg) 50% calc(var(--hwb-b) * 1%)) 50%,
+          hwb(calc(var(--hwb-h) * 1deg) 100% calc(var(--hwb-b) * 1%)) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hwb(calc(var(--hwb-h) * 1deg) 0% calc(var(--hwb-b) * 1%)) 0%,
+          hwb(calc(var(--hwb-h) * 1deg) 50% calc(var(--hwb-b) * 1%)) 50%,
+          hwb(calc(var(--hwb-h) * 1deg) 100% calc(var(--hwb-b) * 1%)) 100%
+        );
+      }
+    }
+  }
+
+  > .hwb-b {
+    input[type="range"] {
+      &::-webkit-slider-runnable-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) 0%) 0%,
+          hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) 50%) 50%,
+          hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) 100%) 100%
+        );
+      }
+
+      &::-moz-range-track {
+        /* prettier-ignore */
+        background: linear-gradient(
+          90deg,
+          hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) 0%) 0%,
+          hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) 50%) 50%,
+          hwb(calc(var(--hwb-h) * 1deg) calc(var(--hwb-w) * 1%) 100%) 100%
+        );
+      }
+    }
+  }
+}
+
+/* purgecss end ignore */
+/* stylelint-enable no-descending-specificity */

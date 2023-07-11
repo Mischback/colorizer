@@ -1,0 +1,18 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+/**
+ * This is the most minimal reset.
+ *
+ * Instead of relying on an actual *reset* or *normalize* stylesheet, only the
+ * most basic reset is provided.
+ *
+ * This assumes that most of the elements will be styled eventually or their
+ * styling is actually not relevant.
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

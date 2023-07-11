@@ -1,0 +1,134 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+.color-form-input-method {
+  input {
+    display: inline-block;
+    margin: 0;
+    border-radius: $border-radius-fraction;
+    outline: none;
+    font-family: $font-stack-monospace;
+    font-size: $color-form-input-text-size;
+  }
+
+  input[type="text"] {
+    padding: 0;
+    border: 0 solid transparent;
+    background: transparent;
+    color: $color-content-fg;
+    text-align: right;
+  }
+
+  .text-input-wrapper {
+    @include content-box-shadow;
+
+    padding: 0.25em 0.5em;
+    border-radius: $border-radius-fraction;
+    background: $color-content-bg-alt;
+
+    &:hover {
+      background: $color-content-bg-dim;
+
+      > input[type="text"] {
+        color: $color-content-button-fg;
+      }
+    }
+
+    &:focus-within {
+      outline: $color-focus-on-light-bg solid $focus-outline-width;
+      outline-offset: 3px;
+      background: $color-content-bg-dim;
+
+      > input[type="text"] {
+        color: $color-content-button-fg;
+      }
+    }
+  }
+}
+
+#color-form-rgb {
+  input[type="text"] {
+    /* purgecss ignore current */
+
+    width: 3em;
+  }
+}
+
+#color-form-hsl {
+  input[type="text"] {
+    /* purgecss ignore current */
+    width: 4em;
+  }
+
+  .hsl-s,
+  .hsl-l {
+    .text-input-wrapper {
+      /* stylelint-disable selector-max-compound-selectors */
+      input {
+        /* purgecss ignore current */
+        width: 3.5em;
+      }
+      /* stylelint-enable selector-max-compound-selectors */
+
+      &::after {
+        /* purgecss ignore current */
+        content: "%";
+        font-family: $font-stack-monospace;
+        font-size: $color-form-input-text-size;
+      }
+    }
+  }
+}
+
+#color-form-hwb {
+  input[type="text"] {
+    /* purgecss ignore current */
+    width: 4em;
+  }
+
+  .hwb-w,
+  .hwb-b {
+    .text-input-wrapper {
+      /* stylelint-disable selector-max-compound-selectors */
+      input {
+        /* purgecss ignore current */
+        width: 3.5em;
+      }
+      /* stylelint-enable selector-max-compound-selectors */
+
+      &::after {
+        /* purgecss ignore current */
+        content: "%";
+        font-family: $font-stack-monospace;
+        font-size: $color-form-input-text-size;
+      }
+    }
+  }
+}
+
+#color-form-oklch {
+  input[type="text"] {
+    /* purgecss ignore current */
+    width: 4em;
+  }
+
+  .oklch-l,
+  .oklch-c {
+    .text-input-wrapper {
+      /* stylelint-disable selector-max-compound-selectors */
+      input {
+        /* purgecss ignore current */
+        width: 3.5em;
+      }
+      /* stylelint-enable selector-max-compound-selectors */
+
+      &::after {
+        /* purgecss ignore current */
+        content: "%";
+        font-family: $font-stack-monospace;
+        font-size: $color-form-input-text-size;
+      }
+    }
+  }
+}
