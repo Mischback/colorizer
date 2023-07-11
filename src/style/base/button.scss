@@ -214,6 +214,11 @@
 .disclosure-button {
   @include button-base($color-focus-on-light-bg);
 
+  svg {
+    width: 1.5em;
+    height: 1.5em;
+  }
+
   &:hover .text-wrapper {
     border-bottom-color: $color-content-fg;
   }
