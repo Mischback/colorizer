@@ -210,3 +210,11 @@
     }
   }
 }
+
+.disclosure-button {
+  @include button-base($color-focus-on-light-bg);
+
+  &:hover .text-wrapper {
+    border-bottom-color: $color-content-fg;
+  }
+}

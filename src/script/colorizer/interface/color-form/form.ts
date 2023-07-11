@@ -91,6 +91,9 @@ export class ColorizerForm implements IColorizerColorObservable {
     const notationsToggleContainer = <HTMLUListElement>(
       getDomElement(this.formContainer, ".notations-toggles")
     );
+    const descriptionToggleButton = <HTMLButtonElement>(
+      getDomElement(this.formContainer, "#form-description-toggle")
+    );
 
     // Setup the available input methods and keep track of them
     inputMethods.forEach((m) => {
@@ -114,6 +117,42 @@ export class ColorizerForm implements IColorizerColorObservable {
       evt.preventDefault();
 
       this.receiveColor(ColorizerColor.fromRgb(0, 0, 0));
+    });
+
+    // Provide the internal logic for the description button
+    descriptionToggleButton.addEventListener("click", (evt) => {
+      evt.preventDefault();
+      evt.stopPropagation();
+
+      const currentStatus = (
+        evt.currentTarget as HTMLButtonElement
+      ).getAttribute("aria-pressed");
+      if (currentStatus === null) {
+        return;
+      }
+
+      const disclosureContent = this.formContainer.querySelectorAll(
+        ".disclosure-content"
+      );
+      disclosureContent.forEach((elem) => {
+        if (currentStatus === "false") {
+          (elem as HTMLElement).classList.remove("hide-disclosure");
+        } else {
+          (elem as HTMLElement).classList.add("hide-disclosure");
+        }
+      });
+
+      if (currentStatus === "false") {
+        (evt.currentTarget as HTMLButtonElement).setAttribute(
+          "aria-pressed",
+          "true"
+        );
+      } else {
+        (evt.currentTarget as HTMLButtonElement).setAttribute(
+          "aria-pressed",
+          "false"
+        );
+      }
     });
   }
 

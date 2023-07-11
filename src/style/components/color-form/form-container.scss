@@ -6,4 +6,17 @@
   .notations-toggles {
     @include notation-toggles;
   }
+
+  .disclosure-content {
+    margin-left: 1em;
+
+    &.hide-disclosure {
+      /* purgecss ignore current */
+      display: none;
+    }
+  }
+
+  p {
+    max-width: 40em;
+  }
 }

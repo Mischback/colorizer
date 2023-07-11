@@ -67,16 +67,19 @@
     </header>
     <ul class="notations-toggles"></ul>
     <section>
-      <button id="form-description-toggle" type="button" aria-pressed="false" class="disclosure-button">
+      <button id="form-description-toggle" type="button" aria-pressed="true" class="disclosure-button">
         <span class="focus">
-          <span class="text-wrapper">Show form description</span>
+          <span class="text-wrapper">Toggle Form Description</span>
         </span>
       </button>
-      <section>
+      <section class="disclosure-content">
         <h3>Usage Guide</h3>
         <p>This form is used to add new colors to your palette.</p>
         <p>The <em>Input Methods</em> provide different notations for colors and might employ different <em>colorspaces</em> (see the detailled description below). Most of the notations rely on different <em>components</em>, usually mapping to coordinates in a colorspace or are translatable into coordinates.</p>
         <p>Each <em>component</em> might be adjusted using a <em>slider</em> or a direct, text-based <em>input</em> field.</p>
+      </section>
+      <section class="disclosure-content">
+        <h3>Input Methods</h3>
         <p><strong>Colorizer</strong> supports the following <em>notations</em> for input of colors:</p>
         <dl>
           <dt>RGB</dt>
