@@ -51,9 +51,6 @@
   input[type="text"] {
     /* purgecss ignore current */
 
-    // FIXME: ``3em`` is working on:
-    //          - Linux / Firefox
-    //          - Linux / Chromium
     width: 3em;
   }
 }
