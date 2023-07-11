@@ -20,7 +20,7 @@
  */
 @mixin button-base(
   $focus-color,
-  $focus-width: 2px,
+  $focus-width: $focus-outline-width,
   $button-border-radius: $border-radius-fraction
 ) {
   padding: calc(0.25em + $focus-width) calc(0.5em + $focus-width);
@@ -208,5 +208,41 @@
       // Note: Actually this is ``100% - [width of thumb] + [offset]``
       left: calc(100% - 1em);
     }
+  }
+}
+
+.disclosure-button {
+  @include button-base($color-focus-on-light-bg);
+
+  color: $color-content-fg;
+
+  svg {
+    width: 1.25em;
+    height: 1.25em;
+    margin: 0 0 0 0.5em;
+
+    use {
+      /* purgecss ignore current */
+      --icon-stroke-color: #000;
+      --icon-stroke-width: 2.5em;
+    }
+  }
+
+  &[aria-pressed="true"] svg {
+    transform: rotate(90deg);
+
+    use {
+      /* purgecss ignore current */
+      --icon-fill-color: #{$color-on};
+    }
+  }
+
+  &[aria-pressed="false"] svg use {
+    /* purgecss ignore current */
+    --icon-fill-color: #{$color-off};
+  }
+
+  &:hover .text-wrapper {
+    border-bottom-color: $color-content-fg;
   }
 }

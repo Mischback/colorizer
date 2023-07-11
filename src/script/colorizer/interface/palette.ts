@@ -331,9 +331,23 @@ export class ColorizerPaletteIO implements IColorizerPaletteObserver {
       case "oklch":
         tmp = color.toOklchString();
         li.classList.add("oklch");
-        li.style.cssText += `--color-component-a: ${tmp.l}%; --color-component-b: ${tmp.c}%; --color-component-c: ${tmp.h}`;
+        // Note: Pay attention to ``--color-component-b``: It is not the value
+        //       as provided by ``toOklchString()``!
+        //       Chrome will not accept *oklch's* ``chroma`` component
+        //       specified in percent, but the stylesheet directly references
+        //       ``--color-component-b`` (**and** is not willing to perform the
+        //       required calculation in CSS). Thus, the conversion from a
+        //       percent-based notation to plain numbers is done here.
+        //       The ``value`` field contains both notations!
+        li.style.cssText += `--color-component-a: ${
+          tmp.l
+        }%; --color-component-b: ${(tmp.c / 100) * 0.4}; --color-component-c: ${
+          tmp.h
+        }`;
         caption.innerHTML = "OkLCH";
-        value.innerHTML = `(${tmp.l}%, ${tmp.c}%, ${tmp.h})`;
+        value.innerHTML = `(${tmp.l}%, ${tmp.c}%, ${tmp.h}) / (${tmp.l}%, ${
+          (tmp.c / 100) * 0.4
+        }, ${tmp.h})`;
         break;
       default:
         break;

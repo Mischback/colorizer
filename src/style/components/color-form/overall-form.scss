@@ -1,0 +1,81 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+#color-form {
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0;
+  padding: 0;
+  gap: 1em;
+
+  button {
+    margin: 0.5em 0;
+    font-size: $color-form-input-text-size;
+  }
+
+  > div {
+    display: flex;
+    flex-basis: 100%;
+    gap: 1em;
+
+    > button[type="submit"] {
+      flex-basis: 90%;
+    }
+  }
+}
+
+.color-form-input-method {
+  @include content-box-shadow;
+
+  position: relative;
+  margin: 1.5em 0 0;
+  padding: 2em 1em 1em;
+  border: 0 solid transparent;
+  border-radius: $border-radius-fraction * 2;
+  background: $color-content-bg-alt;
+
+  /* This class is attached by the form's *toggle button* */
+  &.hide-notation {
+    /* purgecss ignore current */
+    display: none;
+  }
+
+  > legend {
+    @include content-box-shadow;
+
+    position: absolute;
+    top: -1em;
+    right: 1em;
+    padding: 0.25em 0.5em;
+    border-radius: $border-radius-fraction;
+    background: $color-form-legend-bg;
+    color: $color-form-legend-fg;
+
+    > .method-caption {
+      font-weight: bold;
+    }
+  }
+
+  .component {
+    // This is a <fieldset> element!
+    display: flex;
+    position: relative;
+    flex-flow: row nowrap;
+    align-items: center;
+    margin: 0 0 1.5em;
+    padding: 0.75em 0 0;
+    border: 0 solid transparent;
+    gap: 1em;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    > legend {
+      position: absolute;
+      top: -0.7em;
+      background: transparent;
+    }
+  }
+}

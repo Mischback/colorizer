@@ -97,7 +97,7 @@ body {
     position: relative;
     z-index: $main-z-index;
     margin: 0;
-    padding: 1px;
+    padding: 1px 1px 1em;
     border-radius: $border-radius-fraction * 2;
     background-color: $color-content-bg;
     color: $color-content-fg;

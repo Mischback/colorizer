@@ -14,9 +14,17 @@ const purgecss = require("@fullhuman/postcss-purgecss")({
   content: ["./**/*.html"],
   fontFace: true,
   keyFrames: true,
+  rejected: true,
   variables: true,
   safelist: [],
   blocklist: [],
+});
+
+const reporter = require("postcss-reporter")({
+  filter: function (msg) {
+    return true;
+  },
+  clearAllMessages: true,
 });
 
 /* Determine if we're running in *development mode*.
@@ -30,11 +38,16 @@ const devMode = process.env.DEV_FLAG === "dev";
  * *development mode* will skip all optimisation plugins.
  */
 const config = {
-  plugins: [purgecss, require("autoprefixer")(), require("cssnano")()],
+  plugins: [
+    purgecss,
+    require("autoprefixer")(),
+    require("cssnano")(),
+    reporter,
+  ],
 };
 
 if (devMode === true) {
-  config.plugins = [purgecss];
+  config.plugins = [purgecss, reporter];
 }
 
 module.exports = config;

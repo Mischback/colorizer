@@ -3,14 +3,12 @@
 // SPDX-FileType: SOURCE
 
 /* stylelint-disable scss/operator-no-newline-after */
-$color-form-input-text-size: 1.5em;
-$color-form-input-vertical-padding: 0.25em;
-$color-form-input-height: $color-form-input-text-size +
-  (2 * $color-form-input-vertical-padding);
-$color-form-input-range-track-height: 0.75em;
-$color-form-input-range-thumb-size: 0.85 * $color-form-input-text-size;
+$color-form-input-text-size: 1.25em;
+$color-form-legend-bg: $color-content-bg-dim;
+$color-form-legend-fg: $color-content-bg;
 /* stylelint-enable scss/operator-no-newline-after */
 
-@import "tooltip";
-@import "input-text-range";
-@import "button";
+@import "overall-form";
+@import "input-text";
+@import "input-range";
+@import "form-container";

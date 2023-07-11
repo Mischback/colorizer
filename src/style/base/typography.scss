@@ -27,7 +27,17 @@ h2 {
   font-size: 1.8rem;
 }
 
+h3 {
+  font-size: 1.25em;
+}
+
 p {
   font-family: $font-stack-sans-serif;
   font-size: 1rem;
+  line-height: 1.7em;
+}
+
+code,
+pre {
+  font-family: $font-stack-monospace;
 }

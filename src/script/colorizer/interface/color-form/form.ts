@@ -47,6 +47,7 @@ export type TColorizerFormSubmitCallback = (color: ColorizerColor) => void;
  * implementation (implementing ``IColorizerColorObservable``).
  */
 export class ColorizerForm implements IColorizerColorObservable {
+  private formContainer: HTMLElement;
   private form: HTMLFormElement;
 
   // Initialization of color **is done** in the ``constructor()`` by calling
@@ -83,12 +84,30 @@ export class ColorizerForm implements IColorizerColorObservable {
     this.submitCallback = submitCallback;
 
     // Get DOM elements
+    this.formContainer = <HTMLElement>(
+      getDomElement(null, "#panel-root-color-form")
+    );
     this.form = <HTMLFormElement>getDomElement(null, "#color-form");
+    const notationsToggleContainer = <HTMLUListElement>(
+      getDomElement(this.formContainer, ".notations-toggles")
+    );
+    const descriptionToggleButton = <HTMLButtonElement>(
+      getDomElement(this.formContainer, "#form-description-toggle")
+    );
 
     // Setup the available input methods and keep track of them
     inputMethods.forEach((m) => {
-      this.addColorObserver(
-        getColorizerFormInput(m, this.receiveColor.bind(this))
+      const tmpMethod = getColorizerFormInput(m, this.receiveColor.bind(this));
+      this.addColorObserver(tmpMethod);
+      this.form.insertBefore(tmpMethod.fieldset, this.form.lastElementChild);
+
+      const tmpButton = this.generateNotationToggle(m);
+      const tmpLi = document.createElement("li");
+      tmpLi.appendChild(tmpButton);
+
+      notationsToggleContainer.insertBefore(
+        tmpLi,
+        notationsToggleContainer.lastElementChild
       );
     });
 
@@ -97,6 +116,47 @@ export class ColorizerForm implements IColorizerColorObservable {
 
     // Attach the event handler for submitting the ``<form ...>``
     this.form.addEventListener("submit", this.submit.bind(this));
+    this.form.addEventListener("reset", (evt) => {
+      evt.preventDefault();
+
+      this.receiveColor(ColorizerColor.fromRgb(0, 0, 0));
+    });
+
+    // Provide the internal logic for the description button
+    descriptionToggleButton.addEventListener("click", (evt) => {
+      evt.preventDefault();
+      evt.stopPropagation();
+
+      const currentStatus = (
+        evt.currentTarget as HTMLButtonElement
+      ).getAttribute("aria-pressed");
+      if (currentStatus === null) {
+        return;
+      }
+
+      const disclosureContent = this.formContainer.querySelectorAll(
+        ".disclosure-content"
+      );
+      disclosureContent.forEach((elem) => {
+        if (currentStatus === "false") {
+          (elem as HTMLElement).classList.remove("hide-disclosure");
+        } else {
+          (elem as HTMLElement).classList.add("hide-disclosure");
+        }
+      });
+
+      if (currentStatus === "false") {
+        (evt.currentTarget as HTMLButtonElement).setAttribute(
+          "aria-pressed",
+          "true"
+        );
+      } else {
+        (evt.currentTarget as HTMLButtonElement).setAttribute(
+          "aria-pressed",
+          "false"
+        );
+      }
+    });
   }
 
   /**
@@ -200,5 +260,68 @@ export class ColorizerForm implements IColorizerColorObservable {
     evt.stopPropagation();
 
     this.submitCallback(this.color);
+  }
+
+  private toggleNotationButtonEventHandler(evt: Event): void {
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    const notation = (evt.currentTarget as HTMLElement).getAttribute(
+      "colorizer-notation"
+    );
+    if (notation === null) {
+      return;
+    }
+
+    const currentStatus = (evt.currentTarget as HTMLButtonElement).getAttribute(
+      "aria-pressed"
+    );
+    if (currentStatus === null) {
+      return;
+    }
+
+    // Note: This makes a **hard assumption** about an implementation detail
+    //       of the actual input methods!
+    //       The ``id`` attribute is determined dynamically during class
+    //       initialization of the input method.
+    //
+    //       This is not really considered an issue, because the input methods
+    //       are logically linked to the overall form anyways.
+    const inputMethod = <HTMLFieldSetElement>(
+      getDomElement(this.form, `#color-form-${notation}`)
+    );
+    if (currentStatus === "false") {
+      (evt.currentTarget as HTMLButtonElement).setAttribute(
+        "aria-pressed",
+        "true"
+      );
+      inputMethod.classList.remove("hide-notation");
+    } else {
+      (evt.currentTarget as HTMLButtonElement).setAttribute(
+        "aria-pressed",
+        "false"
+      );
+      inputMethod.classList.add("hide-notation");
+    }
+  }
+
+  private generateNotationToggle(notation: string): HTMLButtonElement {
+    const template = <HTMLTemplateElement>(
+      getDomElement(null, "#tpl-toggle-button")
+    );
+
+    const toggleButton = (
+      template.content.firstElementChild as HTMLButtonElement
+    ).cloneNode(true) as HTMLButtonElement;
+    toggleButton.setAttribute("colorizer-notation", notation);
+    toggleButton.addEventListener(
+      "click",
+      this.toggleNotationButtonEventHandler.bind(this)
+    );
+
+    const label = <HTMLSpanElement>getDomElement(toggleButton, ".text-wrapper");
+    label.innerHTML = notation;
+
+    return toggleButton;
   }
 }

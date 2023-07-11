@@ -141,7 +141,7 @@ ifeq ($(BUILD_MODE), $(DEV_FLAG))
 	echo "[development] building stylesheet..."
 	DEV_FLAG=$(DEV_FLAG) \
     npx sass --verbose --embed-sources --embed-source-map --stop-on-error $< | \
-    npx postcss -o $@
+    DEV_FLAG=$(DEV_FLAG) npx postcss -o $@
 else
 	npx sass --verbose --stop-on-error $< | \
     npx postcss -o $@

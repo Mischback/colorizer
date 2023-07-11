@@ -65,162 +65,68 @@
     <header>
       <h2>Add a new Color</h2>
     </header>
+    <ul class="notations-toggles">
+      <li>
+        <button id="form-description-toggle" type="button" aria-pressed="false" class="disclosure-button">
+          <span class="focus">
+            <span class="text-wrapper">Toggle Form Description</span>
+            <svg><use xlink:href="#icon-disclosure-button-indicator" /></svg>
+          </span>
+        </button>
+      </li>
+    </ul>
+    <section class="disclosure-content hide-disclosure">
+      <section>
+        <h3>Usage Guide</h3>
+        <p>This form is used to add new colors to your palette.</p>
+        <p>The <em>Input Methods</em> provide different notations for colors and might employ different <em>colorspaces</em> (see the detailled description below). Most of the notations rely on different <em>components</em>, usually mapping to coordinates in a colorspace or are translatable into coordinates.</p>
+        <p>Each <em>component</em> might be adjusted using a <em>slider</em> or a direct, text-based <em>input</em> field.</p>
+      </section>
+      <section>
+        <h3>Input Methods</h3>
+        <p><strong>Colorizer</strong> supports the following <em>notations</em> for input of colors:</p>
+        <dl>
+          <dt>RGB</dt>
+          <dd>
+            <p>The <em>RGB</em> notation is the most basic method to specify a color in <strong>sRGB</strong> colorspace.</p>
+            <p>It represents a color by specifying the <em>Red</em>, <em>Green</em>, and <em>Blue</em> components of the color with values between <code>0</code> and <code>255</code>.</p>
+          </dd>
+
+          <dt>HSL</dt>
+          <dd>
+            <p>The <em>HSL</em> notation is an alternate method to specify a color in <strong>sRGB</strong> colorspace.</p>
+            <p>The <em>Hue</em> of the color is specified in <code>degree</code> in a range between <code>0</code> and <code>360</code>. The <em>Saturation</em> and <em>Lightness</em> of the color are specified in percent between <code>0</code> and <code>100</code>.</p>
+            <p>For <em>Lightness</em> values of <code>0%</code> and <code>100%</code> the values of <em>hue</em> and <em>saturation</em> are considered <em>powerless</em>, meaning they have no effect on the actual color, which will be <code>black</code> / <code>white</code>.</p>
+            <p>Please note that the <em>Lightness</em> of the <em>HSL</em> notation is just a linear and artificial value. This means, that <code>hsl(120 100% 50%)</code> and <code>hsl(240 100% 50%)</code> share the <em>lightness</em> value of <code>50%</code>, but the <code>green</code> seems significantly brighter than the <code>blue</code>. The reason for this is, that the <strong>perceived lightness</strong> of green and blue hues is different. Other input methods (e.g. <em>OkLCH</em>) do provide the direct manipluation of <em>perceived lightness</em>.</p>
+          </dd>
+
+          <dt>HWB</dt>
+          <dd>
+            <p><em>HWB</em> is another alternate method to specify colors in <strong>sRGB</strong> colorspace.</p>
+            <p>The <em>Hue</em> of the color is specified in <code>degree</code> in a range between <code>0</code> and <code>360</code>. <em>Whiteness</em> and <em>Blackness</em> specify the amount of <code>white/black</code> mixed into the color and are specified in percent between <code>0</code> and <code>100</code>.</p>
+          </dd>
+
+          <dt>OkLCH</dt>
+          <dd>
+            <p><em>OkLCH</em> is the polar notation for the <strong>OkLAB</strong> colorspace.</p>
+            <p>The <em>Lightness</em> component is the <strong>perceived lightness</strong> of the color, specified in percent in range <code>0</code> and <code>100</code>. The <em>Chroma</em> component specifies how <em>colorful</em> the color is. <strong>Colorizer</strong> provides inputs based on percent. However, the value range is not really clipped! The <em>Hue</em> component is specified in <code>degree</code> in a range between <code>0</code> and <code>360</code> (<em>please note</em> that this <em>Hue</em> is not synchronized with <em>HSL's</em> or <em>HWB's</em> <em>hue</em> components!).</p>
+          </dd>
+        </dl>
+      </section>
+    </section>
     <form id="color-form">
-      <button type="submit" class="content-button">
-        <span class="focus">
-          <span class="text-wrapper">Add Color</span>
-        </span>
-      </button>
-
-      <fieldset id="color-form-rgb" class="color-form-input-method">
-        <legend>
-          <strong>RGB input</strong>
-          <span class="tooltip-anchor">
-            <button type="button" aria-label="Description of the RGB input">?</button>
-            <div class="tooltip-display" role="status"></div>
+      <div>
+        <button type="submit" class="content-button">
+          <span class="focus">
+            <span class="text-wrapper">Add Color</span>
           </span>
-        </legend>
-        <fieldset class="component-red">
-          <legend>Red component</legend>
-          <label for="color-form-rgb-r-slider" class="hide-visually">Slider to adjust red component</label>
-          <input id="color-form-rgb-r-slider" type="range" min="0" max="255" step="1" aria-describedby="color-form-rgb-tooltip">
-          <label for="color-form-rgb-r" class="hide-visually">Decimal input for red component</label>
-          <input id="color-form-rgb-r" type="text" pattern="^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$" inputmode="numeric" aria-describedby="color-form-rgb-tooltip">
-        </fieldset>
-        <fieldset class="component-green">
-          <legend>Green component</legend>
-          <label for="color-form-rgb-g-slider" class="hide-visually">Slider to adjust green component</label>
-          <input id="color-form-rgb-g-slider" type="range" min="0" max="255" step="1" aria-describedby="color-form-rgb-tooltip">
-          <label for="color-form-rgb-g" class="hide-visually">Decimal input for green component</label>
-          <input id="color-form-rgb-g" type="text" pattern="^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$" inputmode="numeric" aria-describedby="color-form-rgb-tooltip">
-        </fieldset>
-        <fieldset class="component-blue">
-          <legend>Blue component</legend>
-          <label for="color-form-rgb-b-slider" class="hide-visually">Slider to adjust blue component</label>
-          <input id="color-form-rgb-b-slider" type="range" min="0" max="255" step="1" aria-describedby="color-form-rgb-tooltip">
-          <label for="color-form-rgb-b" class="hide-visually">Decimal input for blue component</label>
-          <input id="color-form-rgb-b" type="text" pattern="^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$" inputmode="numeric" aria-describedby="color-form-rgb-tooltip">
-        </fieldset>
-        <div role="tooltip" id="color-form-rgb-tooltip" class="tooltip-content">
-          <p>The RGB input lets you specify the values for R, G and B components of the color directly.</p>
-          <p>Each of the components may be specified in a range between 0 and 255.</p>
-          <p>The values may be entered directly or using the corresponding sliders.</p>
-        </div>
-      </fieldset>
-
-      <fieldset id="color-form-hsl" class="color-form-input-method">
-        <legend>
-          <strong>HSL input</strong>
-          <span class="tooltip-anchor">
-            <button type="button" aria-label="Description of the HSL input">?</button>
-            <div class="tooltip-display" role="status"></div>
+        </button>
+        <button type="reset" class="content-button danger">
+          <span class="focus">
+            <span class="text-wrapper">Reset Form</span>
           </span>
-        </legend>
-        <fieldset class="component-hue">
-          <legend>Hue component</legend> <label for="color-form-hsl-h-slider" class="hide-visually">Slider to adjust hue component</label>
-          <input id="color-form-hsl-h-slider" type="range" min="0" max="360" step="1" aria-describedby="color-form-hsl-tooltip">
-          <label for="color-form-hsl-h" class="hide-visually">Decimal input for hue component</label>
-          <input id="color-form-hsl-h" type="text" pattern="^(NaN|360|((3[0-5][0-9]|[12][0-9]{2}|([1-9]?[0-9]{1}))(\.[0-9]+)?))$" inputmode="numeric" aria-describedby="color-form-hsl-tooltip">
-        </fieldset>
-        <fieldset class="component-saturation">
-          <legend>Saturation component</legend>
-          <label for="color-form-hsl-s-slider" class="hide-visually">Slider to adjust saturation component</label>
-          <input id="color-form-hsl-s-slider" type="range" min="0" max="100" step="0.01" aria-describedby="color-form-hsl-tooltip">
-          <label for="color-form-hsl-s" class="hide-visually">Decimal input for saturation component</label>
-          <input id="color-form-hsl-s" type="text" pattern="^(100|[1-9]?[0-9](\.[0-9]+)?)$" inputmode="numeric" aria-describedby="color-form-hsl-tooltip">
-        </fieldset>
-        <fieldset class="component-light">
-          <legend>Light component</legend>
-          <label for="color-form-hsl-l-slider" class="hide-visually">Slider to adjust light component</label>
-          <input id="color-form-hsl-l-slider" type="range" min="0" max="100" step="0.01" aria-describedby="color-form-hsl-tooltip">
-          <label for="color-form-hsl-l" class="hide-visually">Decimal input for light component</label>
-          <input id="color-form-hsl-l" type="text" pattern="^(100|[1-9]?[0-9](\.[0-9]+)?)$" inputmode="numeric" aria-describedby="color-form-hsl-tooltip">
-        </fieldset>
-        <div role="tooltip" id="color-form-hsl-tooltip" class="tooltip-content">
-          <p><strong>HSL</strong> is a different notation for the <em>sRGB</em> colorspace.</p>
-          <p>It lets you specify the <strong>Hue</strong> (H), <strong>Saturation</strong> (S) and <strong>Light</strong> (L).</p>
-          <p>While Saturation and Light are specified in percent-based values in range [0..100], the Hue is an angle in range [0..360].</p>
-          <p>The values may be entered directly or using the corresponding sliders.</p>
-        </div>
-      </fieldset>
-
-      <fieldset id="color-form-hwb" class="color-form-input-method">
-        <legend>
-          <strong>HWB input</strong>
-          <span class="tooltip-anchor">
-            <button type="button" aria-label="Description of the HWB input">?</button>
-            <div class="tooltip-display" role="status"></div>
-          </span>
-        </legend>
-        <fieldset class="component-hue">
-          <legend>Hue component</legend> <label for="color-form-hwb-h-slider" class="hide-visually">Slider to adjust hue component</label>
-          <input id="color-form-hwb-h-slider" type="range" min="0" max="360" step="1" aria-describedby="color-form-hwb-tooltip">
-          <label for="color-form-hwb-h" class="hide-visually">Decimal input for hue component</label>
-          <input id="color-form-hwb-h" type="text" pattern="^(NaN|360|((3[0-5][0-9]|[12][0-9]{2}|([1-9]?[0-9]{1}))(\.[0-9]+)?))$" inputmode="numeric" aria-describedby="color-form-hwb-tooltip">
-        </fieldset>
-        <fieldset class="component-white">
-          <legend>White component</legend>
-          <label for="color-form-hwb-w-slider" class="hide-visually">Slider to adjust white component</label>
-          <input id="color-form-hwb-w-slider" type="range" min="0" max="100" step="0.01" aria-describedby="color-form-hwb-tooltip">
-          <label for="color-form-hwb-w" class="hide-visually">Decimal input for white component</label>
-          <input id="color-form-hwb-w" type="text" pattern="^(100|[1-9]?[0-9](\.[0-9]+)?)$" inputmode="numeric" aria-describedby="color-form-hwb-tooltip">
-        </fieldset>
-        <fieldset class="component-black">
-          <legend>Black component</legend>
-          <label for="color-form-hwb-b-slider" class="hide-visually">Slider to adjust black component</label>
-          <input id="color-form-hwb-b-slider" type="range" min="0" max="100" step="0.01" aria-describedby="color-form-hwb-tooltip">
-          <label for="color-form-hwb-b" class="hide-visually">Decimal input for black component</label>
-          <input id="color-form-hwb-b" type="text" pattern="^(100|[1-9]?[0-9](\.[0-9]+)?)$" inputmode="numeric" aria-describedby="color-form-hwb-tooltip">
-        </fieldset>
-        <div role="tooltip" id="color-form-hwb-tooltip" class="tooltip-content">
-          <p><strong>HWB</strong> is a different notation for the <em>sRGB</em> colorspace.</p>
-          <p>It lets you specify the <strong>Hue</strong> (H), <strong>Whiteness</strong> (W) and <strong>Blackness</strong> (B).</p>
-          <p>While Whiteness and Blackness are specified in percent-based values in range [0..100], the Hue is an angle in range [0..360].</p>
-          <p>The values may be entered directly or using the corresponding sliders.</p>
-        </div>
-      </fieldset>
-
-      <fieldset id="color-form-oklch" class="color-form-input-method">
-        <legend>
-          <strong>Oklch input</strong>
-          <span class="tooltip-anchor">
-            <button type="button" aria-label="Description of the Oklch input">?</button>
-            <div class="tooltip-display" role="status"></div>
-          </span>
-        </legend>
-        <fieldset class="component-lightness">
-          <legend>Lightness component</legend>
-          <label for="color-form-oklch-l-slider" class="hide-visually">Slider to adjust lightness component</label>
-          <input id="color-form-oklch-l-slider" type="range" min="0" max="100" step="0.01" aria-describedby="color-form-oklch-tooltip">
-          <label for="color-form-oklch-l" class="hide-visually">Decimal input for lightness component</label>
-          <input id="color-form-oklch-l" type="text" pattern="^(100|[1-9]?[0-9](\.[0-9]+)?)$" inputmode="numeric" aria-describedby="color-form-oklch-tooltip">
-        </fieldset>
-        <fieldset class="component-chroma">
-          <legend>Chroma component</legend>
-          <label for="color-form-oklch-c-slider" class="hide-visually">Slider to adjust chroma component</label>
-          <input id="color-form-oklch-c-slider" type="range" min="0" max="100" step="0.01" aria-describedby="color-form-oklch-tooltip">
-          <label for="color-form-oklch-c" class="hide-visually">Decimal input for chroma component</label>
-          <input id="color-form-oklch-c" type="text" pattern="^(100|[1-9]?[0-9](\.[0-9]+)?)$" inputmode="numeric" aria-describedby="color-form-oklch-tooltip">
-        </fieldset>
-        <fieldset class="component-hue">
-          <legend>Hue component</legend> <label for="color-form-oklch-h-slider" class="hide-visually">Slider to adjust hue component</label>
-          <input id="color-form-oklch-h-slider" type="range" min="0" max="360" step="1" aria-describedby="color-form-oklch-tooltip">
-          <label for="color-form-oklch-h" class="hide-visually">Decimal input for hue component</label>
-          <input id="color-form-oklch-h" type="text" pattern="^(360|((3[0-5][0-9]|[12][0-9]{2}|([1-9]?[0-9]{1}))(\.[0-9]+)?))$" inputmode="numeric" aria-describedby="color-form-oklch-tooltip">
-        </fieldset>
-        <div role="tooltip" id="color-form-oklch-tooltip" class="tooltip-content">
-          <p>Oklch is the polar form of the <strong>Oklab</strong> colorspace.</p>
-          <p>It lets you specify the (perceived) <strong>Lightness</strong> (L), <strong>Chroma</strong> (C) and <strong>Hue</strong> (H).</p>
-          <p>While Lightness and Chroma are specified in percent-based values in range [0..100], the Hue is an angle in range [0..360].</p>
-          <p>The values may be entered directly or using the corresponding sliders.</p>
-        </div>
-      </fieldset>
-
-      <button type="submit" class="content-button">
-        <span class="focus">
-          <span class="text-wrapper">Add Color</span>
-        </span>
-      </button>
+        </button>
+      </div>
     </form>
   </section>
 
@@ -283,6 +189,49 @@
     </span>
   </button>
 </template>
+
+<template id="tpl-input-method">
+  <fieldset class="color-form-input-method">
+    <legend>
+      <span class="method-caption">Template input</span>
+    </legend>
+  </fieldset>
+</template>
+
+<template id="tpl-input-method-component">
+  <fieldset class="component">
+    <legend>Template component</legend>
+    <label for="slider" class="hide-visually">Slider label</label>
+    <input type="range" min="0" max="100" step="1">
+    <label for="text" class="hide-visually">Text label</label>
+    <div class="text-input-wrapper">
+      <input id="color-form-rgb-r" type="text" pattern="^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$" inputmode="numeric">
+    </div>
+  </fieldset>
+</template>
+
+<svg style="display: none">
+  <style>
+    * {
+      --icon-fill-init-color: #ff00cc;
+      --icon-stroke-init-color: #0000ff;
+      --icon-stroke-init-width: 5px;
+
+      fill-opacity: 1;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-opacity: 1;
+      stroke-miterlimit: 4;
+      stroke-dasharray: none;
+    }
+  </style>
+  <symbol id="icon-disclosure-button-indicator" viewBox="0 0 512 512">
+    <path
+      id="path0"
+      style="fill: var(--icon-fill-color, var(--icon-fill-init-color)); stroke: var(--icon-stroke-color, var(--icon-stroke-init-color));stroke-width: var(--icon-stroke-width, var(--icon-stroke-init-width))"
+      d="M 75,55 C 50,80 45,433 75,458 75,458 472,280 472,256 472,230 100,55 75,55 Z" />
+  </symbol>
+</svg>
 
   </body>
 </html>
