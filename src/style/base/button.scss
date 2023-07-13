@@ -67,16 +67,16 @@
  *  </button>
  */
 .content-button {
-  @include button-base($color-focus-on-dark-bg);
+  @include button-base(var(--this-focus, var(--if-button-focus)));
   @include content-box-shadow;
+  @include bg-gradient(
+    var(--this-bg-darkest, var(--if-button-bg-darkest)),
+    var(--this-bg-dark, var(--if-button-bg-dark)),
+    var(--this-bg-light, var(--if-button-bg-light)),
+    var(--this-bg-lightest, var(--if-button-bg-lightest))
+  );
 
-  // @include bg-gradient(
-  //   rgb(0 62 59),
-  //   rgb(0 90 50),
-  //   $color-content-button-bg,
-  //   rgb(0 150 155)
-  // );
-  @include bg-gradient-auto($color-content-button-bg);
+  // @include bg-gradient-auto($color-content-button-bg);
 
   /* prettier-ignore */
   // background: linear-gradient(
@@ -86,18 +86,15 @@
   //   rgb(0 90 86) 50% 90%,  /* not part of the palette; oklch(40% 30% 190)*/
   //   rgb(0 62 59) 95%  /* not part of the overall palette; oklch(30% 30% 190)*/
   // );
-  color: $color-content-button-fg;
+  color: var(--this-fg, var(--if-button-fg));
 
   &:hover {
-    /* prettier-ignore */
-    background: linear-gradient(
-      to bottom,
-      rgb(255 232 0) 5%,  /* not part of the palette; oklch(95% 45% 90)*/
-      $color-content-button-bg-hover 15% 40%,  /* $color-yellow!*/
-      rgb(218 166 0) 50% 90%,  /* not part of the palette; oklch(75% 45% 90)*/
-      rgb(186 134 0) 95%  /* not part of the palette; oklch(65% 45% 90)*/
-    );
-    color: $color-content-button-fg-hover;
+    --this-bg-darkest: var(--if-button-hover-bg-darkest);
+    --this-bg-dark: var(--if-button-hover-bg-dark);
+    --this-bg-light: var(--if-button-hover-bg-light);
+    --this-bg-lightest: var(--if-button-hover-bg-lightest);
+    --this-focus: var(--if-button-hover-focus);
+    --this-fg: var(--if-button-hover-fg);
   }
 }
 
@@ -107,26 +104,20 @@
  * Note the high specificity selector!
  */
 .danger.danger {
-  /* prettier-ignore */
-  background: linear-gradient(
-    to bottom,
-    rgb(249 0 0) 5%,  /* not part of the palette; oklch(60% 80% 60)*/
-    $color-danger 15% 40%,  /* $color-red*/
-    rgb(175 0 0) 50% 90%,  /* not part of the palette; oklch(40% 80% 60)*/
-    rgb(136 0 0) 95%  /* not part of the overall palette; oklch(30% 80% 60)*/
-  );
-  color: $color-light-grey;
+  --this-bg-darkest: var(--if-danger-button-bg-darkest);
+  --this-bg-dark: var(--if-danger-button-bg-dark);
+  --this-bg-light: var(--if-danger-button-bg-light);
+  --this-bg-lightest: var(--if-danger-button-bg-lightest);
+  --this-focus: var(--if-danger-button-focus);
+  --this-fg: var(--if-danger-button-fg);
 
   &:hover {
-    /* prettier-ignore */
-    background: linear-gradient(
-      to bottom,
-      rgb(255 232 0) 5%,  /* not part of the palette; oklch(95% 45% 90)*/
-      $color-content-button-bg-hover 15% 40%,  /* $color-yellow!*/
-      rgb(218 166 0) 50% 90%,  /* not part of the palette; oklch(75% 45% 90)*/
-      rgb(186 134 0) 95%  /* not part of the palette; oklch(65% 45% 90)*/
-    );
-    color: $color-content-button-fg-hover;
+    --this-bg-darkest: var(--if-button-hover-bg-darkest);
+    --this-bg-dark: var(--if-button-hover-bg-dark);
+    --this-bg-light: var(--if-button-hover-bg-light);
+    --this-bg-lightest: var(--if-button-hover-bg-lightest);
+    --this-focus: var(--if-button-hover-focus);
+    --this-fg: var(--if-button-hover-fg);
   }
 }
 

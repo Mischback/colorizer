@@ -36,5 +36,23 @@ body {
    * FIXME: Currently not in use, will require some refactoring of the
    *        button-related code!
    */
-  --if-root-tab-focus: #{$color-undefined};
+  --if-root-tab-focus: #{$color-unstyled};
+  --if-button-bg-lightest: rgb(255 0 0);
+  --if-button-bg-light: rgb(0 255 0);
+  --if-button-bg-dark: rgb(0 0 255);
+  --if-button-bg-darkest: rgb(255 0 0);
+  --if-button-focus: #{$color-unstyled};
+  --if-button-fg: #{$color-unstyled};
+  --if-button-hover-bg-lightest: #{$color-unstyled};
+  --if-button-hover-bg-light: #{$color-unstyled};
+  --if-button-hover-bg-dark: #{$color-unstyled};
+  --if-button-hover-bg-darkest: #{$color-unstyled};
+  --if-button-hover-focus: #{$color-unstyled};
+  --if-button-hover-fg: rgb(0 0 0);
+  --if-danger-button-bg-lightest: rgb(0 192 0);
+  --if-danger-button-bg-light: rgb(0 192 0);
+  --if-danger-button-bg-dark: rgb(0 192 0);
+  --if-danger-button-bg-darkest: rgb(0 192 0);
+  --if-danger-button-focus: #{$color-unstyled};
+  --if-danger-button-fg: #{$color-unstyled};
 }
