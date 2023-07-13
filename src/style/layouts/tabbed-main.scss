@@ -6,7 +6,7 @@ body {
   $main-z-index: 100;
 
   padding: 0 10px;
-  background-color: $color-body-bg;
+  background: $color-body-bg;
 
   nav {
     margin: 0;
@@ -46,8 +46,8 @@ body {
       margin-top: $active-tab-top-border-width;
       padding: 0.5em 0.5em 0.35em;
       border-radius: $tab-border-radius $tab-border-radius 0 0;
-      background: $tab-color-bg;
-      color: $tab-color-fg;
+      background: var(--if-root-tab-bg);
+      color: var(--if-root-tab-fg);
       font-size: 1.2em;
 
       &::after {
@@ -65,7 +65,7 @@ body {
         left: -$glow-size;
         width: calc(100% + $glow-size * 2);
         height: $glow-size;
-        background-color: $color-content-bg;
+        background: var(--if-main-bg);
       }
 
       /* stylelint-disable selector-max-compound-selectors */
@@ -80,12 +80,12 @@ body {
         margin-top: 0;
         border-top-width: $active-tab-top-border-width;
         border-top-color: $active-tab-top-border-color;
-        background-color: $active-tab-color-bg;
-        color: $active-tab-color-fg;
+        background: var(--if-main-bg);
+        color: var(--if-main-fg);
       }
 
       &:hover {
-        background-color: $hover-tab-color-bg;
+        background: $hover-tab-color-bg;
         color: $hover-tab-color-fg;
       }
     }
@@ -99,8 +99,8 @@ body {
     margin: 0;
     padding: 1px 1px 1em;
     border-radius: $border-radius-fraction * 2;
-    background-color: $color-content-bg;
-    color: $color-content-fg;
+    background: var(--if-main-bg);
+    color: var(--if-main-fg);
 
     > * {
       margin: 0 1em;

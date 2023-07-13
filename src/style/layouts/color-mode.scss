@@ -1,0 +1,40 @@
+// SPDX-FileCopyrightText: 2023 Mischback
+// SPDX-License-Identifier: MIT
+// SPDX-FileType: SOURCE
+
+body {
+  /* The background of the ``<main>`` container
+   *
+   * - min 3.0 with ``--if-root-tab-bg`` (WCAG 2.1 for control elements)
+   * - min 4.5 with ``--if-main-fg``
+   * - min 3.0 with ``--if-content-button-bg`` (WCAG 2.1 for control elements)
+   */
+  --if-main-bg: #{$color-teal-dim-lightest};
+
+  /* The foreground of the ``<main>`` container
+   *
+   * - min 4.5 with ``--if-main-bg``
+   */
+  --if-main-fg: #{$color-teal-dark};
+
+  /* The background of the (inactive) root tabs
+   *
+   * - min 3.0 with ``--if-root-tab-fg``
+   */
+  --if-root-tab-bg: #{$color-teal-dim};
+
+  /* The foreground of the (inactive) root tabs
+   *
+   * - min 3.0 with ``--if-root-tab-bg``
+   */
+  --if-root-tab-fg: #{$color-teal-dim-lightest};
+
+  /* The color of the focus indicator of the root tabs
+   *
+   * - min 3.0 with ``--if-root-tab-bg``
+   *
+   * FIXME: Currently not in use, will require some refactoring of the
+   *        button-related code!
+   */
+  --if-root-tab-focus: #{$color-undefined};
+}
