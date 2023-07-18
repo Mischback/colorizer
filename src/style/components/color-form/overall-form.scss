@@ -33,7 +33,8 @@
   padding: 2em 1em 1em;
   border: 0 solid transparent;
   border-radius: $border-radius-fraction * 2;
-  background: $color-content-bg-alt;
+  background: var(--if-content-bg);
+  color: var(--if-content-fg);
 
   /* This class is attached by the form's *toggle button* */
   &.hide-notation {

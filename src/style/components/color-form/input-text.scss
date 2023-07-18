@@ -16,7 +16,7 @@
     padding: 0;
     border: 0 solid transparent;
     background: transparent;
-    color: $color-content-fg;
+    color: var(--if-content-fg);
     text-align: right;
   }
 
@@ -25,7 +25,8 @@
 
     padding: 0.25em 0.5em;
     border-radius: $border-radius-fraction;
-    background: $color-content-bg-alt;
+    background: var(--if-content-bg);
+    color: var(--if-content-fg);
 
     &:hover {
       background: $color-content-bg-dim;
@@ -50,7 +51,6 @@
 #color-form-rgb {
   input[type="text"] {
     /* purgecss ignore current */
-
     width: 3em;
   }
 }
