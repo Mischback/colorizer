@@ -7,7 +7,6 @@ body {
    *
    * - min 3.0 with ``--if-root-tab-bg`` (WCAG 2.1 for control elements)
    * - min 4.5 with ``--if-main-fg``
-   * - min 3.0 with ``--if-content-button-bg`` (WCAG 2.1 for control elements)
    * - min 3.0 with ``--if-button-bg-light`` / ``--if-button-bg-dark``
    * - min 3.0 with ``--if-button-hover-bg-light`` / ``--if-button-hover-bg-dark``
    * - min 3.0 with ``--if-danger-button-bg-light`` / ``--if-danger-button-bg-dark``
@@ -41,6 +40,24 @@ body {
    */
   --if-root-tab-focus: #{$color-unstyled};
 
+  /* Background color of card-like containers/boxes.
+   *
+   * This is more of a styling-related setting, there is no minimum contrast-ratio required to
+   * ``--if-main-bg``.
+   *
+   * - min 4.5 with ``--if-content-fg``
+   * - min 3.0 with ``--if-button-bg-light`` / ``--if-button-bg-dark``
+   * - min 3.0 with ``--if-button-hover-bg-light`` / ``--if-button-hover-bg-dark``
+   * - min 3.0 with ``--if-danger-button-bg-light`` / ``--if-danger-button-bg-dark``
+   */
+  --if-content-bg: #{$color-unstyled};
+
+  /* Foreground/text color of card-like containers/boxes.
+   *
+   * - min 4.5 with ``--if-content-bg``
+   */
+  --if-content-fg: rgb(0 0 0);
+
   /* The background of the default button.
    *
    * This is meant to be a visible four-step gradient. *lightest* and *darkest*
@@ -48,6 +65,7 @@ body {
    * contrast requirements are to be applied to *light* and *dark*.
    *
    * - min 3.0 with ``--if-main-bg``
+   * - min 3.0 with ``--if-content-bg``
    * - min 3.0 with ``--if-button-focus``
    * - min 3.0 with ``--if-button-fg``
    */
@@ -75,6 +93,7 @@ body {
    * contrast requirements are to be applied to *light* and *dark*.
    *
    * - min 3.0 with ``--if-main-bg``
+   * - min 3.0 with ``--if-content-bg``
    * - min 3.0 with ``--if-button-hover-focus``
    * - min 3.0 with ``--if-button-hover-fg``
    */
@@ -104,6 +123,7 @@ body {
    * contrast requirements are to be applied to *light* and *dark*.
    *
    * - min 3.0 with ``--if-main-bg``
+   * - min 3.0 with ``--if-content-bg``
    * - min 3.0 with ``--if-button-focus``
    * - min 3.0 with ``--if-button-fg``
    */
