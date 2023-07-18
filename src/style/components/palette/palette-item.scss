@@ -12,7 +12,8 @@
     margin-bottom: 1em;
     padding: 0.5em 0.25em 0.5em 3.5em;
     border-radius: $border-radius-fraction;
-    background: $color-content-bg-alt;
+    background: var(--if-content-bg);
+    color: var(--if-content-fg);
 
     > * {
       margin: 0;
@@ -25,7 +26,7 @@
       width: 3em;
       height: 100%;
       border-radius: $border-radius-fraction 0 0 $border-radius-fraction;
-      background-color: color(
+      background: color(
         xyz var(--palette-item-color-x) var(--palette-item-color-y)
           var(--palette-item-color-z)
       );
@@ -82,7 +83,7 @@
 
       > .rgb .preview {
         /* purgecss ignore current */
-        background-color: rgb(
+        background: rgb(
           var(--color-component-a) var(--color-component-b)
             var(--color-component-c)
         );
@@ -90,12 +91,12 @@
 
       > .rgb-hex .preview {
         /* purgecss ignore current */
-        background-color: var(--color-component-rgb-hex);
+        background: var(--color-component-rgb-hex);
       }
 
       > .hsl .preview {
         /* purgecss ignore current */
-        background-color: hsl(
+        background: hsl(
           var(--color-component-a) var(--color-component-b)
             var(--color-component-c)
         );
@@ -103,7 +104,7 @@
 
       > .hwb .preview {
         /* purgecss ignore current */
-        background-color: hwb(
+        background: hwb(
           var(--color-component-a) var(--color-component-b)
             var(--color-component-c)
         );
@@ -111,7 +112,7 @@
 
       > .oklch .preview {
         /* purgecss ignore current */
-        background-color: oklch(
+        background: oklch(
           var(--color-component-a) var(--color-component-b)
             var(--color-component-c)
         );
@@ -119,7 +120,7 @@
 
       > .xyz .preview {
         /* purgecss ignore current */
-        background-color: color(
+        background: color(
           xyz var(--color-component-a) var(--color-component-b)
             var(--color-component-c)
         );
