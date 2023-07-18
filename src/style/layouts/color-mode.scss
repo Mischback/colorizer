@@ -50,13 +50,13 @@ body {
    * - min 3.0 with ``--if-button-hover-bg-light`` / ``--if-button-hover-bg-dark``
    * - min 3.0 with ``--if-danger-button-bg-light`` / ``--if-danger-button-bg-dark``
    */
-  --if-content-bg: #{$color-unstyled};
+  --if-content-bg: #{$color-teal-dim-lighter};
 
   /* Foreground/text color of card-like containers/boxes.
    *
    * - min 4.5 with ``--if-content-bg``
    */
-  --if-content-fg: rgb(0 0 0);
+  --if-content-fg: #{$color-teal-dark};
 
   /* The background of the default button.
    *
@@ -69,22 +69,22 @@ body {
    * - min 3.0 with ``--if-button-focus``
    * - min 3.0 with ``--if-button-fg``
    */
-  --if-button-bg-lightest: rgb(255 0 0);
-  --if-button-bg-light: rgb(0 255 0);
-  --if-button-bg-dark: rgb(0 0 255);
-  --if-button-bg-darkest: rgb(255 0 0);
+  --if-button-bg-lightest: #{$color-teal-dim-light};
+  --if-button-bg-light: #{$color-teal-dim};
+  --if-button-bg-dark: #{$color-teal-dim-dark};
+  --if-button-bg-darkest: #{$color-teal-dim-darker};
 
   /* Focus indicator of the default button.
    *
    * - min 3.0 with ``--if-button-bg-light`` / ``--if-button-bg-dark``
    */
-  --if-button-focus: #{$color-unstyled};
+  --if-button-focus: #{$color-yellow};
 
   /* Foreground / text color of the default button.
    *
    * - min 3.0 with ``--if-button-bg-light`` / ``--if-button-bg-dark``
    */
-  --if-button-fg: #{$color-unstyled};
+  --if-button-fg: #{$color-light-grey};
 
   /* The background of all buttons' ``:hover`` state.
    *
@@ -127,20 +127,20 @@ body {
    * - min 3.0 with ``--if-button-focus``
    * - min 3.0 with ``--if-button-fg``
    */
-  --if-danger-button-bg-lightest: rgb(0 192 0);
-  --if-danger-button-bg-light: rgb(0 192 0);
-  --if-danger-button-bg-dark: rgb(0 192 0);
-  --if-danger-button-bg-darkest: rgb(0 192 0);
+  --if-danger-button-bg-lightest: #{$color-red-light};
+  --if-danger-button-bg-light: #{$color-red};
+  --if-danger-button-bg-dark: #{$color-red-dark};
+  --if-danger-button-bg-darkest: #{$color-red-darkest};
 
   /* Focus indicator of the **danger** button.
    *
    * - min 3.0 with ``--if-danger-button-bg-light`` / ``--if-danger-button-bg-dark``
    */
-  --if-danger-button-focus: #{$color-unstyled};
+  --if-danger-button-focus: #{$color-yellow};
 
   /* Foreground / text color of the **danger** button.
    *
    * - min 3.0 with ``--if-danger-button-bg-light`` / ``--if-danger-button-bg-dark``
    */
-  --if-danger-button-fg: #{$color-unstyled};
+  --if-danger-button-fg: #{$color-light-grey};
 }
