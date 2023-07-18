@@ -8,6 +8,9 @@ body {
    * - min 3.0 with ``--if-root-tab-bg`` (WCAG 2.1 for control elements)
    * - min 4.5 with ``--if-main-fg``
    * - min 3.0 with ``--if-content-button-bg`` (WCAG 2.1 for control elements)
+   * - min 3.0 with ``--if-button-bg-light`` / ``--if-button-bg-dark``
+   * - min 3.0 with ``--if-button-hover-bg-light`` / ``--if-button-hover-bg-dark``
+   * - min 3.0 with ``--if-danger-button-bg-light`` / ``--if-danger-button-bg-dark``
    */
   --if-main-bg: #{$color-teal-dim-lightest};
 
@@ -37,22 +40,87 @@ body {
    *        button-related code!
    */
   --if-root-tab-focus: #{$color-unstyled};
+
+  /* The background of the default button.
+   *
+   * This is meant to be a visible four-step gradient. *lightest* and *darkest*
+   * are very thin, they are not required to pass WCAG contrast ratios. The following
+   * contrast requirements are to be applied to *light* and *dark*.
+   *
+   * - min 3.0 with ``--if-main-bg``
+   * - min 3.0 with ``--if-button-focus``
+   * - min 3.0 with ``--if-button-fg``
+   */
   --if-button-bg-lightest: rgb(255 0 0);
   --if-button-bg-light: rgb(0 255 0);
   --if-button-bg-dark: rgb(0 0 255);
   --if-button-bg-darkest: rgb(255 0 0);
+
+  /* Focus indicator of the default button.
+   *
+   * - min 3.0 with ``--if-button-bg-light`` / ``--if-button-bg-dark``
+   */
   --if-button-focus: #{$color-unstyled};
+
+  /* Foreground / text color of the default button.
+   *
+   * - min 3.0 with ``--if-button-bg-light`` / ``--if-button-bg-dark``
+   */
   --if-button-fg: #{$color-unstyled};
+
+  /* The background of all buttons' ``:hover`` state.
+   *
+   * This is meant to be a visible four-step gradient. *lightest* and *darkest*
+   * are very thin, they are not required to pass WCAG contrast ratios. The following
+   * contrast requirements are to be applied to *light* and *dark*.
+   *
+   * - min 3.0 with ``--if-main-bg``
+   * - min 3.0 with ``--if-button-hover-focus``
+   * - min 3.0 with ``--if-button-hover-fg``
+   */
   --if-button-hover-bg-lightest: #{$color-unstyled};
   --if-button-hover-bg-light: #{$color-unstyled};
   --if-button-hover-bg-dark: #{$color-unstyled};
   --if-button-hover-bg-darkest: #{$color-unstyled};
+
+  /* Focus indicator of all buttons' ``:hover`` state.
+   *
+   * - min 3.0 with ``--if-button-hover-bg-light`` / ``--if-button-hover-bg-dark``
+   */
   --if-button-hover-focus: #{$color-unstyled};
+
+  /* Foreground / text color of all buttons' ``:hover`` state.
+   *
+   * - min 3.0 with ``--if-button-hover-bg-light`` / ``--if-button-hover-bg-dark``
+   */
   --if-button-hover-fg: rgb(0 0 0);
+
+  /* The background of the **danger** button.
+   *
+   * **Danger buttons** are used for non-recoverable actions, like deleting an item.
+   *
+   * This is meant to be a visible four-step gradient. *lightest* and *darkest*
+   * are very thin, they are not required to pass WCAG contrast ratios. The following
+   * contrast requirements are to be applied to *light* and *dark*.
+   *
+   * - min 3.0 with ``--if-main-bg``
+   * - min 3.0 with ``--if-button-focus``
+   * - min 3.0 with ``--if-button-fg``
+   */
   --if-danger-button-bg-lightest: rgb(0 192 0);
   --if-danger-button-bg-light: rgb(0 192 0);
   --if-danger-button-bg-dark: rgb(0 192 0);
   --if-danger-button-bg-darkest: rgb(0 192 0);
+
+  /* Focus indicator of the **danger** button.
+   *
+   * - min 3.0 with ``--if-danger-button-bg-light`` / ``--if-danger-button-bg-dark``
+   */
   --if-danger-button-focus: #{$color-unstyled};
+
+  /* Foreground / text color of the **danger** button.
+   *
+   * - min 3.0 with ``--if-danger-button-bg-light`` / ``--if-danger-button-bg-dark``
+   */
   --if-danger-button-fg: #{$color-unstyled};
 }
