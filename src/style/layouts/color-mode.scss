@@ -58,6 +58,33 @@ body {
    */
   --if-content-fg: #{$color-teal-dark};
 
+  /* The background of text inputs.
+   *
+   * Note: For the ``color-form`` this is not applied to the actual ``<input>``
+   *       element but rather the ``.text-input-wrapper`` container.
+   *
+   * - min 4.5 with ``--if-text-input-fg``
+   */
+  --if-text-input-bg: #{$color-teal-dim-lighter};
+
+  /* The foreground/text color of text inputs.
+   *
+   * - min 4.5 with ``--if-text-input-bg``
+   */
+  --if-text-input-fg: #{$color-teal-dark};
+
+  /* The background of ``<legend>`` elements.
+   *
+   * - min 3.0 with ``--if-form-fieldset-legend-fg``
+   */
+  --if-form-fieldset-legend-bg: #{$color-teal-dim};
+
+  /* The foreground/text color of ``<legend>`` elements.
+   *
+   * - min 3.0 with ``--if-form-fieldset-legend-bg``
+   */
+  --if-form-fieldset-legend-fg: #{$color-teal-dim-lightest};
+
   /* The background of the default button.
    *
    * This is meant to be a visible four-step gradient. *lightest* and *darkest*

@@ -8,10 +8,11 @@
 
     .disclosure-button {
       @include content-box-shadow;
-      @include bg-gradient-auto($color-form-legend-bg);
 
       margin-left: 3em;
-      color: $color-form-legend-fg;
+
+      // FIXME: Styling of disclosure buttons
+      color: $color-unstyled;
     }
   }
 

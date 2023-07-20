@@ -50,8 +50,8 @@
     right: 1em;
     padding: 0.25em 0.5em;
     border-radius: $border-radius-fraction;
-    background: $color-form-legend-bg;
-    color: $color-form-legend-fg;
+    background: var(--if-form-fieldset-legend-bg);
+    color: var(--if-form-fieldset-legend-fg);
 
     > .method-caption {
       font-weight: bold;

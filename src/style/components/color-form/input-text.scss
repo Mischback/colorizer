@@ -16,7 +16,7 @@
     padding: 0;
     border: 0 solid transparent;
     background: transparent;
-    color: var(--if-content-fg);
+    color: var(--if-text-input-fg);
     text-align: right;
   }
 
@@ -25,8 +25,8 @@
 
     padding: 0.25em 0.5em;
     border-radius: $border-radius-fraction;
-    background: var(--if-content-bg);
-    color: var(--if-content-fg);
+    background: var(--if-text-input-bg);
+    color: var(--if-text-input-fg);
 
     &:hover {
       background: $color-content-bg-dim;
