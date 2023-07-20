@@ -76,16 +76,6 @@
     var(--this-bg-lightest, var(--if-button-bg-lightest))
   );
 
-  // @include bg-gradient-auto($color-content-button-bg);
-
-  /* prettier-ignore */
-  // background: linear-gradient(
-  //   to bottom,
-  //   rgb(0 150 144) 5%,  /* not part of the palette; oklch(60% 30% 190)*/
-  //   $color-content-button-bg 15% 40%,  /* $color-teal*/
-  //   rgb(0 90 86) 50% 90%,  /* not part of the palette; oklch(40% 30% 190)*/
-  //   rgb(0 62 59) 95%  /* not part of the overall palette; oklch(30% 30% 190)*/
-  // );
   color: var(--this-fg, var(--if-button-fg));
 
   &:hover {
@@ -134,9 +124,11 @@
  *  </button>
  */
 .toggle-button {
-  @include button-base($color-focus-on-light-bg);
+  // FIXME: Styling of toggle buttons
+  @include button-base($color-unstyled);
 
-  color: $color-content-fg;
+  // FIXME: Styling of toggle buttons
+  color: $color-unstyled;
 
   .toggle-base {
     @include content-box-shadow;
@@ -180,8 +172,9 @@
     }
   }
 
+  // FIXME: Styling of toggle buttons
   &:hover .text-wrapper {
-    border-bottom-color: $color-content-fg;
+    border-bottom-color: $color-unstyled;
   }
 
   &[aria-pressed="false"] .toggle-base {
@@ -203,9 +196,11 @@
 }
 
 .disclosure-button {
-  @include button-base($color-focus-on-light-bg);
+  // FIXME: Styling of disclosure buttons
+  @include button-base($color-unstyled);
 
-  color: $color-content-fg;
+  // FIXME: Styling of disclosure buttons
+  color: $color-unstyled;
 
   svg {
     width: 1.25em;
@@ -234,6 +229,7 @@
   }
 
   &:hover .text-wrapper {
-    border-bottom-color: $color-content-fg;
+    // FIXME: Styling of disclosure buttons
+    border-bottom-color: $color-unstyled;
   }
 }

@@ -63,7 +63,9 @@ $color-form-input-range-thumb-size: 0.85 * $color-form-input-text-size;
     background: transparent;
 
     &:focus {
-      outline: $color-focus-on-light-bg solid $focus-outline-width;
+      // Note: The color variable may be named *text-input*, but semantically
+      //       it is applicable here!
+      outline: var(--if-text-input-focus) solid $focus-outline-width;
       outline-offset: 5px;
     }
 

@@ -17,15 +17,10 @@ body {
   #tabs-root {
     $active-tab-top-border-width: 3px;
     $active-tab-top-border-color: $color-red-light;
-    $active-tab-color-bg: $color-content-bg;
-    $active-tab-color-fg: $color-content-fg;
-    $focus-tab-color: $color-focus-on-light-bg;
     $focus-tab-width: 2px;
     $hover-tab-color-bg: $color-yellow;
     $hover-tab-color-fg: $color-teal-dark;
     $tab-border-radius: $border-radius-fraction;
-    $tab-color-bg: $color-content-bg-dim;
-    $tab-color-fg: $color-content-bg;
 
     @include horizontal-list;
 
@@ -37,7 +32,7 @@ body {
 
     /* These are the actual *tabs* */
     [role="tab"] {
-      @include button-base($color-focus-on-light-bg);
+      @include button-base(var(--if-root-tab-focus));
       @include root-element-shadow;
 
       position: relative;

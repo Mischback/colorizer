@@ -29,20 +29,20 @@
     color: var(--if-text-input-fg);
 
     &:hover {
-      background: $color-content-bg-dim;
+      background: var(--if-text-input-hover-bg);
 
       > input[type="text"] {
-        color: $color-content-button-fg;
+        color: var(--if-text-input-hover-fg);
       }
     }
 
     &:focus-within {
-      outline: $color-focus-on-light-bg solid $focus-outline-width;
+      outline: var(--if-text-input-focus) solid $focus-outline-width;
       outline-offset: 3px;
-      background: $color-content-bg-dim;
+      background: var(--if-text-input-hover-bg);
 
       > input[type="text"] {
-        color: $color-content-button-fg;
+        color: var(--if-text-input-hover-fg);
       }
     }
   }

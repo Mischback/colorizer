@@ -34,11 +34,8 @@ body {
   /* The color of the focus indicator of the root tabs
    *
    * - min 3.0 with ``--if-root-tab-bg``
-   *
-   * FIXME: Currently not in use, will require some refactoring of the
-   *        button-related code!
    */
-  --if-root-tab-focus: #{$color-unstyled};
+  --if-root-tab-focus: #{$color-red-light};
 
   /* Background color of card-like containers/boxes.
    *
@@ -72,6 +69,28 @@ body {
    * - min 4.5 with ``--if-text-input-bg``
    */
   --if-text-input-fg: #{$color-teal-dark};
+
+  /* The background-color of text inputs on hover.
+   *
+   * - min 4.5 with ``--if-text-input-hover-fg``
+   */
+  --if-text-input-hover-bg: #{$color-teal-dim};
+
+  /* The foreground/text color of text inputs on hover.
+   *
+   * - min 4.5 with ``--if-text-input-hover-bg``
+   */
+  --if-text-input-hover-fg: #{$color-teal-light};
+
+  /* Focus indicator of the text inputs.
+   *
+   * Note: The focus indicator is applied to the ``.text-input-wrapper``
+   *       container. The container's [surrounding color] *should be*
+   *       ``--if-content-bg``.
+   *
+   * - min 3.0 with the [surrounding color]
+   */
+  --if-text-input-focus: #{$color-red-light};
 
   /* The background of ``<legend>`` elements.
    *
