@@ -53,8 +53,6 @@ $element-shadow-as-outline: 0 0 2px 1px $color-teal-dark;
  * - ``dark``: the base color with -5% in OkLCH's ``L``
  * - ``light``: the base color with +5% in OkLCH's ``L``
  * - ``lightest``: the base color with +15% in OkLCH's ``L``
- *
- * If this manual approach seems overdone, see ``bg-gradient-auto``mixin below.
  */
 @mixin bg-gradient($darkest, $dark, $light, $lightest) {
   background: linear-gradient(
@@ -63,24 +61,5 @@ $element-shadow-as-outline: 0 0 2px 1px $color-teal-dark;
     $light 5% 48%,
     $dark 52% 95%,
     $darkest 96% 100%
-  );
-}
-
-/**
- * Coherent background-gradient with automatically calculated shades.
- *
- * This mixin uses the *HSL sRGB* notation to adjust the ``lightness`` of the
- * color. This is not as exact as adjusting OkLCH's ``L`` component, as *HSL*
- * is not meant to provide *perceived lightness* of colors in its ``L``
- * component.
- *
- * See ``bg-gradient`` mixin for a more manual approach.
- */
-@mixin bg-gradient-auto($color) {
-  @include bg-gradient(
-    color.scale($color, $lightness: -15%),
-    color.scale($color, $lightness: -8%),
-    color.scale($color, $lightness: 7%),
-    color.scale($color, $lightness: 15%)
   );
 }

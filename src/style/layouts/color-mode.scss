@@ -191,4 +191,11 @@ body {
    * - min 3.0 with ``--if-danger-button-bg-light`` / ``--if-danger-button-bg-dark``
    */
   --if-danger-button-fg: #{$color-light-grey};
+
+  /* Colors for the **toggle** buttons.
+   *
+   */
+  --if-toggle-button-off: #{$color-red};
+  --if-toggle-button-on: #{$color-green};
+  --if-toggle-button-undefined: #{$color-light-grey};
 }

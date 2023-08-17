@@ -132,7 +132,6 @@
 
   .toggle-base {
     @include content-box-shadow;
-    @include bg-gradient-auto($color-light-grey);
 
     display: inline-block;
     position: relative;
@@ -141,6 +140,7 @@
     margin: 0 0.5em 0 0.1em;
     padding: 0;
     border-radius: 0.5em;
+    background: var(--if-toggle-button-undefined);
 
     // Note: Transition timings have to be synchronized with ``toggle-thumb``!
 
@@ -178,7 +178,7 @@
   }
 
   &[aria-pressed="false"] .toggle-base {
-    @include bg-gradient-auto($color-off);
+    background: var(--if-toggle-button-off);
 
     > .toggle-thumb {
       left: -0.1em;
@@ -186,7 +186,7 @@
   }
 
   &[aria-pressed="true"] .toggle-base {
-    @include bg-gradient-auto($color-on);
+    background: var(--if-toggle-button-on);
 
     > .toggle-thumb {
       // Note: Actually this is ``100% - [width of thumb] + [offset]``
@@ -219,13 +219,13 @@
 
     use {
       /* purgecss ignore current */
-      --icon-fill-color: #{$color-on};
+      --icon-fill-color: var(--if-toggle-button-on);
     }
   }
 
   &[aria-pressed="false"] svg use {
     /* purgecss ignore current */
-    --icon-fill-color: #{$color-off};
+    --icon-fill-color: var(--if-toggle-button-off);
   }
 
   &:hover .text-wrapper {
