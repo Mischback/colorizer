@@ -3,6 +3,8 @@
 // SPDX-FileType: SOURCE
 
 body {
+  --if-body-bg: #{$color-teal-dim-darkest};
+
   /* The background of the ``<main>`` container
    *
    * - min 3.0 with ``--if-root-tab-bg`` (WCAG 2.1 for control elements)

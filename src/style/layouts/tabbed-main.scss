@@ -6,7 +6,7 @@ body {
   $main-z-index: 100;
 
   padding: 0 10px;
-  background: $color-body-bg;
+  background: var(--if-body-bg);
 
   nav {
     margin: 0;
