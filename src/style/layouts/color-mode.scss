@@ -194,6 +194,8 @@ body {
 
   /* Colors for the **toggle** buttons.
    *
+   * - min 3.0 with ``--if-main-bg``
+   * - min 3.0 with ``--if-content-bg``
    */
   --if-toggle-button-off: #{$color-red};
   --if-toggle-button-on: #{$color-green};

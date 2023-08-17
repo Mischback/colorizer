@@ -16,6 +16,14 @@
     }
   }
 
+  .toggle-button {
+    color: var(--if-content-fg);
+
+    &:hover .text-wrapper {
+      border-bottom-color: var(--if-content-fg);
+    }
+  }
+
   .disclosure-content {
     @include content-box-shadow;
 

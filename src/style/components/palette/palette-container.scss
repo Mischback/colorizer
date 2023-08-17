@@ -10,4 +10,12 @@
   .notations-toggles {
     @include notation-toggles;
   }
+
+  .toggle-button {
+    color: var(--if-content-fg);
+
+    &:hover .text-wrapper {
+      border-bottom-color: var(--if-content-fg);
+    }
+  }
 }
